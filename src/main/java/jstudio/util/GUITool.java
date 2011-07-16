@@ -14,27 +14,6 @@ import javax.swing.JTextField;
 
 public class GUITool {
 	
-	public static void createPanel(Object o, boolean editable){
-		//TODO: create panel
-		for(Field f: o.getClass().getFields()){
-			String fname = f.getName();
-			fname = fname.substring(0,1).toUpperCase() + fname.substring(1);
-			Class c = f.getType();
-			String setter = "set"+fname;
-			String getter = "get"+fname;
-			try {
-				o.getClass().getMethod(setter, c);
-				o.getClass().getMethod(getter, c);
-				//TODO: if method exists, add the field to the panel
-				//TODO: add listener to fields
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (NoSuchMethodException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-	
 	public static void appendContainer(Container c, GridBagConstraints gc, Container f){
 		int ow = gc.gridwidth; //store old weight
 		gc.gridwidth=2;
@@ -93,7 +72,7 @@ public class GUITool {
 	public static JTextField createField(Container c, GridBagConstraints gc, String label, String value, boolean editable){
 		JTextField f = new JTextField(value);
 		f.setEditable(editable);
-		f.setColumns(1);
+		f.setColumns(0);
 		gc.gridy++;
 		JLabel l = new JLabel(label);
 		l.setHorizontalAlignment(JLabel.RIGHT);

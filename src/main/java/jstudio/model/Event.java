@@ -15,8 +15,18 @@ public class Event implements DatabaseObject {
 	private Person person;
 	private String description;
 	
+	private static final String[] labels = new String[]{
+		"Date",
+		"Person",
+		"Description"
+	};
+	
 	public Event(){
 	
+	}
+	
+	public String[] getLabels(){
+		return labels;
 	}
 	
 	public void setId(Long id) {
