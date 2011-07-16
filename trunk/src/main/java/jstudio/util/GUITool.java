@@ -2,6 +2,8 @@ package jstudio.util;
 
 import java.awt.Container;
 import java.awt.GridBagConstraints;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -11,6 +13,27 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class GUITool {
+	
+	public static void createPanel(Object o, boolean editable){
+		//TODO: create panel
+		for(Field f: o.getClass().getFields()){
+			String fname = f.getName();
+			fname = fname.substring(0,1).toUpperCase() + fname.substring(1);
+			Class c = f.getType();
+			String setter = "set"+fname;
+			String getter = "get"+fname;
+			try {
+				o.getClass().getMethod(setter, c);
+				o.getClass().getMethod(getter, c);
+				//TODO: if method exists, add the field to the panel
+				//TODO: add listener to fields
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	public static void appendContainer(Container c, GridBagConstraints gc, Container f){
 		int ow = gc.gridwidth; //store old weight
