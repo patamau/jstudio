@@ -3,9 +3,14 @@ package jstudio.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -32,6 +37,26 @@ public class ContactsPanel
 	private JButton refreshButton;
 	private JTextField filterField;
 	private JStudioGUI gui;
+	private JPopupMenu popup;
+	
+	class PopupListener extends MouseAdapter {
+	    public void mousePressed(MouseEvent e) {
+	        maybeShowPopup(e);
+	    }
+
+	    public void mouseReleased(MouseEvent e) {
+	        maybeShowPopup(e);
+	    }
+
+	    private void maybeShowPopup(MouseEvent e) {
+	        if (e.isPopupTrigger()) {
+	        	int row = table.rowAtPoint(e.getPoint());
+	        	Person p = (Person)model.getValueAt(row, 0);
+	        	table.setRowSelectionInterval(row, row);
+	            popup.show(e.getComponent(), e.getX(), e.getY());
+	        }
+	    }
+	}
 	
 	public ContactsPanel(JStudioGUI gui){
 		this.gui = gui;
@@ -55,19 +80,27 @@ public class ContactsPanel
 		filterField.addActionListener(this);
 		actionPanel.add(filterField);
 		this.add(actionPanel, BorderLayout.NORTH);
+		
+		popup = new JPopupMenu();
+	    JMenuItem menuItem = new JMenuItem("View");
+	    menuItem.addActionListener(this);
+	    popup.add(menuItem);
+	    menuItem = new JMenuItem("Edit");
+	    menuItem.addActionListener(this);
+	    popup.add(menuItem);
+	    table.addMouseListener(new PopupListener());
 	}
 	
 	public void valueChanged(ListSelectionEvent event) {
         int viewRow = table.getSelectedRow();
-        if (0<=viewRow){        	
-        	//TODO: what?
-            //new PersonPanel((Person)table.getValueAt(viewRow, 0),false));
+        if (0<=viewRow){        
+            setSelectedPerson((Person)table.getValueAt(viewRow, 0));
         }
     }
 	
 	public void setSelectedPerson(Person p){
-		//TODO: ok so what?
-		new PersonPanel(p, false);
+		JDialog dialog = PersonPanel.createDialog(gui, p, false);
+		dialog.setVisible(true);
 	}
 	
 	public synchronized void clear(){
