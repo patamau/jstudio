@@ -53,7 +53,6 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 	private Contacts contacts;
 	
 	public JStudio(){
-		//
 	}
 	
 	private void initializeGUI(){
