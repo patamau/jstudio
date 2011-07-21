@@ -37,26 +37,6 @@ public class ContactsPanel
 	private JButton refreshButton;
 	private JTextField filterField;
 	private JStudioGUI gui;
-	private JPopupMenu popup;
-	
-	class PopupListener extends MouseAdapter {
-	    public void mousePressed(MouseEvent e) {
-	        maybeShowPopup(e);
-	    }
-
-	    public void mouseReleased(MouseEvent e) {
-	        maybeShowPopup(e);
-	    }
-
-	    private void maybeShowPopup(MouseEvent e) {
-	        if (e.isPopupTrigger()) {
-	        	int row = table.rowAtPoint(e.getPoint());
-	        	Person p = (Person)model.getValueAt(row, 0);
-	        	table.setRowSelectionInterval(row, row);
-	            popup.show(e.getComponent(), e.getX(), e.getY());
-	        }
-	    }
-	}
 	
 	public ContactsPanel(JStudioGUI gui){
 		this.gui = gui;
@@ -81,20 +61,13 @@ public class ContactsPanel
 		actionPanel.add(filterField);
 		this.add(actionPanel, BorderLayout.NORTH);
 		
-		popup = new JPopupMenu();
-	    JMenuItem menuItem = new JMenuItem("View");
-	    menuItem.addActionListener(this);
-	    popup.add(menuItem);
-	    menuItem = new JMenuItem("Edit");
-	    menuItem.addActionListener(this);
-	    popup.add(menuItem);
-	    table.addMouseListener(new PopupListener());
+	    table.addMouseListener(new PopupListener<Person>(table, new PersonPopup(this.gui)));
 	}
 	
 	public void valueChanged(ListSelectionEvent event) {
         int viewRow = table.getSelectedRow();
         if (0<=viewRow){        
-            setSelectedPerson((Person)table.getValueAt(viewRow, 0));
+            //setSelectedPerson((Person)table.getValueAt(viewRow, 0));
         }
     }
 	

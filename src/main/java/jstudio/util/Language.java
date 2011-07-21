@@ -254,8 +254,13 @@ public class Language {
 			}
 		}
 		lman.languages.clear();
-		if(!lman.lroot.exists()) return; //ignore if no such root exists
+		if(!lman.lroot.exists()){
+			if(!lman.lroot.mkdir()){
+				return; //ignore if no such root exists or cannot be created
+			}
+		}
 		File[] lfiles = lman.lroot.listFiles(lman.lfilter);
+		if(lfiles!=null)
 		for(File lf:lfiles){
 			String c = getCode(lf.getName());
 			LanguageDescriptor ldesc = new LanguageDescriptor(lf,getLocale(c));

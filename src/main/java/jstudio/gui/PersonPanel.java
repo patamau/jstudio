@@ -46,7 +46,7 @@ public class PersonPanel extends JPanel implements ActionListener {
 	/**
 	 * Creates a specific dialog for the person,
 	 * handling specifically changes, removal and additional links
-	 * The dialog is not modal
+	 * The dialog is modal if it is editable
 	 * @param parent
 	 * @return
 	 */
@@ -54,9 +54,9 @@ public class PersonPanel extends JPanel implements ActionListener {
 		if(dialog==null){
 			dialog = new JDialog(parent);
 			dialog.setTitle(Language.string("Person dialog"));
-			dialog.setModal(false);
 			dialog.getContentPane().setLayout(new BorderLayout());
 		}
+		dialog.setModal(editable);
 		dialog.getContentPane().removeAll();
 		dialog.getContentPane().add(new PersonPanel(p, editable),BorderLayout.CENTER);
 		dialog.pack();
