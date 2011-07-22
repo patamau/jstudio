@@ -32,7 +32,7 @@ public class Event implements DatabaseObject {
 		return id;
 	}
 	
-	public Date getDate() throws ParseException{
+	public Date getDate(){
 		return date;
 	}
 	

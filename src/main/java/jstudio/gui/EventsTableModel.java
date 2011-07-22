@@ -3,7 +3,6 @@ package jstudio.gui;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import jstudio.model.Person;
 import jstudio.util.Language;
 import jstudio.util.TableSorter;
 
@@ -21,6 +20,7 @@ public class EventsTableModel extends DefaultTableModel {
 		table.setModel(ts);
 		ts.setSortingStatus(0, TableSorter.ASCENDING);
 		table.getColumn("Time").setMaxWidth(50);
+		table.getColumn("Time").setMinWidth(50);
 	}
 
 	public boolean isCellEditable(int row, int col){
@@ -29,8 +29,6 @@ public class EventsTableModel extends DefaultTableModel {
 	
 	public Class<?> getColumnClass(int col){
 		switch(col){
-		case 0: return Long.class;
-		case 2: return Person.class;
 		default: return String.class;
 		}
 	}
