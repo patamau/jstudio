@@ -24,7 +24,7 @@ public interface DatabaseInterface {
 	public void connect(String host, String table, String user, String pass);
 	public boolean isConnected();
 	public DatabaseObject store(String table, DatabaseObject o);
-	public List getAll(String table);
+	public List<?> getAll(String table);
 	public DatabaseObject get(String table, int id);
-	public List getAll(String table, HashMap<String, String> values);
+	public List<?> getAll(String table, HashMap<String, String> values);
 }

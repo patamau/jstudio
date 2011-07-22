@@ -1,7 +1,5 @@
 package jstudio.gui;
 
-import java.util.Date;
-
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 

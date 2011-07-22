@@ -2,13 +2,9 @@ package jstudio;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.Date;
 
 import javax.swing.JOptionPane;
 import javax.swing.JWindow;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import jstudio.control.Agenda;
 import jstudio.control.Contacts;
@@ -16,11 +12,13 @@ import jstudio.db.DatabaseInterface;
 import jstudio.db.HibernateDB;
 import jstudio.gui.IconPanel;
 import jstudio.gui.JStudioGUI;
-import jstudio.model.Person;
 import jstudio.util.Configuration;
 import jstudio.util.FilteredStream;
 import jstudio.util.Language;
 import jstudio.util.Resources;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the main class for the control flow of the JStudio application

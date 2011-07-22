@@ -11,7 +11,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
-import org.hibernate.cfg.Mappings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,13 +30,18 @@ public class HibernateDB implements DatabaseInterface{
      * Host also accepts port option as a suffix like localhost:3306
      */
     public void connect(String host, String dbname, String user, String password){
-    	// load the standard configuration
-       	Configuration c = new Configuration().configure();
        	//override default configuration property
        	String url = protocol+"://"+host+"/"+dbname;
+    	// load the standard configuration
+       	Configuration c = new Configuration();
+       	c.addResource("person.hbm.xml");
+       	c.addResource("event.hbm.xml");
        	
        	c.setProperty(Environment.DRIVER, driver);
-       	//XXX: forcing mysql dialect
+       	c.setProperty(Environment.CACHE_PROVIDER, "org.hibernate.cache.NoCacheProvider");
+       	c.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+       	c.setProperty(Environment.POOL_SIZE, "1");
+       	//XXX: I'm forcing mysql dialect here
        	c.setProperty(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");
        	c.setProperty(Environment.HBM2DDL_AUTO, "update");
        	c.setProperty(Environment.URL, url);
@@ -74,8 +78,6 @@ public class HibernateDB implements DatabaseInterface{
     		}
     	}
     	return false;
-    			
-    			
     }
     
     public DatabaseObject store(String table, DatabaseObject o){

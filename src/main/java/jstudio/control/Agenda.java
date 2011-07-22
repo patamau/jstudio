@@ -1,14 +1,10 @@
 package jstudio.control;
 
-import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import jstudio.db.DatabaseInterface;
 import jstudio.model.Event;
-import jstudio.model.Person;
 
 /**
  * Agenda holds events on a daily basis.

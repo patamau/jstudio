@@ -11,6 +11,7 @@
         <property name="date"/>
         <many-to-one name="person" lazy="false" 
         	class="jstudio.model.Person" cascade="all"/>
+        <property name="altPerson"/>
         <property name="description"/>
     </class>
 </hibernate-mapping>
