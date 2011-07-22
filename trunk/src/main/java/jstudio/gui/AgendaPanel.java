@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
@@ -17,6 +18,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Event;
+import jstudio.model.Person;
 import jstudio.util.Language;
 
 import org.slf4j.Logger;
@@ -34,6 +36,7 @@ public class AgendaPanel
 	private DefaultTableModel model;
 	private JTable table;
 	private JButton refreshButton;
+	private JTextField filterField;
 	private JStudioGUI gui;
 
 	public AgendaPanel(JStudioGUI gui){
@@ -54,13 +57,18 @@ public class AgendaPanel
 		refreshButton = new JButton(Language.string("Refresh"));
 		refreshButton.addActionListener(this);
 		actionPanel.add(refreshButton);
+		filterField = new JTextField();
+		filterField.addActionListener(this);
+		actionPanel.add(filterField);
 		this.add(actionPanel, BorderLayout.NORTH);
+		
+		table.addMouseListener(new PopupListener<Event>(table, new EventPopup(this.gui)));
 	}
 	
 	public void valueChanged(ListSelectionEvent event) {
         int viewRow = table.getSelectedRow();
         if (viewRow >= 0) {
-        	
+        	//what to do when selected
         }
     }
 	
