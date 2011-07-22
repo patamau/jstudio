@@ -3,10 +3,8 @@ package jstudio.gui;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
-import jstudio.model.Person;
 import jstudio.util.ContextualMenu;
 
 public class PopupListener<Context> extends MouseAdapter {

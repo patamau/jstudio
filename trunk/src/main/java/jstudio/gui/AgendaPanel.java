@@ -1,7 +1,6 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
@@ -10,21 +9,18 @@ import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import jstudio.model.Event;
+import jstudio.util.Language;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jstudio.model.Event;
-import jstudio.model.Person;
-import jstudio.util.Language;
 
 @SuppressWarnings("serial")
 public class AgendaPanel 
@@ -77,9 +73,12 @@ public class AgendaPanel
 	}
 
 	public synchronized void addEvent(Event e){
+		String p = e.getPerson()!=null?
+				e.getPerson().getName()+" "+e.getPerson().getLastname():
+				e.getAltPerson();
 		model.addRow(new Object[]{
 				e,
-				e.getPerson().getName(),
+				p,
 				e.getDescription()
 		});
 	}
