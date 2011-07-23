@@ -4,11 +4,49 @@
   <artifactId>jstudio</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>JStudio</name>
+  <properties>
+    <jasperreports.version>3.7.2</jasperreports.version>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jasperreports-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile-reports</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+<!--note this must be repeated here to pick up correct xml validation -->
+          <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>${jasperreports.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
   <repositories>
   	<repository>
   		<id>local</id>
   		<url>file://C:\Documents and Settings\Matteo\.m2\repository\</url>
   	</repository>
+  	<repository>
+      <id>jasperreports</id>
+      <url>http://jasperreports.sourceforge.net/maven2</url>
+    </repository>
   </repositories>
   <dependencies>
   	<dependency>
@@ -41,5 +79,10 @@
   		<artifactId>hibernate-entitymanager</artifactId>
   		<version>3.4.0.GA</version>
   	</dependency>
+  	<dependency>
+      <groupId>net.sf.jasperreports</groupId>
+      <artifactId>jasperreports</artifactId>
+      <version>${jasperreports.version}</version>
+    </dependency>
   </dependencies>
 </project>
