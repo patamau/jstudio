@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 
 import jstudio.control.Agenda;
-import jstudio.control.Contacts;
+import jstudio.control.Persons;
 import jstudio.db.DatabaseInterface;
 import jstudio.db.HibernateDB;
 import jstudio.gui.IconPanel;
@@ -48,7 +48,7 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 	
 	private DatabaseInterface database;
 	private Agenda agenda;
-	private Contacts contacts;
+	private Persons contacts;
 	
 	public JStudio(){
 	}
@@ -76,7 +76,7 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		}
 		//initialize data handlers
 		agenda = new Agenda(database);
-		contacts = new Contacts(database);
+		contacts = new Persons(database);
 		if(database.isConnected()){
 			//contacts.addPerson(new Person("Matteo","Pedrotti",new Date(),"Via bomport, 20", "12312424"));
 		}
@@ -169,7 +169,7 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		return agenda;
 	}
 	
-	public Contacts getContacts(){
+	public Persons getContacts(){
 		return contacts;
 	}
 }

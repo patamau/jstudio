@@ -11,13 +11,13 @@ import jstudio.model.Person;
  * @author Matteo
  *
  */
-public class Contacts {
+public class Persons {
 	
 	public static String DB_TABLE = "Person";
 	
 	private DatabaseInterface database;
 	
-	public Contacts(DatabaseInterface dbmanager){
+	public Persons(DatabaseInterface dbmanager){
 		database = dbmanager;
 	}
 
