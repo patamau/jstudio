@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 
 import jstudio.JStudio;
 import jstudio.control.Agenda;
-import jstudio.control.Contacts;
+import jstudio.control.Persons;
 import jstudio.db.DatabaseInterface;
 import jstudio.db.HibernateDB;
 import jstudio.model.Person;
@@ -37,7 +37,7 @@ public class ReportGenerator<Entry> {
 		initializeConfiguration();
 		ReportGenerator<Person> rg = new ReportGenerator<Person>();
 		rg.setReport("/report1.jasper");
-		Contacts cts = new Contacts(initializeData());
+		Persons cts = new Persons(initializeData());
 		rg.setData(cts.getAll());
 		try {
 			rg.generatePdf(".","sampleReportPerson.pdf");
