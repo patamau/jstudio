@@ -39,6 +39,8 @@
 
         <mapping resource="person.hbm.xml"/>
         <mapping resource="event.hbm.xml"/>
+        <mapping resource="treatment.hbm.xml"/>
+        <mapping resource="invoice.hbm.xml"/>
     </session-factory>
 
 </hibernate-configuration>

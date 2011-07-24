@@ -1,9 +1,14 @@
 package jstudio.util;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -99,6 +104,43 @@ public class GUITool {
 		int px = gc.gridx;
 		gc.gridx++;
 		c.add(f,gc);
+		gc.fill=GridBagConstraints.NONE;
+		gc.weightx=0.0f;
+		gc.gridx=px;
+		return f;
+	}
+	
+	public static JTextField createDateField(final Container c, GridBagConstraints gc, String label, String value, boolean editable, final SimpleDateFormat dateFormat){
+		final JTextField f = new JTextField(value);
+		f.setEditable(editable);
+		f.setColumns(0);
+		gc.gridy++;
+		JLabel l = new JLabel(label);
+		l.setHorizontalAlignment(JLabel.RIGHT);
+		l.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
+		c.add(l,gc);
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=1.0f;
+		int px = gc.gridx;
+		gc.gridx++;
+		c.add(f,gc);
+		if(editable){
+			JButton b = new JButton("...");
+			b.setPreferredSize(new Dimension(25,20));
+			b.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					DatePicker d = new DatePicker(c);
+					try {
+						d.setDate(dateFormat.parse(f.getText()));
+					} catch (ParseException e1) {
+						//ignore errors here!
+					}
+					f.setText(dateFormat.format(d.getDate()));
+				}
+			});
+			gc.gridx++;
+			c.add(b,gc);
+		}
 		gc.fill=GridBagConstraints.NONE;
 		gc.weightx=0.0f;
 		gc.gridx=px;

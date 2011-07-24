@@ -38,7 +38,7 @@ public class PersonPanel extends JPanel implements ActionListener {
 		
 		nameField = GUITool.createField(this, gc, Language.string("Name"), this.person.getName(), editable);
 		lastnameField = GUITool.createField(this, gc, Language.string("Lastname"), this.person.getLastname(), editable);
-		birthdateField = GUITool.createField(this, gc, Language.string("Birthdate"), Person.birthdateFormat.format(this.person.getBirthdate()), editable);
+		birthdateField = GUITool.createDateField(this, gc, Language.string("Birthdate"), Person.birthdateFormat.format(this.person.getBirthdate()), editable, Person.birthdateFormat);
 		addressField = GUITool.createField(this, gc, Language.string("Address"), this.person.getAddress(), editable);
 		phoneField = GUITool.createField(this, gc, Language.string("Phone"), this.person.getPhone(), editable);
 	}
@@ -56,6 +56,7 @@ public class PersonPanel extends JPanel implements ActionListener {
 			dialog.setTitle(Language.string("Person dialog"));
 			dialog.getContentPane().setLayout(new BorderLayout());
 		}
+		dialog.setLocationRelativeTo(parent);
 		dialog.setModal(editable);
 		dialog.getContentPane().removeAll();
 		dialog.getContentPane().add(new PersonPanel(p, editable),BorderLayout.CENTER);

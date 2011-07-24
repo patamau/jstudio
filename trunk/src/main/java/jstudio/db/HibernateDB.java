@@ -36,6 +36,8 @@ public class HibernateDB implements DatabaseInterface{
        	Configuration c = new Configuration();
        	c.addResource("person.hbm.xml");
        	c.addResource("event.hbm.xml");
+       	c.addResource("treatment.hbm.xml");
+       	c.addResource("invoice.hbm.xml");
        	
        	c.setProperty(Environment.DRIVER, driver);
        	c.setProperty(Environment.CACHE_PROVIDER, "org.hibernate.cache.NoCacheProvider");
