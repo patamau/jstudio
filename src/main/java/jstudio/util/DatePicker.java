@@ -2,6 +2,7 @@ package jstudio.util;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,7 +24,7 @@ public class DatePicker {
 	private JButton[] buttons = new JButton[42];
 	private JLabel[] labels = new JLabel[7];
 
-	public DatePicker(JFrame parent) {
+	public DatePicker(Component parent) {
 		calendar = Calendar.getInstance();
 		calendar.setFirstDayOfWeek(Calendar.MONDAY);
 
@@ -80,8 +81,8 @@ public class DatePicker {
 			}
 		});
 		p2.add(nextButton);
-
-		dialog = new JDialog(parent);
+		
+		dialog = new JDialog();
 		dialog.setTitle("Date Picker");
 		dialog.setModal(true);
 		dialog.add(p1, BorderLayout.CENTER);
@@ -89,8 +90,6 @@ public class DatePicker {
 		dialog.pack();
 		dialog.setResizable(false);
 		dialog.setLocationRelativeTo(parent);
-		setDate(new Date());
-		dialog.setVisible(true);
 	}
 
 	public void setDate(Date date) {
@@ -99,8 +98,13 @@ public class DatePicker {
 		int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)-2;
 		int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
 		int day = 1;
-		System.err.println(dayOfWeek+" of "+calendar.getTime());
 		for (int x=0;x<buttons.length; x++) {
+			int dow = x%7;
+			if(dow==5){
+				buttons[x].setForeground(saturdayColor);
+			}else if(dow==6){
+				buttons[x].setForeground(sundayColor);
+			}
 			if(x<dayOfWeek||day>daysInMonth){
 				buttons[x].setText("");
 				buttons[x].setEnabled(false);
@@ -113,6 +117,7 @@ public class DatePicker {
 	}
 
 	public Date getDate() {
+		dialog.setVisible(true);
 		return calendar.getTime();
 	}
 
@@ -129,13 +134,20 @@ public class DatePicker {
 		p.add(text);
 		p.add(b);
 		final JFrame f = new JFrame();
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.getContentPane().add(p);
 		f.pack();
 		f.setVisible(true);
 		final SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 		b.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				Date d = (new DatePicker(f)).getDate();
+				DatePicker dp = new DatePicker(f);
+				try {
+					dp.setDate(dateFormat.parse(text.getText()));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				Date d = dp.getDate();
 				System.out.println("Date is " + d);
 				if (d != null) {
 					text.setText(dateFormat.format(d));
