@@ -123,6 +123,7 @@ public class HibernateDB implements DatabaseInterface{
     	return o;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Collection<DatabaseObject> getBetween(String table, String field, String from, String to){
     	Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
@@ -135,8 +136,7 @@ public class HibernateDB implements DatabaseInterface{
     	sb.append(from);
     	sb.append("' and '");
     	sb.append(to);
-    	sb.append("'");
-    	
+    	sb.append("'");    	
     	Collection<DatabaseObject> l = (Collection<DatabaseObject>)session.createQuery(sb.toString()).list();
     	commit(t);
     	return l;

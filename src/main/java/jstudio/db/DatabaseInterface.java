@@ -2,7 +2,6 @@ package jstudio.db;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 public interface DatabaseInterface {
 	
