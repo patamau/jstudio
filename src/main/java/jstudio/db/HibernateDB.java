@@ -1,7 +1,7 @@
 package jstudio.db;
 
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 import jstudio.db.DatabaseInterface;
 
@@ -107,10 +107,10 @@ public class HibernateDB implements DatabaseInterface{
     }
     
     @SuppressWarnings("unchecked")
-	public List<DatabaseObject> getAll(String table){
+	public Collection<DatabaseObject> getAll(String table){
     	Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
-    	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery("from "+table).list();
+    	Collection<DatabaseObject> l = (Collection<DatabaseObject>)session.createQuery("from "+table).list();
     	commit(t);
     	return l;
     }
@@ -122,9 +122,28 @@ public class HibernateDB implements DatabaseInterface{
     	commit(t);
     	return o;
 	}
+	
+	public Collection<DatabaseObject> getBetween(String table, String field, String from, String to){
+    	Session session = sessionFactory.getCurrentSession();
+    	Transaction t = session.beginTransaction();
+    	StringBuffer sb = new StringBuffer();
+    	sb.append("from ");
+    	sb.append(table);
+    	sb.append(" where ");
+    	sb.append(field);
+    	sb.append(" between '");
+    	sb.append(from);
+    	sb.append("' and '");
+    	sb.append(to);
+    	sb.append("'");
+    	
+    	Collection<DatabaseObject> l = (Collection<DatabaseObject>)session.createQuery(sb.toString()).list();
+    	commit(t);
+    	return l;
+	}
 
 	@SuppressWarnings("unchecked")
-	public List<DatabaseObject> getAll(String table,
+	public Collection<DatabaseObject> getAll(String table,
 			HashMap<String, String> values) {
 		//if no values specified, bounce to default getAll
 		if(null==values||0==values.keySet().size()) return getAll(table);
@@ -145,7 +164,7 @@ public class HibernateDB implements DatabaseInterface{
     			sb.append(" AND ");
     		}
     	}
-    	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery("from "+table).list();
+    	Collection<DatabaseObject> l = (Collection<DatabaseObject>)session.createQuery(sb.toString()).list();
     	commit(t);
     	return l;
 	}

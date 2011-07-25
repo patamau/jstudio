@@ -14,6 +14,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 
 import jstudio.JStudio;
@@ -23,6 +24,7 @@ import jstudio.model.Person;
 import jstudio.util.Configuration;
 import jstudio.util.ConfigurationDialog;
 import jstudio.util.Language;
+import jstudio.util.Resources;
 
 @SuppressWarnings("serial")
 public class JStudioGUI extends JFrame implements ActionListener {
@@ -35,6 +37,11 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		WIDTH_DEF=640, 
 		HEIGHT_DEF=480;
 	
+	public static final String
+		PIC_AGENDA="eventicon.png",
+		PIC_ADDRESSBOOK="personicon.png",
+		PIC_ACCOUNTING="invoiceicon.png";
+	
 	private boolean initialized = false;
 	private JStudio app;
 	private JMenuItem 
@@ -46,6 +53,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		invoiceItem;
 		
 	private JLabel statusLabel;
+	private JTabbedPane tabbedPane;
 	private AgendaPanel agendaPanel;
 	private AddressBookPanel contactsPanel;
 	private InvoicePanel invoicePanel;
@@ -87,14 +95,14 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		
 		//create view menu
 		JMenu viewMenu = new JMenu(Language.string("View"));
-		agendaItem = new JMenuItem(Language.string("Agenda"));
-		agendaItem.addActionListener(this);
-		parchiveItem = new JMenuItem(Language.string("Contacts"));
+		parchiveItem = new JMenuItem(Language.string("Address book"), Resources.getImage(PIC_ADDRESSBOOK));
 		parchiveItem.addActionListener(this);
-		invoiceItem = new JMenuItem(Language.string("Invoicing"));
+		agendaItem = new JMenuItem(Language.string("Agenda"), Resources.getImage(PIC_AGENDA));
+		agendaItem.addActionListener(this);
+		invoiceItem = new JMenuItem(Language.string("Accounting"), Resources.getImage(PIC_ACCOUNTING));
 		invoiceItem.addActionListener(this);
-		viewMenu.add(agendaItem);
 		viewMenu.add(parchiveItem);
+		viewMenu.add(agendaItem);
 		viewMenu.add(invoiceItem);
 		menuBar.add(viewMenu);
 		setJMenuBar(menuBar);
@@ -105,12 +113,22 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
 		
+		tabbedPane = new JTabbedPane();
+		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		//initialize sub panels
 		contactsPanel = new AddressBookPanel(this);
 		agendaPanel = new AgendaPanel(this);
 		invoicePanel = new InvoicePanel();
 		//by default show contacts
-		showContacts();
+		tabbedPane.addTab(Language.string("Address book"),
+				Resources.getImage(PIC_ADDRESSBOOK),
+				contactsPanel);
+		tabbedPane.addTab(Language.string("Agenda"),
+				Resources.getImage(PIC_AGENDA),
+				agendaPanel);
+		tabbedPane.addTab(Language.string("Accounting"),
+				Resources.getImage(PIC_ACCOUNTING),
+				invoicePanel);
 	}
 	
 	@Override
@@ -119,6 +137,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		super.setVisible(visible);
 		loadContacts();
 		loadEvents(new Date());
+		loadInvoices();
 	} 
 	
 	public void loadContacts(){
@@ -135,8 +154,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 	
 	public void loadEvents(Date date){
 		agendaPanel.clear();
-		//TODO: filter by date
-		Collection<Event> list = app.getAgenda().getAll();
+		Collection<Event> list = app.getAgenda().getByDate(date);
 		if(list!=null){
 			for(Event e: list){
 				agendaPanel.addEvent(e);
@@ -158,23 +176,20 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		}
 	}
 
-	private void _showPanel(JPanel panel){
-		getContentPane().removeAll();
-		getContentPane().add(panel, BorderLayout.CENTER);
-		getContentPane().validate();
-		getContentPane().repaint();
+	private void showPanel(JPanel panel){
+		tabbedPane.setSelectedComponent(panel);
 	}
 	
 	public void showContacts(){
-		_showPanel(contactsPanel);
+		showPanel(contactsPanel);
 	}
 	
 	public void showAgenda(){
-		_showPanel(agendaPanel);
+		showPanel(agendaPanel);
 	}
 	
 	public void showInvoice(){
-		_showPanel(invoicePanel);
+		showPanel(invoicePanel);
 	}
 
 	public void actionPerformed(ActionEvent event) {
