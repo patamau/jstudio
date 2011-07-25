@@ -1,4 +1,4 @@
-package jstudio.gui;
+package jstudio.util;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -8,7 +8,6 @@ import java.awt.Graphics;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
-import jstudio.util.Resources;
 
 public class IconPanel extends JPanel{
 	

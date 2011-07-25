@@ -22,8 +22,9 @@ public class EventPanel extends JPanel implements ActionListener {
 	private Event event;
 	private JTextField 
 		dateField, 
-		personField,
-		altPersonField,
+		nameField,
+		lastnameField,
+		phoneField,
 		descriptionField;
 
 	public EventPanel(Event event, boolean editable){
@@ -38,15 +39,19 @@ public class EventPanel extends JPanel implements ActionListener {
 		dateField = GUITool.createField(this, gc, 
 				Language.string("Date"), 
 				Event.timeFormat.format(this.event.getDate()), editable);
-		personField = GUITool.createField(this, gc, 
-				Language.string("Contact"), 
-				this.event.getPerson().getName()+" "+this.event.getPerson().getLastname(), editable);
-		altPersonField = GUITool.createField(this, gc, 
-				Language.string("Alternative contact"), 
-				this.event.getAltPerson(), editable);
+		//TODO: add persons browse button
+		nameField = GUITool.createField(this, gc, 
+				Language.string("Name"), 
+				this.event.getName(), editable);
+		lastnameField = GUITool.createField(this, gc,
+				Language.string("Lastname"),
+				this.event.getLastname(), editable);
 		descriptionField = GUITool.createField(this, gc, 
 				Language.string("Description"), 
 				this.event.getDescription(), editable);
+		phoneField = GUITool.createField(this, gc,
+				Language.string("Phone"),
+				this.event.getPhone(), editable);
 	}
 	
 	/**
@@ -59,9 +64,10 @@ public class EventPanel extends JPanel implements ActionListener {
 	public static JDialog createDialog(JFrame parent, Event e, boolean editable){
 		if(dialog==null){
 			dialog = new JDialog(parent);
-			dialog.setTitle(Language.string("Person dialog"));
+			dialog.setTitle(Language.string("Event dialog"));
 			dialog.getContentPane().setLayout(new BorderLayout());
 		}
+		dialog.setLocationRelativeTo(parent);
 		dialog.setModal(editable);
 		dialog.getContentPane().removeAll();
 		dialog.getContentPane().add(new EventPanel(e, editable),BorderLayout.CENTER);

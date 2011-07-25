@@ -46,7 +46,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		
 	private JLabel statusLabel;
 	private AgendaPanel agendaPanel;
-	private ContactsPanel contactsPanel;
+	private PersonsPanel contactsPanel;
 	private InvoicePanel invoicePanel;
 
 	public JStudioGUI(String title, JStudio app){
@@ -105,7 +105,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
 		
 		//initialize sub panels
-		contactsPanel = new ContactsPanel(this);
+		contactsPanel = new PersonsPanel(this);
 		agendaPanel = new AgendaPanel(this);
 		invoicePanel = new InvoicePanel();
 		//by default show contacts

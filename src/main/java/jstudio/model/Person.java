@@ -14,19 +14,43 @@ public class Person implements DatabaseObject, Comparable<Object> {
 	
 	private Long id;
 	private Date birthdate;
-	private String name, lastname, address, phone;
+	private String name, lastname, address, city, cap, code, phone;
 	
 	public Person(){
 		
 	}
 
-	public Person(String name, String lastname, Date birthdate, String address, String phone){
+	public Person(String name, String lastname, Date birthdate, String address, String city, String cap, String code, String phone){
 		this.id=0l;
 		this.name=name;
 		this.lastname=lastname;
 		this.birthdate=birthdate;
 		this.address=address;
 		this.phone=phone;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getCap() {
+		return cap;
+	}
+
+	public void setCap(String cap) {
+		this.cap = cap;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	public Long getId() {

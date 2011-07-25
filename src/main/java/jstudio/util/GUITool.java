@@ -57,7 +57,7 @@ public class GUITool {
 		f.setRows(0);
 		gc.gridy++;
 		gc.anchor=GridBagConstraints.NORTH;
-		JLabel jlabel = new JLabel(label);
+		JLabel jlabel = new JLabel(label, JLabel.RIGHT);
 		jlabel.setAlignmentY(JLabel.TOP_ALIGNMENT);
 		jlabel.setVerticalAlignment(JLabel.TOP);
 		c.add(jlabel,gc);
@@ -79,9 +79,7 @@ public class GUITool {
 		f.setEditable(editable);
 		f.setColumns(0);
 		gc.gridy++;
-		JLabel l = new JLabel(label);
-		l.setHorizontalAlignment(JLabel.RIGHT);
-		l.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
+		JLabel l = new JLabel(label, JLabel.RIGHT);
 		c.add(l,gc);
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		gc.weightx=1.0f;
@@ -98,7 +96,7 @@ public class GUITool {
 		JComboBox f = new JComboBox(values);
 		f.setEditable(editable);
 		gc.gridy++;
-		c.add(new JLabel(label),gc);
+		c.add(new JLabel(label, JLabel.RIGHT),gc);
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		gc.weightx=1.0f;
 		int px = gc.gridx;
@@ -115,9 +113,7 @@ public class GUITool {
 		f.setEditable(editable);
 		f.setColumns(0);
 		gc.gridy++;
-		JLabel l = new JLabel(label);
-		l.setHorizontalAlignment(JLabel.RIGHT);
-		l.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
+		JLabel l = new JLabel(label, JLabel.RIGHT);
 		c.add(l,gc);
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		gc.weightx=1.0f;

@@ -9,7 +9,7 @@ import jstudio.model.Person;
 import jstudio.util.Language;
 import jstudio.util.TableSorter;
 
-public class ContactsTableModel extends DefaultTableModel {
+public class PersonsTableModel extends DefaultTableModel {
 	
 	private static final Object[] cols = new Object[]{
 			Language.string("Id"),
@@ -19,7 +19,7 @@ public class ContactsTableModel extends DefaultTableModel {
 			Language.string("Address"), 
 			Language.string("Phone")};
 	
-	public ContactsTableModel(JTable table) {
+	public PersonsTableModel(JTable table) {
 		super(cols, 0);
 		TableSorter ts = new TableSorter(this,table.getTableHeader());
 		table.setModel(ts);
