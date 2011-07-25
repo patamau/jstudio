@@ -12,7 +12,7 @@ import jstudio.db.DatabaseObject;
  */
 public abstract class Controller<E extends DatabaseObject> {
 	
-	private DatabaseInterface database;
+	protected DatabaseInterface database;
 	private String source;
 	
 	public Controller(DatabaseInterface database){

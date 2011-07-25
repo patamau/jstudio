@@ -3,11 +3,13 @@ package jstudio.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -19,6 +21,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Event;
+import jstudio.util.DatePicker;
 import jstudio.util.Language;
 import jstudio.util.PopupListener;
 
@@ -31,11 +34,14 @@ public class AgendaPanel
 		implements ListSelectionListener, ActionListener {
 	
 	//time format for event entries
-	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+	public static final SimpleDateFormat 
+		timeFormat = new SimpleDateFormat("hh:mm"),
+		dateFormat = new SimpleDateFormat("EEEE dd MMMM yyyy");
 	private static final Logger logger = LoggerFactory.getLogger(AgendaPanel.class);
 	
 	private DefaultTableModel model;
 	private JTable table;
+	private JButton dateButton;
 	private JButton refreshButton;
 	private JTextField filterField;
 	private JStudioGUI gui;
@@ -56,6 +62,16 @@ public class AgendaPanel
 		JScrollPane scrollpane = new JScrollPane(table);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 		this.add(scrollpane, BorderLayout.CENTER);
+		
+		JPanel topPanel = new JPanel(new BorderLayout());
+		
+		JToolBar datePanel = new JToolBar(Language.string("Actions"));
+		datePanel.setFloatable(false);
+		dateButton = new JButton("");
+		dateButton.addActionListener(this);
+		datePanel.add(dateButton);
+		setDate(new Date());
+		topPanel.add(datePanel, BorderLayout.NORTH);
 
 		JToolBar actionPanel = new JToolBar(Language.string("Actions"));
 		actionPanel.setFloatable(false);
@@ -65,9 +81,23 @@ public class AgendaPanel
 		filterField = new JTextField();
 		filterField.addActionListener(this);
 		actionPanel.add(filterField);
-		this.add(actionPanel, BorderLayout.NORTH);
+		topPanel.add(actionPanel, BorderLayout.CENTER);
+		
+		this.add(topPanel, BorderLayout.NORTH);
 		
 		table.addMouseListener(new PopupListener<Event>(table, new EventPopup(this.gui)));
+	}
+	
+	public void setDate(Date date){
+		dateButton.setText(dateFormat.format(date));
+	}
+	
+	public Date getDate(){
+		try {
+			return dateFormat.parse(dateButton.getText());
+		} catch (ParseException e) {
+			return new Date();
+		}
 	}
 	
 	public void valueChanged(ListSelectionEvent event) {
@@ -121,7 +151,13 @@ public class AgendaPanel
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==refreshButton){
-			gui.loadEvents(new Date());
+			gui.loadEvents(getDate());
+		}else if(o==dateButton){
+			DatePicker dp = new DatePicker(this);
+			dp.setDate(this.getDate());
+			Date d = dp.getDate();
+			this.setDate(d);
+			gui.loadEvents(d);
 		}else{
 			logger.warn("Event source not mapped: "+o);
 		}
