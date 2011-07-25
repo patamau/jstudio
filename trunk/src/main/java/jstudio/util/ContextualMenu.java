@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+@SuppressWarnings("serial")
 public abstract class ContextualMenu<Context> 
 		extends JPopupMenu 
 		implements ActionListener {

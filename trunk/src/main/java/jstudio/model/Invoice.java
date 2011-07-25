@@ -9,6 +9,8 @@ import jstudio.db.DatabaseObject;
 
 public class Invoice implements DatabaseObject{
 	
+	private static final long serialVersionUID = 2636840744342729819L;
+
 	public static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
 	private Long id;

@@ -16,6 +16,7 @@ import jstudio.model.Person;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
+@SuppressWarnings("serial")
 public class PersonPanel extends JPanel implements ActionListener {
 	
 	private static JDialog dialog;

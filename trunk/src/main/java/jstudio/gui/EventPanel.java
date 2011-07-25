@@ -16,6 +16,7 @@ import jstudio.model.Event;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
+@SuppressWarnings("serial")
 public class EventPanel extends JPanel implements ActionListener {
 	
 	private static JDialog dialog;

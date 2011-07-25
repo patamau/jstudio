@@ -1,6 +1,5 @@
 package jstudio.model;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -8,6 +7,8 @@ import jstudio.db.DatabaseObject;
 
 public class Event implements DatabaseObject {
 	
+	private static final long serialVersionUID = 715529267460671641L;
+
 	public static final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
 	private Long id;

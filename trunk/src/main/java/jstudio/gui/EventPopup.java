@@ -7,10 +7,10 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import jstudio.model.Event;
-import jstudio.model.Person;
 import jstudio.util.ContextualMenu;
 import jstudio.util.Language;
 
+@SuppressWarnings("serial")
 public class EventPopup extends ContextualMenu<Event> {
 
 	private Event event;

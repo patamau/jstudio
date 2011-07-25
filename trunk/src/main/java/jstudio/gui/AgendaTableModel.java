@@ -1,30 +1,27 @@
 package jstudio.gui;
 
-import java.util.Date;
-
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import jstudio.model.Person;
 import jstudio.util.Language;
 import jstudio.util.TableSorter;
 
-public class PersonsTableModel extends DefaultTableModel {
+@SuppressWarnings("serial")
+public class AgendaTableModel extends DefaultTableModel {
 	
 	private static final Object[] cols = new Object[]{
-			Language.string("Id"),
-			Language.string("Name"), 
-			Language.string("Lastname"), 
-			Language.string("Birthdate"), 
-			Language.string("Address"), 
-			Language.string("Phone")};
+			Language.string("Time"), 
+			Language.string("Contact"), 
+			Language.string("Description")
+			};
 	
-	public PersonsTableModel(JTable table) {
+	public AgendaTableModel(JTable table) {
 		super(cols, 0);
 		TableSorter ts = new TableSorter(this,table.getTableHeader());
 		table.setModel(ts);
 		ts.setSortingStatus(0, TableSorter.ASCENDING);
-		table.getColumn("Id").setMaxWidth(30); //id column is smaller
+		table.getColumn("Time").setMaxWidth(50);
+		table.getColumn("Time").setMinWidth(50);
 	}
 
 	public boolean isCellEditable(int row, int col){
@@ -33,8 +30,6 @@ public class PersonsTableModel extends DefaultTableModel {
 	
 	public Class<?> getColumnClass(int col){
 		switch(col){
-		case 0: return Person.class;
-		case 3: return Date.class;
 		default: return String.class;
 		}
 	}
