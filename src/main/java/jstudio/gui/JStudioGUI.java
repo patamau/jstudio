@@ -3,8 +3,8 @@ package jstudio.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -18,6 +18,7 @@ import javax.swing.JToolBar;
 
 import jstudio.JStudio;
 import jstudio.model.Event;
+import jstudio.model.Invoice;
 import jstudio.model.Person;
 import jstudio.util.Configuration;
 import jstudio.util.ConfigurationDialog;
@@ -46,7 +47,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		
 	private JLabel statusLabel;
 	private AgendaPanel agendaPanel;
-	private PersonsPanel contactsPanel;
+	private AddressBookPanel contactsPanel;
 	private InvoicePanel invoicePanel;
 
 	public JStudioGUI(String title, JStudio app){
@@ -105,7 +106,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		getContentPane().add(statusBar, BorderLayout.SOUTH);
 		
 		//initialize sub panels
-		contactsPanel = new PersonsPanel(this);
+		contactsPanel = new AddressBookPanel(this);
 		agendaPanel = new AgendaPanel(this);
 		invoicePanel = new InvoicePanel();
 		//by default show contacts
@@ -122,25 +123,38 @@ public class JStudioGUI extends JFrame implements ActionListener {
 	
 	public void loadContacts(){
 		contactsPanel.clear();
-		List<Person> pps = app.getContacts().getAll();
+		Collection<Person> pps = app.getAddressBook().getAll();
 		if(pps!=null){
 			for(Person p: pps){
 				contactsPanel.addPerson(p);
 			}
 		}else{
-			JOptionPane.showMessageDialog(this, Language.string("Unable to load contacts"),"Database error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, Language.string("Unable to load contacts"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
 		}
 	}
 	
 	public void loadEvents(Date date){
 		agendaPanel.clear();
-		List<Event> list = app.getAgenda().getAll();
+		//TODO: filter by date
+		Collection<Event> list = app.getAgenda().getAll();
 		if(list!=null){
 			for(Event e: list){
 				agendaPanel.addEvent(e);
 			}
 		}else{
-			JOptionPane.showMessageDialog(this, Language.string("Unable to load events"),"Database error",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, Language.string("Unable to load events"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public void loadInvoices(){
+		//TODO: invoicePanel.clear();
+		Collection<Invoice> list = app.getAccounting().getAll();
+		if(list!=null){
+			for(Invoice i: list){
+				//TODO: invoicePanel.addInvoice(i);
+			}
+		}else{
+			JOptionPane.showMessageDialog(this, Language.string("Unable to load invoices"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
 		}
 	}
 

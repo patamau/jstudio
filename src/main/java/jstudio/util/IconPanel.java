@@ -9,6 +9,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 
+@SuppressWarnings("serial")
 public class IconPanel extends JPanel{
 	
 	public static int BORDER = 10;

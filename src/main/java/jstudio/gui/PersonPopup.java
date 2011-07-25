@@ -10,6 +10,7 @@ import jstudio.model.Person;
 import jstudio.util.ContextualMenu;
 import jstudio.util.Language;
 
+@SuppressWarnings("serial")
 public class PersonPopup extends ContextualMenu<Person> {
 
 	private Person person;

@@ -19,7 +19,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Event;
-import jstudio.model.Person;
 import jstudio.util.Language;
 import jstudio.util.PopupListener;
 
@@ -50,7 +49,7 @@ public class AgendaPanel
 		this.setLayout(new BorderLayout());
 
 		table = new JTable();
-		model = new EventsTableModel(table);
+		model = new AgendaTableModel(table);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getSelectionModel().addListSelectionListener(this);
 

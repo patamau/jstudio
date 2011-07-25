@@ -4,6 +4,8 @@ import jstudio.db.DatabaseObject;
 
 public class Treatment implements DatabaseObject{
 
+	private static final long serialVersionUID = -3847404193905268779L;
+	
 	private Long id;
 	private Invoice invoice;
 	private String description;

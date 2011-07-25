@@ -7,8 +7,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 
 import jstudio.control.Agenda;
-import jstudio.control.Invoices;
-import jstudio.control.Persons;
+import jstudio.control.Accounting;
+import jstudio.control.AddressBook;
 import jstudio.db.DatabaseInterface;
 import jstudio.db.HibernateDB;
 import jstudio.gui.JStudioGUI;
@@ -50,8 +50,8 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 	
 	private DatabaseInterface database;
 	private Agenda agenda;
-	private Persons contacts;
-	private Invoices invoices;
+	private AddressBook addressBook;
+	private Accounting accounting;
 	
 	public JStudio(){
 	}
@@ -79,11 +79,11 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		}
 		//initialize data handlers
 		agenda = new Agenda(database);
-		contacts = new Persons(database);
-		invoices = new Invoices(database);
+		addressBook = new AddressBook(database);
+		accounting = new Accounting(database);
 		if(database.isConnected()){
 			//contacts.addPerson(new Person("Matteo","Pedrotti",new Date(),"Via bomport, 20", "12312424"));
-			for(Invoice i: invoices.getAll()){
+			for(Invoice i: accounting.getAll()){
 				logger.info(i.toString());
 			}
 		}
@@ -176,7 +176,11 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		return agenda;
 	}
 	
-	public Persons getContacts(){
-		return contacts;
+	public AddressBook getAddressBook(){
+		return addressBook;
+	}
+	
+	public Accounting getAccounting(){
+		return accounting;
 	}
 }

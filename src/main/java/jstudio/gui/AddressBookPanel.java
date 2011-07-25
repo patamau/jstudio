@@ -23,11 +23,12 @@ import jstudio.util.PopupListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PersonsPanel 
+@SuppressWarnings("serial")
+public class AddressBookPanel 
 		extends JPanel 
 		implements ListSelectionListener, ActionListener {
 	
-	private static final Logger logger = LoggerFactory.getLogger(PersonsPanel.class);
+	private static final Logger logger = LoggerFactory.getLogger(AddressBookPanel.class);
 
 	private DefaultTableModel model;
 	private JTable table;
@@ -39,12 +40,12 @@ public class PersonsPanel
 	private int lastSelectedRow = -1;
 	private long lastSelectionTime = 0;
 	
-	public PersonsPanel(JStudioGUI gui){
+	public AddressBookPanel(JStudioGUI gui){
 		this.gui = gui;
 		this.setLayout(new BorderLayout());
 		
 		table = new JTable();
-		model = new PersonsTableModel(table);
+		model = new AddressBookTableModel(table);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getSelectionModel().addListSelectionListener(this);
 

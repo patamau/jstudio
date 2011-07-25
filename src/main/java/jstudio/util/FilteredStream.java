@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.Date;
 import java.util.Vector;
 
 import javax.swing.JButton;

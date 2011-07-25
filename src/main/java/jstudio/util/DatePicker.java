@@ -16,8 +16,6 @@ public class DatePicker {
 		sundayColor = Color.RED,
 		saturdayColor = Color.RED.darker();
 
-	private int month = java.util.Calendar.getInstance().get(java.util.Calendar.MONTH);
-	private int year = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);;
 	private JLabel monthLabel = new JLabel("", JLabel.CENTER);
 	private Calendar calendar;
 	private JDialog dialog;
