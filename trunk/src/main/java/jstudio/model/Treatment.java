@@ -7,19 +7,29 @@ public class Treatment implements DatabaseObject{
 	private Long id;
 	private Invoice invoice;
 	private String description;
+	private Integer quantity;
 	private Float cost;
 	
 	public Treatment(){
 		
 	}
 	
-	public Treatment(Invoice invoice, String description, Float cost){
+	public Treatment(Invoice invoice, String description, Integer quantity, Float cost){
 		this.id=0l;
 		this.invoice=invoice;
 		this.description=description;
+		this.quantity=quantity;
 		this.cost=cost;
 	}
 	
+	public Integer getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(Integer quantity) {
+		this.quantity = quantity;
+	}
+
 	//FIXME: only for debugging 
 	public String toString(){
 		return description+" "+cost;
@@ -53,7 +63,6 @@ public class Treatment implements DatabaseObject{
 		this.cost = cost;
 	}
 
-	@Override
 	public Long getId() {
 		return id;
 	}

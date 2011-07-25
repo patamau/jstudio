@@ -25,6 +25,9 @@ public class PersonPanel extends JPanel implements ActionListener {
 		lastnameField,
 		birthdateField,
 		addressField,
+		cityField,
+		capField,
+		codeField,
 		phoneField;
 
 	public PersonPanel(Person person, boolean editable){
@@ -40,6 +43,9 @@ public class PersonPanel extends JPanel implements ActionListener {
 		lastnameField = GUITool.createField(this, gc, Language.string("Lastname"), this.person.getLastname(), editable);
 		birthdateField = GUITool.createDateField(this, gc, Language.string("Birthdate"), Person.birthdateFormat.format(this.person.getBirthdate()), editable, Person.birthdateFormat);
 		addressField = GUITool.createField(this, gc, Language.string("Address"), this.person.getAddress(), editable);
+		cityField = GUITool.createField(this, gc, Language.string("City"), this.person.getCity(), editable);
+		capField = GUITool.createField(this, gc, Language.string("CAP"), this.person.getCap(), editable);
+		codeField = GUITool.createField(this, gc, Language.string("Code"), this.person.getCode(), editable);
 		phoneField = GUITool.createField(this, gc, Language.string("Phone"), this.person.getPhone(), editable);
 	}
 	

@@ -13,23 +13,60 @@ public class Event implements DatabaseObject {
 	private Long id;
 	private Date date;
 	private Person person;
-	private String altPerson;
+	private String name, lastname, phone;
 	private String description;
 	
 	public Event(){
 	
 	}
+	
+	public Event(Date date, String name, String lastname, String phone, String description){
+		this.id=0l;
+		this.date = date;
+		this.person = null;
+		this.name = name;
+		this.lastname = lastname;
+		this.phone = phone;
+		this.description = description;
+	}
 
-	public Event(Date date, Person person, String altPerson, String description){
+	public Event(Date date, Person person, String description){
 		this.id=0l;
 		this.date = date;
 		this.person = person;
-		this.altPerson = altPerson;
+		this.name = person.getName();
+		this.lastname = person.getLastname();
+		this.phone = person.getAddress();
 		this.description = description;
 	}
 	
 	public Long getId(){
 		return id;
+	}
+	
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getLastname() {
+		return lastname;
+	}
+
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 	
 	public Date getDate(){
@@ -42,14 +79,6 @@ public class Event implements DatabaseObject {
 	
 	public String getDescription(){
 		return description;
-	}
-	
-	public String getAltPerson() {
-		return altPerson;
-	}
-
-	public void setAltPerson(String altPerson) {
-		this.altPerson = altPerson;
 	}
 	
 	public void setId(Long id) {
@@ -66,8 +95,7 @@ public class Event implements DatabaseObject {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-	
+	}	
 	
 	public String toString(){
 		return timeFormat.format(date);

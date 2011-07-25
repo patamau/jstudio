@@ -18,15 +18,16 @@ import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Person;
 import jstudio.util.Language;
+import jstudio.util.PopupListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ContactsPanel 
+public class PersonsPanel 
 		extends JPanel 
 		implements ListSelectionListener, ActionListener {
 	
-	private static final Logger logger = LoggerFactory.getLogger(ContactsPanel.class);
+	private static final Logger logger = LoggerFactory.getLogger(PersonsPanel.class);
 
 	private DefaultTableModel model;
 	private JTable table;
@@ -34,12 +35,16 @@ public class ContactsPanel
 	private JTextField filterField;
 	private JStudioGUI gui;
 	
-	public ContactsPanel(JStudioGUI gui){
+	// internally used to catch a double click on the table
+	private int lastSelectedRow = -1;
+	private long lastSelectionTime = 0;
+	
+	public PersonsPanel(JStudioGUI gui){
 		this.gui = gui;
 		this.setLayout(new BorderLayout());
 		
 		table = new JTable();
-		model = new ContactsTableModel(table);
+		model = new PersonsTableModel(table);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getSelectionModel().addListSelectionListener(this);
 
@@ -63,11 +68,21 @@ public class ContactsPanel
 	public void valueChanged(ListSelectionEvent event) {
         int viewRow = table.getSelectedRow();
         if (0<=viewRow){        
-            //setSelectedPerson((Person)table.getValueAt(viewRow, 0));
+        	System.err.println("Selected "+viewRow+" at "+System.currentTimeMillis()+" and last time was "+lastSelectionTime);
+        	if(viewRow==lastSelectedRow&&
+        			200>(System.currentTimeMillis()-lastSelectionTime)){
+        		showPerson((Person)table.getValueAt(viewRow, 0));	
+        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
+        		lastSelectedRow = -1;
+        	}else{
+            	lastSelectedRow = viewRow;
+            	lastSelectionTime = System.currentTimeMillis();
+        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
+        	}
         }
     }
 	
-	public void setSelectedPerson(Person p){
+	public void showPerson(Person p){
 		JDialog dialog = PersonPanel.createDialog(gui, p, false);
 		dialog.setVisible(true);
 	}

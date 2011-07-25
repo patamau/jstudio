@@ -28,7 +28,6 @@
           </execution>
         </executions>
         <dependencies>
-<!--note this must be repeated here to pick up correct xml validation -->
           <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>

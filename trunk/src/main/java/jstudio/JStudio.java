@@ -11,11 +11,11 @@ import jstudio.control.Invoices;
 import jstudio.control.Persons;
 import jstudio.db.DatabaseInterface;
 import jstudio.db.HibernateDB;
-import jstudio.gui.IconPanel;
 import jstudio.gui.JStudioGUI;
 import jstudio.model.Invoice;
 import jstudio.util.Configuration;
 import jstudio.util.FilteredStream;
+import jstudio.util.IconPanel;
 import jstudio.util.Language;
 import jstudio.util.Resources;
 

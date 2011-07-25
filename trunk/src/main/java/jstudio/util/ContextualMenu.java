@@ -1,5 +1,6 @@
 package jstudio.util;
 
+import java.awt.Font;
 import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
@@ -21,9 +22,11 @@ public abstract class ContextualMenu<Context>
 	    viewItem.addActionListener(this);
 	    this.add(viewItem);
 	    editItem = new JMenuItem("Edit");
+	    editItem.setFont(editItem.getFont().deriveFont(Font.PLAIN));
 	    editItem.addActionListener(this);
 	    this.add(editItem);
 	    removeItem = new JMenuItem("Remove");
+	    removeItem.setFont(removeItem.getFont().deriveFont(Font.PLAIN));
 	    removeItem.addActionListener(this);
 	    this.add(removeItem);
 	}

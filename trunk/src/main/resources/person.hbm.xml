@@ -8,10 +8,13 @@
         <id name="id" column="id" type="long">
         	<generator class="increment"/>
         </id>
-        <property name="name"/>
-        <property name="lastname"/>
-        <property name="address"/>
-        <property name="phone"/>
+        <property name="name" type="string"/>
+        <property name="lastname" type="string"/>
+        <property name="address" type="string"/>
+        <property name="city" type="string"/>
+        <property name="cap" type="string"/>
+        <property name="code" type="string"/>
+        <property name="phone" type="string"/>
         <property name="birthdate"/>
     </class>
 </hibernate-mapping>

@@ -10,8 +10,10 @@
         </id>
         <property name="date"/>
         <many-to-one name="person" lazy="false" 
-        	class="jstudio.model.Person" cascade="all"/>
-        <property name="altPerson"/>
-        <property name="description"/>
+        	class="jstudio.model.Person" cascade="none"/>
+        <property name="name" type="string"/>
+        <property name="lastname" type="string"/>
+        <property name="phone" type="string"/>
+        <property name="description" type="string"/>
     </class>
 </hibernate-mapping>

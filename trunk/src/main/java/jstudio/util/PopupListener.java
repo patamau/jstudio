@@ -1,11 +1,10 @@
-package jstudio.gui;
+package jstudio.util;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JTable;
 
-import jstudio.util.ContextualMenu;
 
 public class PopupListener<Context> extends MouseAdapter {
 	private JTable table;

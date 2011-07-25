@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -20,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
 import jstudio.model.Event;
 import jstudio.model.Person;
 import jstudio.util.Language;
+import jstudio.util.PopupListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,10 @@ public class AgendaPanel
 	private JButton refreshButton;
 	private JTextField filterField;
 	private JStudioGUI gui;
+	
+	// internally used to catch a double click on the table
+	private int lastSelectedRow = -1;
+	private long lastSelectionTime = 0;
 
 	public AgendaPanel(JStudioGUI gui){
 		this.gui = gui;
@@ -67,13 +73,23 @@ public class AgendaPanel
 	
 	public void valueChanged(ListSelectionEvent event) {
         int viewRow = table.getSelectedRow();
-        if (viewRow >= 0) {
-        	//what to do when selected
+        if (0<=viewRow){        
+        	if(viewRow==lastSelectedRow&&
+        			200>(System.currentTimeMillis()-lastSelectionTime)){
+        		showEvent((Event)table.getValueAt(viewRow, 0));	
+        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
+        		lastSelectedRow = -1;
+        	}else{
+            	lastSelectedRow = viewRow;
+            	lastSelectionTime = System.currentTimeMillis();
+        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
+        	}
         }
     }
 	
-	public void setSelectedEvent(Event e){
-		//splitPane.setRightComponent(new EventPanel(e, false));
+	public void showEvent(Event e){
+		JDialog dialog = EventPanel.createDialog(gui, e, false);
+		dialog.setVisible(true);
 	}
 	
 	public synchronized void clear(){
@@ -81,12 +97,9 @@ public class AgendaPanel
 	}
 
 	public synchronized void addEvent(Event e){
-		String p = e.getPerson()!=null?
-				e.getPerson().getName()+" "+e.getPerson().getLastname():
-				e.getAltPerson();
 		model.addRow(new Object[]{
 				e,
-				p,
+				e.getName()+" "+e.getLastname(),
 				e.getDescription()
 		});
 	}
