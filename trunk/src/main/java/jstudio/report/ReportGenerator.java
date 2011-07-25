@@ -16,7 +16,6 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import jstudio.JStudio;
-import jstudio.control.Agenda;
 import jstudio.control.AddressBook;
 import jstudio.db.DatabaseInterface;
 import jstudio.db.HibernateDB;
