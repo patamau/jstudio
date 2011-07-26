@@ -8,6 +8,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class DatePicker {
 	private static final SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy");
@@ -32,7 +33,7 @@ public class DatePicker {
 		monthLabel = new JLabel("", JLabel.CENTER);
 
 		JPanel p1 = new JPanel(new GridLayout(7, 7));
-		p1.setPreferredSize(new Dimension(430, 120));
+		p1.setPreferredSize(new Dimension(300, 100));
 		
 		//WEEK DAYS
 		String[] header = {  
@@ -57,6 +58,7 @@ public class DatePicker {
 		for (int x = 0; x < buttons.length; x++) {
 			final int selection = x;
 			buttons[x] = new JButton();
+			buttons[x].setBorder(new EmptyBorder(0, 0, 0, 0));
 			buttons[x].setFocusPainted(false);
 			buttons[x].setBackground(Color.white);
 			buttons[x].addActionListener(new ActionListener() {
@@ -73,6 +75,8 @@ public class DatePicker {
 		
 		JPanel p2 = new JPanel(new GridLayout(1, 3));
 		JButton previousButton = new JButton(Language.string("<<"));
+		previousButton.setBackground(Color.WHITE);
+		previousButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		previousButton.setToolTipText(Language.string("Previous month"));
 		previousButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -83,6 +87,8 @@ public class DatePicker {
 		p2.add(previousButton);
 		p2.add(monthLabel);
 		JButton nextButton = new JButton(Language.string(">>"));
+		nextButton.setBackground(Color.WHITE);
+		nextButton.setBorder(new EmptyBorder(0, 0, 0, 0));
 		nextButton.setToolTipText(Language.string("Next month"));
 		nextButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
@@ -105,7 +111,7 @@ public class DatePicker {
 	private void initOriginalDate(Date date){
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
-		this.originalDayOfMonth = c.get(Calendar.DAY_OF_MONTH);
+		this.originalDayOfMonth = c.get(Calendar.DAY_OF_MONTH)+1;
 		this.originalMonth = c.get(Calendar.MONTH);
 		this.originalYear = c.get(Calendar.YEAR);
 	}
@@ -173,7 +179,7 @@ public class DatePicker {
 				try {
 					dp.setDate(dateFormat.parse(text.getText()));
 				} catch (ParseException e) {
-					e.printStackTrace();
+					dp.setDate(new Date());
 				}
 				Date d = dp.getDate();
 				System.out.println("Date is " + d);
