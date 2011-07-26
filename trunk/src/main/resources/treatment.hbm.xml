@@ -11,6 +11,7 @@
         <many-to-one name="invoice" lazy="false" 
         	class="jstudio.model.Invoice" cascade="all"/>
         <property name="description" type="string"/>
+        <property name="quantity" type="integer"/>
         <property name="cost" type="float"/>
     </class>
 </hibernate-mapping>

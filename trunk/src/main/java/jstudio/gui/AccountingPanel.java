@@ -3,9 +3,6 @@ package jstudio.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -19,8 +16,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
-import jstudio.model.Event;
-import jstudio.util.DatePicker;
+import jstudio.model.Invoice;
+import jstudio.model.Treatment;
 import jstudio.util.Language;
 import jstudio.util.PopupListener;
 
@@ -28,18 +25,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
-public class AgendaPanel 
+public class AccountingPanel 
 		extends JPanel 
 		implements ListSelectionListener, ActionListener {
 	
-	//time format for event entries
-	public static final SimpleDateFormat 
-		dateFormat = new SimpleDateFormat("EEEE dd MMMM yyyy");
-	private static final Logger logger = LoggerFactory.getLogger(AgendaPanel.class);
+	private static final Logger logger = LoggerFactory.getLogger(AccountingPanel.class);
 	
 	private DefaultTableModel model;
 	private JTable table;
-	private JButton dateButton;
 	private JButton refreshButton;
 	private JTextField filterField;
 	private JStudioGUI gui;
@@ -48,28 +41,18 @@ public class AgendaPanel
 	private int lastSelectedRow = -1;
 	private long lastSelectionTime = 0;
 
-	public AgendaPanel(JStudioGUI gui){
+	public AccountingPanel(JStudioGUI gui){
 		this.gui = gui;
 		this.setLayout(new BorderLayout());
 
 		table = new JTable();
-		model = new AgendaTableModel(table);
+		model = new AccountingTableModel(table);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		table.getSelectionModel().addListSelectionListener(this);
 
 		JScrollPane scrollpane = new JScrollPane(table);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 		this.add(scrollpane, BorderLayout.CENTER);
-		
-		JPanel topPanel = new JPanel(new BorderLayout());
-		
-		JToolBar datePanel = new JToolBar(Language.string("Actions"));
-		datePanel.setFloatable(false);
-		dateButton = new JButton("");
-		dateButton.addActionListener(this);
-		datePanel.add(dateButton);
-		setDate(new Date());
-		topPanel.add(datePanel, BorderLayout.NORTH);
 
 		JToolBar actionPanel = new JToolBar(Language.string("Actions"));
 		actionPanel.setFloatable(false);
@@ -79,24 +62,10 @@ public class AgendaPanel
 		filterField = new JTextField();
 		filterField.addActionListener(this);
 		actionPanel.add(filterField);
-		topPanel.add(actionPanel, BorderLayout.CENTER);
 		
-		this.add(topPanel, BorderLayout.NORTH);
+		this.add(actionPanel, BorderLayout.NORTH);
 		
-		table.addMouseListener(new PopupListener<Event>(table, new EventPopup(this.gui)));
-	}
-	
-	public void setDate(Date date){
-		if(date==null) date = new Date();
-		dateButton.setText(dateFormat.format(date));
-	}
-	
-	public Date getDate(){
-		try {
-			return dateFormat.parse(dateButton.getText());
-		} catch (ParseException e) {
-			return new Date();
-		}
+		table.addMouseListener(new PopupListener<Invoice>(table, new InvoicePopup(this.gui)));
 	}
 	
 	public void valueChanged(ListSelectionEvent event) {
@@ -104,7 +73,7 @@ public class AgendaPanel
         if (0<=viewRow){        
         	if(viewRow==lastSelectedRow&&
         			200>(System.currentTimeMillis()-lastSelectionTime)){
-        		showEvent((Event)table.getValueAt(viewRow, 0));	
+        		showInvoice((Invoice)table.getValueAt(viewRow, 0));	
         		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
         		lastSelectedRow = -1;
         	}else{
@@ -115,8 +84,8 @@ public class AgendaPanel
         }
     }
 	
-	public void showEvent(Event e){
-		JDialog dialog = EventPanel.createDialog(gui, e, false);
+	public void showInvoice(Invoice i){
+		JDialog dialog = InvoicePanel.createDialog(gui, i, false);
 		dialog.setVisible(true);
 	}
 	
@@ -124,20 +93,30 @@ public class AgendaPanel
 		while(model.getRowCount()>0) model.removeRow(0);
 	}
 
-	public synchronized void addEvent(Event e){
+	public synchronized void addInvoice(Invoice i){
+		StringBuffer sb = new StringBuffer();
+		float total = 0f;
+		for(Treatment t: i.getTreatments()){
+			//FIXME: proper formatting plz
+			sb.append(" ");
+			sb.append(t.getDescription());
+			total += t.getCost()*t.getQuantity();
+		}
 		model.addRow(new Object[]{
-				e,
-				e.getName()+" "+e.getLastname(),
-				e.getDescription()
+				i,
+				i.getDate(),
+				i.getName()+" "+i.getLastname(),
+				sb.toString(),
+				total
 		});
 	}
 	
-	public synchronized void removeEvent(int id){
-		Event e;
+	public synchronized void removeInvoice(int id){
+		Invoice ob;
 		int frow = -1;
 		for(int i=0; i<model.getRowCount(); i++){
-			e = (Event)model.getValueAt(i, 0);
-			if(e.getId()==id){
+			ob = (Invoice)model.getValueAt(i, 0);
+			if(ob.getId()==id){
 				frow = i;
 				break;
 			}
@@ -150,17 +129,7 @@ public class AgendaPanel
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==refreshButton){
-			gui.loadEvents(getDate());
-		}else if(o==dateButton){
-			DatePicker dp = new DatePicker(this);
-			dp.setDate(this.getDate());
-			Date d = dp.getDate();
-			if(d!=null){
-				this.setDate(d);
-				gui.loadEvents(d);
-			}else{
-				gui.loadEvents(getDate()); //refresh
-			}
+			gui.loadInvoices();
 		}else{
 			logger.warn("Event source not mapped: "+o);
 		}

@@ -20,8 +20,8 @@ public class Treatment implements DatabaseObject{
 		this.id=0l;
 		this.invoice=invoice;
 		this.description=description;
-		this.quantity=quantity;
-		this.cost=cost;
+		this.quantity=quantity!=null?quantity:0;
+		this.cost=cost!=null?cost:0f;
 	}
 	
 	public Integer getQuantity() {
@@ -29,6 +29,7 @@ public class Treatment implements DatabaseObject{
 	}
 
 	public void setQuantity(Integer quantity) {
+		if(quantity==null) quantity=1;
 		this.quantity = quantity;
 	}
 
@@ -62,6 +63,7 @@ public class Treatment implements DatabaseObject{
 	}
 
 	public void setCost(Float cost) {
+		if(cost==null) cost = 0f;
 		this.cost = cost;
 	}
 

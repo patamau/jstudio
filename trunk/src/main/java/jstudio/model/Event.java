@@ -51,6 +51,7 @@ public class Event implements DatabaseObject {
 	}
 
 	public void setName(String name) {
+		if(name==null) name = "";
 		this.name = name;
 	}
 
@@ -59,6 +60,7 @@ public class Event implements DatabaseObject {
 	}
 
 	public void setLastname(String lastname) {
+		if(lastname==null) lastname = "";
 		this.lastname = lastname;
 	}
 
@@ -67,6 +69,7 @@ public class Event implements DatabaseObject {
 	}
 
 	public void setPhone(String phone) {
+		if(phone==null) phone = "";
 		this.phone = phone;
 	}
 	
@@ -95,6 +98,7 @@ public class Event implements DatabaseObject {
 	}
 
 	public void setDescription(String description) {
+		if(description==null) description="";
 		this.description = description;
 	}	
 	
