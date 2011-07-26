@@ -16,19 +16,25 @@ public class DatePicker {
 		sundayColor = Color.RED,
 		saturdayColor = Color.RED.darker();
 
-	private JLabel monthLabel = new JLabel("", JLabel.CENTER);
+	private boolean picked = false; //tell if the user clicked on the calendar or not
+	private JLabel monthLabel;
 	private Calendar calendar;
 	private JDialog dialog;
-	private JButton[] buttons = new JButton[42];
-	private JLabel[] labels = new JLabel[7];
+	private JButton[] buttons;
+	private JLabel[] labels;
+	private int originalDayOfMonth, originalMonth, originalYear;
 
 	public DatePicker(Component parent) {
 		calendar = Calendar.getInstance();
 		calendar.setFirstDayOfWeek(Calendar.MONDAY);
+		
+		//LABEL
+		monthLabel = new JLabel("", JLabel.CENTER);
 
 		JPanel p1 = new JPanel(new GridLayout(7, 7));
 		p1.setPreferredSize(new Dimension(430, 120));
 		
+		//WEEK DAYS
 		String[] header = {  
 				Language.string("Mon"), 
 				Language.string("Tue"), 
@@ -38,6 +44,7 @@ public class DatePicker {
 				Language.string("Sat"),
 				Language.string("Sun")
 			};		
+		labels = new JLabel[7];
 		for (int i=0; i<labels.length; i++){
 			labels[i] = new JLabel(header[i],JLabel.CENTER);
 			p1.add(labels[i]);
@@ -45,6 +52,8 @@ public class DatePicker {
 		labels[5].setForeground(saturdayColor);
 		labels[6].setForeground(sundayColor);
 
+		//MONTH DAYS
+		buttons = new JButton[42];
 		for (int x = 0; x < buttons.length; x++) {
 			final int selection = x;
 			buttons[x] = new JButton();
@@ -56,13 +65,15 @@ public class DatePicker {
 					int dom = Integer.parseInt(day);
 					calendar.set(Calendar.DAY_OF_MONTH, dom);
 					dialog.dispose();
+					picked=true;
 				}
 			});
 			p1.add(buttons[x]);
 		}
 		
 		JPanel p2 = new JPanel(new GridLayout(1, 3));
-		JButton previousButton = new JButton("<< Previous");
+		JButton previousButton = new JButton(Language.string("<<"));
+		previousButton.setToolTipText(Language.string("Previous month"));
 		previousButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				calendar.add(Calendar.MONTH, -1);
@@ -71,7 +82,8 @@ public class DatePicker {
 		});
 		p2.add(previousButton);
 		p2.add(monthLabel);
-		JButton nextButton = new JButton("Next >>");
+		JButton nextButton = new JButton(Language.string(">>"));
+		nextButton.setToolTipText(Language.string("Next month"));
 		nextButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				calendar.add(Calendar.MONTH, +1);
@@ -81,7 +93,7 @@ public class DatePicker {
 		p2.add(nextButton);
 		
 		dialog = new JDialog();
-		dialog.setTitle("Date Picker");
+		dialog.setTitle(Language.string("Date Picker"));
 		dialog.setModal(true);
 		dialog.add(p1, BorderLayout.CENTER);
 		dialog.add(p2, BorderLayout.NORTH);
@@ -89,8 +101,19 @@ public class DatePicker {
 		dialog.setResizable(false);
 		dialog.setLocationRelativeTo(parent);
 	}
+	
+	private void initOriginalDate(Date date){
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		this.originalDayOfMonth = c.get(Calendar.DAY_OF_MONTH);
+		this.originalMonth = c.get(Calendar.MONTH);
+		this.originalYear = c.get(Calendar.YEAR);
+	}
 
 	public void setDate(Date date) {
+		if(date==null) date = new Date();
+		//record original data
+		if(this.originalDayOfMonth==0) initOriginalDate(date);
 		calendar.setTime(date);
 		calendar.set(Calendar.DAY_OF_MONTH, 1);
 		int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)-2;
@@ -98,6 +121,7 @@ public class DatePicker {
 		int day = 1;
 		for (int x=0;x<buttons.length; x++) {
 			int dow = x%7;
+			buttons[x].setBackground(Color.WHITE);
 			if(dow==5){
 				buttons[x].setForeground(saturdayColor);
 			}else if(dow==6){
@@ -109,6 +133,11 @@ public class DatePicker {
 			}else{
 				buttons[x].setText(Integer.toString(day++));
 				buttons[x].setEnabled(true);
+				if(originalDayOfMonth==day&&
+						originalMonth==calendar.get(Calendar.MONTH)&&
+						originalYear==calendar.get(Calendar.YEAR)){
+					buttons[x].setBackground(Color.LIGHT_GRAY);
+				}
 			}
 		}
 		monthLabel.setText(sdf.format(calendar.getTime()));
@@ -116,7 +145,8 @@ public class DatePicker {
 
 	public Date getDate() {
 		dialog.setVisible(true);
-		return calendar.getTime();
+		if(picked) return calendar.getTime();
+		else return null;
 	}
 
 	/**
