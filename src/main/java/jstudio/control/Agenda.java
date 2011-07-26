@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Date;
 
 import jstudio.db.DatabaseInterface;
-import jstudio.db.DatabaseObject;
 import jstudio.model.Event;
 
 /**

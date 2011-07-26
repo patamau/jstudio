@@ -49,14 +49,14 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		connectionItem,
 		exitItem,
 		agendaItem,
-		parchiveItem,
-		invoiceItem;
+		addressBookItem,
+		accountingItem;
 		
 	private JLabel statusLabel;
 	private JTabbedPane tabbedPane;
 	private AgendaPanel agendaPanel;
-	private AddressBookPanel contactsPanel;
-	private InvoicePanel invoicePanel;
+	private AddressBookPanel addressBookPanel;
+	private AccountingPanel accountingPanel;
 
 	public JStudioGUI(String title, JStudio app){
 		super(title);
@@ -95,15 +95,15 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		
 		//create view menu
 		JMenu viewMenu = new JMenu(Language.string("View"));
-		parchiveItem = new JMenuItem(Language.string("Address book"), Resources.getImage(PIC_ADDRESSBOOK));
-		parchiveItem.addActionListener(this);
+		addressBookItem = new JMenuItem(Language.string("Address book"), Resources.getImage(PIC_ADDRESSBOOK));
+		addressBookItem.addActionListener(this);
 		agendaItem = new JMenuItem(Language.string("Agenda"), Resources.getImage(PIC_AGENDA));
 		agendaItem.addActionListener(this);
-		invoiceItem = new JMenuItem(Language.string("Accounting"), Resources.getImage(PIC_ACCOUNTING));
-		invoiceItem.addActionListener(this);
-		viewMenu.add(parchiveItem);
+		accountingItem = new JMenuItem(Language.string("Accounting"), Resources.getImage(PIC_ACCOUNTING));
+		accountingItem.addActionListener(this);
+		viewMenu.add(addressBookItem);
 		viewMenu.add(agendaItem);
-		viewMenu.add(invoiceItem);
+		viewMenu.add(accountingItem);
 		menuBar.add(viewMenu);
 		setJMenuBar(menuBar);
 		
@@ -116,19 +116,19 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		tabbedPane = new JTabbedPane();
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
 		//initialize sub panels
-		contactsPanel = new AddressBookPanel(this);
+		addressBookPanel = new AddressBookPanel(this);
 		agendaPanel = new AgendaPanel(this);
-		invoicePanel = new InvoicePanel();
+		accountingPanel = new AccountingPanel(this);
 		//by default show contacts
 		tabbedPane.addTab(Language.string("Address book"),
 				Resources.getImage(PIC_ADDRESSBOOK),
-				contactsPanel);
+				addressBookPanel);
 		tabbedPane.addTab(Language.string("Agenda"),
 				Resources.getImage(PIC_AGENDA),
 				agendaPanel);
 		tabbedPane.addTab(Language.string("Accounting"),
 				Resources.getImage(PIC_ACCOUNTING),
-				invoicePanel);
+				accountingPanel);
 	}
 	
 	@Override
@@ -141,11 +141,11 @@ public class JStudioGUI extends JFrame implements ActionListener {
 	} 
 	
 	public void loadContacts(){
-		contactsPanel.clear();
+		addressBookPanel.clear();
 		Collection<Person> pps = app.getAddressBook().getAll();
 		if(pps!=null){
 			for(Person p: pps){
-				contactsPanel.addPerson(p);
+				addressBookPanel.addPerson(p);
 			}
 		}else{
 			JOptionPane.showMessageDialog(this, Language.string("Unable to load contacts"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
@@ -165,11 +165,11 @@ public class JStudioGUI extends JFrame implements ActionListener {
 	}
 	
 	public void loadInvoices(){
-		//TODO: invoicePanel.clear();
+		accountingPanel.clear();
 		Collection<Invoice> list = app.getAccounting().getAll();
 		if(list!=null){
 			for(Invoice i: list){
-				//TODO: invoicePanel.addInvoice(i);
+				accountingPanel.addInvoice(i);
 			}
 		}else{
 			JOptionPane.showMessageDialog(this, Language.string("Unable to load invoices"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
@@ -180,16 +180,16 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		tabbedPane.setSelectedComponent(panel);
 	}
 	
-	public void showContacts(){
-		showPanel(contactsPanel);
+	public void showAddressBook(){
+		showPanel(addressBookPanel);
 	}
 	
 	public void showAgenda(){
 		showPanel(agendaPanel);
 	}
 	
-	public void showInvoice(){
-		showPanel(invoicePanel);
+	public void showAccounting(){
+		showPanel(accountingPanel);
 	}
 
 	public void actionPerformed(ActionEvent event) {
@@ -201,12 +201,12 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		}else if(src==connectionItem){
 			DBDialog dbdialog = new DBDialog(this,app.getDatabase());
 			dbdialog.showDialog(Configuration.getGlobalConfiguration());			
-		}else if(src==parchiveItem){
-			showContacts();
+		}else if(src==addressBookItem){
+			showAddressBook();
 		}else if(src==agendaItem){
 			showAgenda();
-		}else if(src==invoiceItem){
-			showInvoice();
+		}else if(src==accountingItem){
+			showAccounting();
 		}else if(src==exitItem){
 			this.dispose();
 		}

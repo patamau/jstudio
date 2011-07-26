@@ -98,7 +98,7 @@ public class AddressBookPanel
 				p.getName(),
 				p.getLastname(),
 				p.getBirthdate(),
-				p.getAddress(),
+				p.getCity(),
 				p.getPhone()});
 	}
 	

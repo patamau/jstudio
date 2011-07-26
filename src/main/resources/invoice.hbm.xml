@@ -10,10 +10,16 @@
 		</id>
 		<property name="date" />
 		<many-to-one name="person" lazy="false" class="jstudio.model.Person"
-			cascade="all" />
+			cascade="none" />
 		<set name="treatments" lazy="false" cascade="all" inverse="true">
              <key column="invoice"/>
              <one-to-many class="jstudio.model.Treatment"/>
         </set>
+        <property name="name" />
+		<property name="lastname" />
+		<property name="address" />
+		<property name="city" />
+		<property name="cap" />
+		<property name="code" />
 	</class>
 </hibernate-mapping>

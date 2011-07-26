@@ -46,19 +46,8 @@ public class Invoice implements DatabaseObject{
 		this.treatments=treatments;
 	}
 	
-	//FIXME: used for debuggin
 	public String toString(){
-		StringBuffer sb = new StringBuffer();
-		sb.append(Person.birthdateFormat.format(date));
-		sb.append(" ");
-		sb.append(person.getName());
-		sb.append(" ");
-		sb.append(person.getLastname());
-		for(Treatment t: treatments){
-			sb.append(" ");
-			sb.append(t);
-		}
-		return sb.toString();
+		return Long.toString(id);
 	}
 	
 	
@@ -67,6 +56,7 @@ public class Invoice implements DatabaseObject{
 	}
 
 	public void setName(String name) {
+		if(name==null) name = "";
 		this.name = name;
 	}
 
@@ -75,6 +65,7 @@ public class Invoice implements DatabaseObject{
 	}
 
 	public void setLastname(String lastname) {
+		if(lastname==null) lastname = "";
 		this.lastname = lastname;
 	}
 
@@ -83,6 +74,7 @@ public class Invoice implements DatabaseObject{
 	}
 
 	public void setAddress(String address) {
+		if(address==null) address = "";
 		this.address = address;
 	}
 
@@ -91,6 +83,7 @@ public class Invoice implements DatabaseObject{
 	}
 
 	public void setCity(String city) {
+		if(city==null) city = "";
 		this.city = city;
 	}
 
@@ -99,6 +92,7 @@ public class Invoice implements DatabaseObject{
 	}
 
 	public void setCap(String cap) {
+		if(cap==null) cap = "";
 		this.cap = cap;
 	}
 
@@ -107,6 +101,7 @@ public class Invoice implements DatabaseObject{
 	}
 
 	public void setCode(String code) {
+		if(cap==null) cap = "";
 		this.code = code;
 	}
 	
