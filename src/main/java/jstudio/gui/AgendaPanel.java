@@ -88,6 +88,7 @@ public class AgendaPanel
 	}
 	
 	public void setDate(Date date){
+		if(date==null) date = new Date();
 		dateButton.setText(dateFormat.format(date));
 	}
 	
@@ -155,8 +156,12 @@ public class AgendaPanel
 			DatePicker dp = new DatePicker(this);
 			dp.setDate(this.getDate());
 			Date d = dp.getDate();
-			this.setDate(d);
-			gui.loadEvents(d);
+			if(d!=null){
+				this.setDate(d);
+				gui.loadEvents(d);
+			}else{
+				gui.loadEvents(getDate()); //refresh
+			}
 		}else{
 			logger.warn("Event source not mapped: "+o);
 		}
