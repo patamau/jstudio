@@ -89,6 +89,8 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 			for(Invoice i: accounting.getAll()){
 				logger.info(i.toString());
 			}
+			String code = comuni.getCode("TN", "Trento");
+			logger.info("CODE: "+code);
 		}
 	}
 	
