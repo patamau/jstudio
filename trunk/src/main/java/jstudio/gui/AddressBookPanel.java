@@ -63,7 +63,7 @@ public class AddressBookPanel
 		actionPanel.add(filterField);
 		this.add(actionPanel, BorderLayout.NORTH);
 		
-	    table.addMouseListener(new PopupListener<Person>(table, new PersonPopup(this.gui)));
+	    table.addMouseListener(new PopupListener<Person>(table, new PersonPopup(this.gui, this.gui.getApplication().getAddressBook())));
 	}
 	
 	public void valueChanged(ListSelectionEvent event) {
@@ -84,7 +84,7 @@ public class AddressBookPanel
     }
 	
 	public void showPerson(Person p){
-		JDialog dialog = PersonPanel.createDialog(gui, p, false);
+		JDialog dialog = PersonPanel.createDialog(gui, p, null);
 		dialog.setVisible(true);
 	}
 	

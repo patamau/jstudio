@@ -6,6 +6,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import jstudio.control.Controller;
 import jstudio.model.Event;
 import jstudio.util.ContextualMenu;
 import jstudio.util.Language;
@@ -15,8 +16,8 @@ public class EventPopup extends ContextualMenu<Event> {
 
 	private Event event;
 	
-	public EventPopup(JFrame parent){
-		super(parent);
+	public EventPopup(JFrame parent, Controller<Event> controller){
+		super(parent, controller);
 	}
 	
 	@Override

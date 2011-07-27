@@ -32,8 +32,9 @@ public class GUITool {
 		gc.gridwidth=ow;
 	}
 	
-	public static JButton createButton(Container c, GridBagConstraints gc, String label){
+	public static JButton createButton(Container c, GridBagConstraints gc, String label, ActionListener listener){
 		JButton f = new JButton(label);
+		if(listener!=null) f.addActionListener(listener);
 		int ow = gc.gridwidth; //store old weight
 		gc.gridwidth=2;
 		gc.gridy++;
