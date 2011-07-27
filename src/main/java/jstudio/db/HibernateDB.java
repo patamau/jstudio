@@ -1,6 +1,6 @@
 package jstudio.db;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.HashMap;
 
 import jstudio.db.DatabaseInterface;
@@ -83,8 +83,8 @@ public class HibernateDB implements DatabaseInterface{
     	return false;
     }
     
-    public DatabaseObject store(String table, DatabaseObject o){
-    	// table is ignored because hibernate mapping already takes care of this
+    public DatabaseObject store(String source, DatabaseObject o){
+    	// source is ignored because hibernate mapping already takes care of this
     	Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
     	session.saveOrUpdate(o);
@@ -108,29 +108,29 @@ public class HibernateDB implements DatabaseInterface{
     }
     
     @SuppressWarnings("unchecked")
-	public Collection<DatabaseObject> getAll(String table){
+	public List<DatabaseObject> getAll(String source){
     	Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
-    	Collection<DatabaseObject> l = (Collection<DatabaseObject>)session.createQuery("from "+table).list();
+    	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery("from "+source).list();
     	commit(t);
     	return l;
     }
 
-	public DatabaseObject get(String table, int id) {
+	public DatabaseObject get(String source, int id) {
 		Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
-    	DatabaseObject o = (DatabaseObject)session.createQuery("from "+table+" where id="+id).uniqueResult();
+    	DatabaseObject o = (DatabaseObject)session.createQuery("from "+source+" where id="+id).uniqueResult();
     	commit(t);
     	return o;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Collection<DatabaseObject> getBetween(String table, String field, String from, String to){
+	public List<DatabaseObject> getBetween(String source, String field, String from, String to){
     	Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
     	StringBuffer sb = new StringBuffer();
     	sb.append("from ");
-    	sb.append(table);
+    	sb.append(source);
     	sb.append(" where ");
     	sb.append(field);
     	sb.append(" between '");
@@ -138,21 +138,21 @@ public class HibernateDB implements DatabaseInterface{
     	sb.append("' and '");
     	sb.append(to);
     	sb.append("'");    	
-    	Collection<DatabaseObject> l = (Collection<DatabaseObject>)session.createQuery(sb.toString()).list();
+    	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery(sb.toString()).list();
     	commit(t);
     	return l;
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<DatabaseObject> getAll(String table,
+	public List<DatabaseObject> getAll(String source,
 			HashMap<String, String> values) {
 		//if no values specified, bounce to default getAll
-		if(null==values||0==values.keySet().size()) return getAll(table);
+		if(null==values||0==values.keySet().size()) return getAll(source);
     	Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
     	StringBuffer sb = new StringBuffer();
     	sb.append("from ");
-    	sb.append(table);
+    	sb.append(source);
     	sb.append(" where ");
     	int siz = values.size();
     	for(String k: values.keySet()){
@@ -165,7 +165,7 @@ public class HibernateDB implements DatabaseInterface{
     			sb.append(" AND ");
     		}
     	}
-    	Collection<DatabaseObject> l = (Collection<DatabaseObject>)session.createQuery(sb.toString()).list();
+    	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery(sb.toString()).list();
     	commit(t);
     	return l;
 	}
