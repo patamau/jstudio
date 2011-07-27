@@ -7,11 +7,13 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import jstudio.control.Controller;
 import jstudio.model.Person;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
@@ -21,6 +23,7 @@ public class PersonPanel extends JPanel implements ActionListener {
 	
 	private static JDialog dialog;
 	private Person person;
+	private Controller<Person> controller;
 	private JTextField 
 		nameField, 
 		lastnameField,
@@ -30,9 +33,12 @@ public class PersonPanel extends JPanel implements ActionListener {
 		capField,
 		codeField,
 		phoneField;
+	private JButton okButton, cancelButton;
 
-	public PersonPanel(Person person, boolean editable){
+	public PersonPanel(Person person, Controller<Person> controller){
 		this.person = person;
+		this.controller = controller;
+		boolean editable = controller!=null;
 		
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -48,6 +54,11 @@ public class PersonPanel extends JPanel implements ActionListener {
 		capField = GUITool.createField(this, gc, Language.string("CAP"), this.person.getCap(), editable);
 		codeField = GUITool.createField(this, gc, Language.string("Code"), this.person.getCode(), editable);
 		phoneField = GUITool.createField(this, gc, Language.string("Phone"), this.person.getPhone(), editable);
+		
+		if(editable){
+			okButton = GUITool.createButton(this, gc, Language.string("Ok"),this);
+			cancelButton = GUITool.createButton(this, gc, Language.string("Cancel"),this);
+		}
 	}
 	
 	/**
@@ -57,22 +68,28 @@ public class PersonPanel extends JPanel implements ActionListener {
 	 * @param parent
 	 * @return
 	 */
-	public static JDialog createDialog(JFrame parent, Person p, boolean editable){
+	public static JDialog createDialog(JFrame parent, Person p, Controller<Person> controller){
 		if(dialog==null){
 			dialog = new JDialog(parent);
 			dialog.setTitle(Language.string("Person dialog"));
 			dialog.getContentPane().setLayout(new BorderLayout());
 		}
 		dialog.setLocationRelativeTo(parent);
-		dialog.setModal(editable);
+		dialog.setModal(controller!=null);
 		dialog.getContentPane().removeAll();
-		dialog.getContentPane().add(new PersonPanel(p, editable),BorderLayout.CENTER);
+		dialog.getContentPane().add(new PersonPanel(p, controller),BorderLayout.CENTER);
 		dialog.pack();
 		return dialog;
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
-		//TODO: ok, cancel, edit
+		if(o==okButton){
+			person.setCity(cityField.getText());
+			controller.store(person);
+			dialog.dispose();
+		}else if(o==cancelButton){
+			dialog.dispose();
+		}
 	}
 }

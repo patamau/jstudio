@@ -7,8 +7,11 @@ import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import jstudio.control.Controller;
+import jstudio.db.DatabaseObject;
+
 @SuppressWarnings("serial")
-public abstract class ContextualMenu<Context> 
+public abstract class ContextualMenu<Context extends DatabaseObject> 
 		extends JPopupMenu 
 		implements ActionListener {
 	
@@ -16,9 +19,12 @@ public abstract class ContextualMenu<Context>
 		viewItem, editItem, removeItem;
 	protected JFrame
 		parent;
+	protected Controller<Context> controller;
+	protected Context context;
 
-	public ContextualMenu(JFrame parent){
+	public ContextualMenu(JFrame parent, Controller<Context> controller){
 		this.parent=parent;
+		this.controller=controller;
 		viewItem = new JMenuItem("View");
 	    viewItem.addActionListener(this);
 	    this.add(viewItem);
@@ -32,5 +38,7 @@ public abstract class ContextualMenu<Context>
 	    this.add(removeItem);
 	}
 	
-	public abstract void setContext(Context context);
+	public void setContext(Context context){
+		this.context = context;
+	}
 }

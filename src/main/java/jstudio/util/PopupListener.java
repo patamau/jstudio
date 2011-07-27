@@ -5,8 +5,10 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JTable;
 
+import jstudio.db.DatabaseObject;
 
-public class PopupListener<Context> extends MouseAdapter {
+
+public class PopupListener<Context extends DatabaseObject> extends MouseAdapter {
 	private JTable table;
 	private ContextualMenu<Context> popup;
 	

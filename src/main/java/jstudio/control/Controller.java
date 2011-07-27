@@ -41,4 +41,8 @@ public abstract class Controller<E extends DatabaseObject> {
 	public Collection<E> getAll(){
 		return (Collection<E>)database.getAll(source);
 	}
+	
+	public void store(E o){
+		database.store(source, o);
+	}
 }

@@ -69,6 +69,10 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		this.app = app;
 	}
 	
+	public JStudio getApplication(){
+		return app;
+	}
+	
 	private void createGUI(){
 		//only one gui created at a time
 		if(initialized) return;

@@ -6,6 +6,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
+import jstudio.control.Controller;
 import jstudio.model.Invoice;
 import jstudio.util.ContextualMenu;
 import jstudio.util.Language;
@@ -15,8 +16,8 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 
 	private Invoice invoice;
 	
-	public InvoicePopup(JFrame parent){
-		super(parent);
+	public InvoicePopup(JFrame parent, Controller<Invoice> controller){
+		super(parent, controller);
 	}
 	
 	@Override

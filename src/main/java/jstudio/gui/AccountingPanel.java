@@ -65,7 +65,7 @@ public class AccountingPanel
 		
 		this.add(actionPanel, BorderLayout.NORTH);
 		
-		table.addMouseListener(new PopupListener<Invoice>(table, new InvoicePopup(this.gui)));
+		table.addMouseListener(new PopupListener<Invoice>(table, new InvoicePopup(this.gui, this.gui.getApplication().getAccounting())));
 	}
 	
 	public void valueChanged(ListSelectionEvent event) {

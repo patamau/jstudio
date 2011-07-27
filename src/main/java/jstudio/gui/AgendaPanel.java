@@ -83,7 +83,7 @@ public class AgendaPanel
 		
 		this.add(topPanel, BorderLayout.NORTH);
 		
-		table.addMouseListener(new PopupListener<Event>(table, new EventPopup(this.gui)));
+		table.addMouseListener(new PopupListener<Event>(table, new EventPopup(this.gui, this.gui.getApplication().getAgenda())));
 	}
 	
 	public void setDate(Date date){
