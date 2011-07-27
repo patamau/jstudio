@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+        
+<hibernate-mapping package="jstudio.model">
+    <class name="Comune" table="comuni">
+        <id name="id" column="id" type="long">
+        	<generator class="increment"/>
+        </id>
+        <property column="id_nazionale" name="idNazionale" type="string"/>
+        <property column="id_catastale" name="idCatastale" type="string"/>
+        <property name="provincia" type="string"/>
+        <property name="comune" type="string"/>
+    </class>
+</hibernate-mapping>

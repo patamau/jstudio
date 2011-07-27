@@ -9,6 +9,7 @@ import javax.swing.JWindow;
 import jstudio.control.Agenda;
 import jstudio.control.Accounting;
 import jstudio.control.AddressBook;
+import jstudio.control.Comuni;
 import jstudio.db.DatabaseInterface;
 import jstudio.db.HibernateDB;
 import jstudio.gui.JStudioGUI;
@@ -52,6 +53,7 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 	private Agenda agenda;
 	private AddressBook addressBook;
 	private Accounting accounting;
+	private Comuni comuni;
 	
 	public JStudio(){
 	}
@@ -81,6 +83,7 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		agenda = new Agenda(database);
 		addressBook = new AddressBook(database);
 		accounting = new Accounting(database);
+		comuni = new Comuni(database);
 		if(database.isConnected()){
 			//contacts.addPerson(new Person("Matteo","Pedrotti",new Date(),"Via bomport, 20", "12312424"));
 			for(Invoice i: accounting.getAll()){
@@ -182,5 +185,9 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 	
 	public Accounting getAccounting(){
 		return accounting;
+	}
+	
+	public Comuni getComuni(){
+		return comuni;
 	}
 }

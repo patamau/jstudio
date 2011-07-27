@@ -6,10 +6,12 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -85,7 +87,20 @@ public class PersonPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==okButton){
+			try {
+				person.setBirthdate(Person.birthdateFormat.parse(birthdateField.getText()));
+			} catch (ParseException e1) {
+				String msg = Language.string("Wrong date format for {0}, expected {1}",birthdateField.getText(),Person.birthdateFormat.toPattern());
+				JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			person.setName(nameField.getText());
+			person.setLastname(lastnameField.getText());
+			person.setAddress(addressField.getText());
 			person.setCity(cityField.getText());
+			person.setCap(capField.getText());		
+			person.setCode(codeField.getText());
+			person.setPhone(phoneField.getText());
 			controller.store(person);
 			dialog.dispose();
 		}else if(o==cancelButton){
