@@ -7,6 +7,7 @@ public class CodeGenerator {
 	private static int[] even = new int[43];
 	
 	private static String normalize(String src){
+		if(src==null) src="";
 		src = src.trim().toUpperCase();
 		return src;
 	}
@@ -162,6 +163,7 @@ public class CodeGenerator {
 		//preparing values
 		name = normalize(name);
 		last = normalize(last);
+		if(idloc==null) idloc = "X000";
 		idloc= normalize(idloc);
 		day = male?day:day+40;
 		

@@ -80,10 +80,10 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 			JOptionPane.showMessageDialog(null, Language.string("Database connection error")+": "+e.getLocalizedMessage(), Language.string("Data initialization"), JOptionPane.ERROR_MESSAGE);
 		}
 		//initialize data handlers
-		agenda = new Agenda(database);
-		addressBook = new AddressBook(database);
-		accounting = new Accounting(database);
-		comuni = new Comuni(database);
+		agenda = new Agenda(this);
+		addressBook = new AddressBook(this);
+		accounting = new Accounting(this);
+		comuni = new Comuni(this);
 		if(database.isConnected()){
 			//contacts.addPerson(new Person("Matteo","Pedrotti",new Date(),"Via bomport, 20", "12312424"));
 			for(Invoice i: accounting.getAll()){

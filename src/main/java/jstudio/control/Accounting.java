@@ -1,12 +1,11 @@
 package jstudio.control;
 
-import jstudio.db.DatabaseInterface;
+import jstudio.JStudio;
 import jstudio.model.Invoice;
 
 public class Accounting extends Controller<Invoice>{
 
-	public Accounting(DatabaseInterface database){
-		super(database);
-		setSource(Invoice.class.getName());
+	public Accounting(JStudio app){
+		super(app, Invoice.class.getName());
 	}
 }

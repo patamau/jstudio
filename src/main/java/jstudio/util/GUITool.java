@@ -120,8 +120,10 @@ public class GUITool {
 		gc.gridx++;
 		c.add(f,gc);
 		if(editable){
-			JButton b = new JButton("...");
-			b.setPreferredSize(new Dimension(25,20));
+			String blabel = Language.string("Pick");
+			JButton b = new JButton(blabel);
+			int swidth = b.getFontMetrics(b.getFont()).stringWidth(blabel);
+			b.setPreferredSize(new Dimension(swidth+40,20));
 			b.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					DatePicker d = new DatePicker(c);
@@ -133,6 +135,8 @@ public class GUITool {
 					f.setText(dateFormat.format(d.getDate()));
 				}
 			});
+			gc.weightx=0.0f;
+			gc.fill=GridBagConstraints.NONE;
 			gc.gridx++;
 			c.add(b,gc);
 		}
