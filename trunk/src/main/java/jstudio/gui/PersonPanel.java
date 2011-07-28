@@ -1,12 +1,15 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
+import java.util.Calendar;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -17,6 +20,8 @@ import javax.swing.JTextField;
 
 import jstudio.control.Controller;
 import jstudio.model.Person;
+import jstudio.util.CodeGenerator;
+import jstudio.util.DatePicker;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
@@ -37,10 +42,10 @@ public class PersonPanel extends JPanel implements ActionListener {
 		phoneField;
 	private JButton okButton, cancelButton;
 
-	public PersonPanel(Person person, Controller<Person> controller){
+	public PersonPanel(Person person, Controller<Person> _controller){
 		this.person = person;
-		this.controller = controller;
-		boolean editable = controller!=null;
+		this.controller = _controller;
+		boolean editable = _controller!=null;
 		
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -55,6 +60,41 @@ public class PersonPanel extends JPanel implements ActionListener {
 		cityField = GUITool.createField(this, gc, Language.string("City"), this.person.getCity(), editable);
 		capField = GUITool.createField(this, gc, Language.string("CAP"), this.person.getCap(), editable);
 		codeField = GUITool.createField(this, gc, Language.string("Code"), this.person.getCode(), editable);
+		if(editable){
+			String blabel = Language.string("Generate");
+			JButton b = new JButton(blabel);
+			int swidth = b.getFontMetrics(b.getFont()).stringWidth(blabel);
+			b.setPreferredSize(new Dimension(swidth+40,20));
+			b.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent e) {
+					boolean male = true; //TODO: add gender
+					String pv = "TN"; //TODO: add province
+					String loc = controller.getApplication().getComuni().getCode(pv, cityField.getText());
+					Calendar c = Calendar.getInstance();
+					try{
+						c.setTime(Person.birthdateFormat.parse(birthdateField.getText()));
+					}catch(ParseException pe){
+						c.set(Calendar.YEAR, 1);
+						c.set(Calendar.MONTH, 1);
+						c.set(Calendar.DAY_OF_YEAR, 1);
+					}
+					String code = CodeGenerator.generate(
+							nameField.getText(), 
+							lastnameField.getText(), 
+							male, 
+							c.get(Calendar.YEAR), 
+							c.get(Calendar.MONTH)+1, 
+							c.get(Calendar.DAY_OF_MONTH),
+							loc
+							);
+					codeField.setText(code);
+				}
+			});
+			gc.gridx+=2;
+			this.add(b,gc);
+			gc.gridx=0;
+			gc.gridy++;
+		}
 		phoneField = GUITool.createField(this, gc, Language.string("Phone"), this.person.getPhone(), editable);
 		
 		if(editable){

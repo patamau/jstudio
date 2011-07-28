@@ -13,16 +13,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
-
 import jstudio.JStudio;
 import jstudio.control.AddressBook;
-import jstudio.db.DatabaseInterface;
-import jstudio.db.HibernateDB;
 import jstudio.model.Person;
-import jstudio.util.Configuration;
-import jstudio.util.Language;
- 
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
  
@@ -33,48 +26,19 @@ import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 public class ReportGenerator<Entry> {
 	
 	public static void main(String args[]){
-		initializeConfiguration();
+		JStudio app = new JStudio();
+		app.initialize();
+		AddressBook cts = app.getAddressBook();
+		
 		ReportGenerator<Person> rg = new ReportGenerator<Person>();
 		rg.setReport("/report1.jasper");
-		AddressBook cts = new AddressBook(initializeData());
 		rg.setData(cts.getAll());
 		try {
 			rg.generatePdf(".","sampleReportPerson.pdf");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private static void initializeConfiguration(){
-		//initialize configuration loading the configuration file
-		Configuration configuration = new Configuration();
-		configuration.load(JStudio.class.getSimpleName()+Configuration.FILE_SUFFIX);
-		Language.setCurrentLanguage(
-				configuration.getProperty(
-						"language",
-						Language.getCurrentLanguage().getCode()
-					)
-				);
-		//configuration is set globally
-		Configuration.setGlobalConfiguration(configuration);
-	}
-	
-	private static DatabaseInterface initializeData(){
-		DatabaseInterface database;
-		//initialize database manager
-		String protocol = Configuration.getGlobal(DatabaseInterface.KEY_PROTOCOL,DatabaseInterface.DEF_PROTOCOL);
-		String driver = Configuration.getGlobal(DatabaseInterface.KEY_DRIVER,DatabaseInterface.DEF_DRIVER);
-		database = new HibernateDB(protocol, driver);
-		String hostname = Configuration.getGlobal(DatabaseInterface.KEY_HOST, DatabaseInterface.DEF_HOST);
-		String dbname = Configuration.getGlobal(DatabaseInterface.KEY_NAME, DatabaseInterface.DEF_NAME);
-		String user = Configuration.getGlobal(DatabaseInterface.KEY_USER, DatabaseInterface.DEF_USER);
-		String password = Configuration.getGlobal(DatabaseInterface.KEY_PASS, DatabaseInterface.DEF_PASS);
-		try {
-			database.connect(hostname, dbname, user, password);
-		} catch (Throwable e) {
-			JOptionPane.showMessageDialog(null, Language.string("Database connection error")+": "+e.getLocalizedMessage(), Language.string("Data initialization"), JOptionPane.ERROR_MESSAGE);
-		}
-		return database;
+		System.exit(0);
 	}
 	
 	private String reportName;
