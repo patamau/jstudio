@@ -3,6 +3,7 @@ package jstudio.model;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import jstudio.db.DatabaseObject;
@@ -121,7 +122,7 @@ public class Invoice implements DatabaseObject{
 		this.person = person;
 	}
 
-	public Collection<Treatment> getTreatments() {
+	public Set<Treatment> getTreatments() {
 		return treatments;
 	}
 

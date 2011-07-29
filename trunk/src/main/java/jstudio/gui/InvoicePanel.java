@@ -15,18 +15,23 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Invoice;
+import jstudio.model.Person;
 import jstudio.model.Treatment;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
+import jstudio.util.PopupListener;
 
 @SuppressWarnings("serial")
-public class InvoicePanel extends JPanel implements ActionListener {
+public class InvoicePanel extends JPanel implements ListSelectionListener, ActionListener {
 	
 	private static JDialog dialog;
 	private Invoice invoice;
+	private JStudioGUI gui;
 	private JTextField 
 		idField,
 		dateField, 
@@ -36,9 +41,14 @@ public class InvoicePanel extends JPanel implements ActionListener {
 		cityField,
 		capField,
 		codeField;
+	private JTable table; //treatments
+	// internally used to catch a double click on the table
+	private int lastSelectedRow = -1;
+	private long lastSelectionTime = 0;
 
-	public InvoicePanel(Invoice invoice, boolean editable){
+	public InvoicePanel(Invoice invoice, boolean editable, JStudioGUI gui){
 		this.invoice = invoice;
+		this.gui = gui;
 		
 		this.setLayout(new BorderLayout());
 		
@@ -77,19 +87,20 @@ public class InvoicePanel extends JPanel implements ActionListener {
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
-		JTable table = new JTable(){
+		table = new JTable(){
 		  public Dimension getPreferredScrollableViewportSize() {
 			  return getPreferredSize();
 		  }
 		};
-		DefaultTableModel model = new TreatmentTableModel(table);
+		DefaultTableModel model = new TreatmentTableModel(table, invoice);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table.getSelectionModel().addListSelectionListener(this);
 		
 		int quantity_tot = 0;
 		float cost_tot = 0f;
 		for(Treatment t: invoice.getTreatments()){
 			model.addRow(new Object[]{
-					t.getDescription(),
+					t,
 					t.getQuantity(),
 					t.getCost()
 			});
@@ -100,7 +111,7 @@ public class InvoicePanel extends JPanel implements ActionListener {
 		body.add(new JScrollPane(table), BorderLayout.CENTER);
 		
 		JTable total = new JTable();
-		DefaultTableModel tmodel = new TreatmentTableModel(total);
+		DefaultTableModel tmodel = new TreatmentTableModel(total, null);
 		total.setRowSelectionAllowed(false);		
 		tmodel.addRow(new Object[]{
 				Language.string("Total"),
@@ -112,6 +123,8 @@ public class InvoicePanel extends JPanel implements ActionListener {
 		
 		this.add(head, BorderLayout.NORTH);
 		this.add(body, BorderLayout.CENTER);
+		
+		//table.addMouseListener(new PopupListener<Treatment>(table, new TreatmentPopup(this.gui, this.gui.getApplication().getAccounting().getTreatmentManager())));
 	}
 	
 	/**
@@ -121,18 +134,39 @@ public class InvoicePanel extends JPanel implements ActionListener {
 	 * @param parent
 	 * @return
 	 */
-	public static JDialog createDialog(JFrame parent, Invoice object, boolean editable){
+	public static JDialog createDialog(JStudioGUI gui, Invoice object, boolean editable){
 		if(dialog==null){
-			dialog = new JDialog(parent);
+			dialog = new JDialog(gui);
 			dialog.setTitle(Language.string("Invoice dialog"));
 			dialog.getContentPane().setLayout(new BorderLayout());
 		}
-		dialog.setLocationRelativeTo(parent);
+		dialog.setLocationRelativeTo(gui);
 		dialog.setModal(editable);
 		dialog.getContentPane().removeAll();
-		dialog.getContentPane().add(new InvoicePanel(object, editable),BorderLayout.CENTER);
+		dialog.getContentPane().add(new InvoicePanel(object, editable, gui),BorderLayout.CENTER);
 		dialog.pack();
 		return dialog;
+	}
+	
+	public void valueChanged(ListSelectionEvent event) {
+        int viewRow = table.getSelectedRow();
+        if (0<=viewRow){        
+        	if(viewRow==lastSelectedRow&&
+        			200>(System.currentTimeMillis()-lastSelectionTime)){
+        		showTreatment((Treatment)table.getValueAt(viewRow, 0));	
+        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
+        		lastSelectedRow = -1;
+        	}else{
+            	lastSelectedRow = viewRow;
+            	lastSelectionTime = System.currentTimeMillis();
+        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
+        	}
+        }
+    }
+	
+	public void showTreatment(Treatment t){
+		JDialog dialog = TreatmentPanel.createDialog(gui, t, gui.getApplication().getAccounting().getTreatmentManager());
+		dialog.setVisible(true);
 	}
 
 	public void actionPerformed(ActionEvent e) {

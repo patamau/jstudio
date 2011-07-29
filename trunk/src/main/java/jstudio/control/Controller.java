@@ -10,7 +10,7 @@ import jstudio.db.DatabaseObject;
  * @author Matteo
  *
  */
-public abstract class Controller<E extends DatabaseObject> {
+public class Controller<E extends DatabaseObject> {
 	
 	private String source;
 	private JStudio app;

@@ -46,6 +46,7 @@ public class Person implements DatabaseObject, Comparable<Object> {
 	}
 	
 	public Integer getGender(){
+		if(gender==null) gender=Gender.Male.getId();
 		return gender;
 	}
 	

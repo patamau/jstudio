@@ -33,9 +33,8 @@ public class Treatment implements DatabaseObject{
 		this.quantity = quantity;
 	}
 
-	//FIXME: only for debugging 
 	public String toString(){
-		return description+" "+cost;
+		return description;
 	}
 	
 	public void setId(Long id){
