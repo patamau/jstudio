@@ -91,16 +91,23 @@ public class GUITool {
 		return f;
 	}
 	
-	public static JComboBox createCombo(Container c, GridBagConstraints gc, String label, String[] values, boolean editable){
+	public static JComboBox createCombo(Container c, GridBagConstraints gc, String label, int selected, Object[] values, boolean editable){
 		JComboBox f = new JComboBox(values);
-		f.setEditable(editable);
+		f.setEditable(false);
+		f.setEnabled(editable);
+		f.setSelectedIndex(selected);
+		f.setPreferredSize(new Dimension(0,20));
 		gc.gridy++;
 		c.add(new JLabel(label, JLabel.RIGHT),gc);
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		gc.weightx=1.0f;
 		int px = gc.gridx;
 		gc.gridx++;
-		c.add(f,gc);
+		if(!editable){
+			c.add(new JLabel(values[selected].toString(), JLabel.LEFT),gc);
+		}else{
+			c.add(f,gc);
+		}
 		gc.fill=GridBagConstraints.NONE;
 		gc.weightx=0.0f;
 		gc.gridx=px;
