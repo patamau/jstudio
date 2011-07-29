@@ -16,7 +16,7 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 
 	private Invoice invoice;
 	
-	public InvoicePopup(JFrame parent, Controller<Invoice> controller){
+	public InvoicePopup(JStudioGUI parent, Controller<Invoice> controller){
 		super(parent, controller);
 	}
 	
@@ -28,10 +28,10 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==viewItem){
-			JDialog dialog = InvoicePanel.createDialog(parent, invoice, false);
+			JDialog dialog = InvoicePanel.createDialog((JStudioGUI)parent, invoice, false);
 			dialog.setVisible(true);
 		}else if(o==editItem){
-			JDialog dialog = InvoicePanel.createDialog(parent, invoice, true);
+			JDialog dialog = InvoicePanel.createDialog((JStudioGUI)parent, invoice, true);
 			dialog.setVisible(true);
 		}else if(o==removeItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 

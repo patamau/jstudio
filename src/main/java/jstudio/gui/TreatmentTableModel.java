@@ -1,10 +1,13 @@
 package jstudio.gui;
 
 import javax.swing.JTable;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import jstudio.model.Invoice;
+import jstudio.model.Treatment;
 import jstudio.util.Language;
-import jstudio.util.TableSorter;
 
 @SuppressWarnings("serial")
 public class TreatmentTableModel extends DefaultTableModel {
@@ -15,11 +18,10 @@ public class TreatmentTableModel extends DefaultTableModel {
 			Language.string("Cost")
 			};
 	
-	public TreatmentTableModel(JTable table) {
+	public TreatmentTableModel(JTable table, Invoice invoice) {
 		super(cols, 0);
-		TableSorter ts = new TableSorter(this,table.getTableHeader());
-		table.setModel(ts);
-		//ts.setSortingStatus(0, TableSorter.ASCENDING);
+		table.setModel(this);
+		//FIXME: translation!
 		table.getColumn("Quantity").setMaxWidth(50);
 		table.getColumn("Quantity").setMinWidth(50);
 		table.getColumn("Cost").setMaxWidth(50);

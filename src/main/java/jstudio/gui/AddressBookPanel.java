@@ -69,7 +69,6 @@ public class AddressBookPanel
 	public void valueChanged(ListSelectionEvent event) {
         int viewRow = table.getSelectedRow();
         if (0<=viewRow){        
-        	System.err.println("Selected "+viewRow+" at "+System.currentTimeMillis()+" and last time was "+lastSelectionTime);
         	if(viewRow==lastSelectedRow&&
         			200>(System.currentTimeMillis()-lastSelectionTime)){
         		showPerson((Person)table.getValueAt(viewRow, 0));	
