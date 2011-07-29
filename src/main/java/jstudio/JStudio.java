@@ -84,14 +84,16 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		addressBook = new AddressBook(this);
 		accounting = new Accounting(this);
 		comuni = new Comuni(this);
-		if(database.isConnected()){
-			//contacts.addPerson(new Person("Matteo","Pedrotti",new Date(),"Via bomport, 20", "12312424"));
-			for(Invoice i: accounting.getAll()){
-				logger.info(i.toString());
-			}
-			String code = comuni.getCode("TN", "Trento");
-			logger.info("CODE: "+code);
-		}
+		
+		//FIXME: this is just for quick internal testing
+//		if(database.isConnected()){
+//			//contacts.addPerson(new Person("Matteo","Pedrotti",new Date(),"Via bomport, 20", "12312424"));
+//			for(Invoice i: accounting.getAll()){
+//				logger.info(i.toString());
+//			}
+//			String code = comuni.getCode("TN", "Trento");
+//			logger.info("CODE: "+code);
+//		}
 	}
 	
 	private void initializeConfiguration(){

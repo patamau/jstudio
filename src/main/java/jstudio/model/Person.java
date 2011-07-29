@@ -12,9 +12,25 @@ public class Person implements DatabaseObject, Comparable<Object> {
 	
 	public static final SimpleDateFormat birthdateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	
+	public enum Gender{
+		Male(0),
+		Female(1);
+		
+		private int id;
+		
+		private Gender(int id){
+			this.id=id;
+		}
+		
+	    public int getId() {
+	        return id;
+	    }
+	}
+	
 	private Long id;
 	private Date birthdate;
 	private String name, lastname, address, city, cap, code, phone;
+	private Integer gender;
 	
 	public Person(){
 		
@@ -27,6 +43,14 @@ public class Person implements DatabaseObject, Comparable<Object> {
 		this.birthdate=birthdate;
 		this.address=address;
 		this.phone=phone;
+	}
+	
+	public Integer getGender(){
+		return gender;
+	}
+	
+	public void setGender(Integer gender){
+		this.gender = gender;
 	}
 
 	public String getCity() {

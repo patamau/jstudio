@@ -16,5 +16,6 @@
         <property name="code" type="string"/>
         <property name="phone" type="string"/>
         <property name="birthdate"/>
+        <property name="gender"/>
     </class>
 </hibernate-mapping>
