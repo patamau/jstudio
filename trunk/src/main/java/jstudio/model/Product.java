@@ -2,7 +2,7 @@ package jstudio.model;
 
 import jstudio.db.DatabaseObject;
 
-public class Treatment implements DatabaseObject{
+public class Product implements DatabaseObject{
 
 	private static final long serialVersionUID = -3847404193905268779L;
 	
@@ -12,11 +12,11 @@ public class Treatment implements DatabaseObject{
 	private Integer quantity;
 	private Float cost;
 	
-	public Treatment(){
+	public Product(){
 		
 	}
 	
-	public Treatment(Invoice invoice, String description, Integer quantity, Float cost){
+	public Product(Invoice invoice, String description, Integer quantity, Float cost){
 		this.id=0l;
 		this.invoice=invoice;
 		this.description=description;

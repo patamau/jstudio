@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
         
 <hibernate-mapping package="jstudio.model">
-    <class name="Treatment" table="treatments">
+    <class name="Product" table="products">
         <id name="id" type="long" column="id">
         	<generator class="increment"/>
         </id>

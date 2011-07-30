@@ -17,7 +17,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Invoice;
-import jstudio.model.Treatment;
+import jstudio.model.Product;
 import jstudio.util.Language;
 import jstudio.util.PopupListener;
 
@@ -96,7 +96,7 @@ public class AccountingPanel
 	public synchronized void addInvoice(Invoice i){
 		StringBuffer sb = new StringBuffer();
 		float total = 0f;
-		for(Treatment t: i.getTreatments()){
+		for(Product t: i.getProducts()){
 			//FIXME: proper formatting plz
 			sb.append(" ");
 			sb.append(t.getDescription());
