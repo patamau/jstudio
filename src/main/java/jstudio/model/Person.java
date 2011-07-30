@@ -29,22 +29,23 @@ public class Person implements DatabaseObject, Comparable<Object> {
 	
 	private Long id;
 	private Date birthdate;
-	private String name, lastname, address, city, cap, code, phone;
+	private String name, lastname,		
+		address, city, province, cap, 
+		code, phone;
 	private Integer gender;
 	
 	public Person(){
 		
 	}
-
-	public Person(String name, String lastname, Date birthdate, String address, String city, String cap, String code, String phone){
-		this.id=0l;
-		this.name=name;
-		this.lastname=lastname;
-		this.birthdate=birthdate;
-		this.address=address;
-		this.phone=phone;
-	}
 	
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
 	public Integer getGender(){
 		if(gender==null) gender=Gender.Male.getId();
 		return gender;

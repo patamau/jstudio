@@ -67,8 +67,8 @@ public class EventPanel extends JPanel implements ActionListener {
 			dialog = new JDialog(parent);
 			dialog.setTitle(Language.string("Event dialog"));
 			dialog.getContentPane().setLayout(new BorderLayout());
+			dialog.setLocationRelativeTo(parent);
 		}
-		dialog.setLocationRelativeTo(parent);
 		dialog.setModal(editable);
 		dialog.getContentPane().removeAll();
 		dialog.getContentPane().add(new EventPanel(e, editable),BorderLayout.CENTER);

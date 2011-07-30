@@ -14,7 +14,7 @@ import org.hibernate.cfg.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HibernateDB implements DatabaseInterface{
+public class HibernateDB implements DatabaseInterface<DatabaseObject>{
 
 	private static final Logger logger = LoggerFactory.getLogger(HibernateDB.class);
     private SessionFactory sessionFactory;
@@ -36,7 +36,7 @@ public class HibernateDB implements DatabaseInterface{
        	Configuration c = new Configuration();
        	c.addResource("person.hbm.xml");
        	c.addResource("event.hbm.xml");
-       	c.addResource("treatment.hbm.xml");
+       	c.addResource("product.hbm.xml");
        	c.addResource("invoice.hbm.xml");
        	c.addResource("comune.hbm.xml");
        	
@@ -165,6 +165,20 @@ public class HibernateDB implements DatabaseInterface{
     			sb.append(" AND ");
     		}
     	}
+    	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery(sb.toString()).list();
+    	commit(t);
+    	return l;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<DatabaseObject> getAll(String source, String column) {
+    	Session session = sessionFactory.getCurrentSession();
+    	Transaction t = session.beginTransaction();
+    	StringBuffer sb = new StringBuffer();
+    	sb.append("from ");
+    	sb.append(source);
+    	sb.append(" group by ");
+    	sb.append(column);
     	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery(sb.toString()).list();
     	commit(t);
     	return l;

@@ -36,9 +36,10 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
 		lastnameField,
 		addressField,
 		cityField,
+		provinceField,
 		capField,
 		codeField;
-	private JTable table; //treatments
+	private JTable productTable;
 	// internally used to catch a double click on the table
 	private int lastSelectedRow = -1;
 	private long lastSelectionTime = 0;
@@ -75,6 +76,9 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
 		cityField = GUITool.createField(head, gc,
 				Language.string("City"),
 				this.invoice.getCity(), editable);
+		provinceField = GUITool.createField(head, gc,
+				Language.string("Province"),
+				this.invoice.getProvince(), editable);
 		capField = GUITool.createField(head, gc, 
 				Language.string("CAP"), 
 				this.invoice.getCap(), editable);
@@ -84,14 +88,14 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
-		table = new JTable(){
+		productTable = new JTable(){
 		  public Dimension getPreferredScrollableViewportSize() {
 			  return getPreferredSize();
 		  }
 		};
-		DefaultTableModel model = new TreatmentTableModel(table, invoice);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.getSelectionModel().addListSelectionListener(this);
+		DefaultTableModel model = new ProductTableModel(productTable, invoice);
+		productTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		productTable.getSelectionModel().addListSelectionListener(this);
 		
 		int quantity_tot = 0;
 		float cost_tot = 0f;
@@ -105,10 +109,10 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
 			cost_tot += t.getCost();
 		}
 		
-		body.add(new JScrollPane(table), BorderLayout.CENTER);
+		body.add(new JScrollPane(productTable), BorderLayout.CENTER);
 		
 		JTable total = new JTable();
-		DefaultTableModel tmodel = new TreatmentTableModel(total, null);
+		DefaultTableModel tmodel = new ProductTableModel(total, null);
 		total.setRowSelectionAllowed(false);		
 		tmodel.addRow(new Object[]{
 				Language.string("Total"),
@@ -121,7 +125,7 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
 		this.add(head, BorderLayout.NORTH);
 		this.add(body, BorderLayout.CENTER);
 		
-		//table.addMouseListener(new PopupListener<Treatment>(table, new TreatmentPopup(this.gui, this.gui.getApplication().getAccounting().getTreatmentManager())));
+		//table.addMouseListener(new PopupListener<Product>(table, new TreatmentPopup(this.gui, this.gui.getApplication().getAccounting().getProductManager())));
 	}
 	
 	/**
@@ -136,8 +140,8 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
 			dialog = new JDialog(gui);
 			dialog.setTitle(Language.string("Invoice dialog"));
 			dialog.getContentPane().setLayout(new BorderLayout());
+			dialog.setLocationRelativeTo(gui);
 		}
-		dialog.setLocationRelativeTo(gui);
 		dialog.setModal(editable);
 		dialog.getContentPane().removeAll();
 		dialog.getContentPane().add(new InvoicePanel(object, editable, gui),BorderLayout.CENTER);
@@ -146,23 +150,23 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
 	}
 	
 	public void valueChanged(ListSelectionEvent event) {
-        int viewRow = table.getSelectedRow();
+        int viewRow = productTable.getSelectedRow();
         if (0<=viewRow){        
         	if(viewRow==lastSelectedRow&&
         			200>(System.currentTimeMillis()-lastSelectionTime)){
-        		showProduct((Product)table.getValueAt(viewRow, 0));	
-        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
+        		showProduct((Product)productTable.getValueAt(viewRow, 0));	
+        		productTable.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
         		lastSelectedRow = -1;
         	}else{
             	lastSelectedRow = viewRow;
             	lastSelectionTime = System.currentTimeMillis();
-        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
+        		productTable.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
         	}
         }
     }
 	
 	public void showProduct(Product t){
-		JDialog dialog = ProductPanel.createDialog(gui, t, gui.getApplication().getAccounting().getTreatmentManager());
+		JDialog dialog = ProductPanel.createDialog(gui, t, gui.getApplication().getAccounting().getProducts());
 		dialog.setVisible(true);
 	}
 
