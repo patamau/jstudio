@@ -69,16 +69,7 @@ public class AddressBookPanel
 	public void valueChanged(ListSelectionEvent event) {
         int viewRow = table.getSelectedRow();
         if (0<=viewRow){        
-        	if(viewRow==lastSelectedRow&&
-        			200>(System.currentTimeMillis()-lastSelectionTime)){
-        		showPerson((Person)table.getValueAt(viewRow, 0));	
-        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
-        		lastSelectedRow = -1;
-        	}else{
-            	lastSelectedRow = viewRow;
-            	lastSelectionTime = System.currentTimeMillis();
-        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
-        	}
+        	showPerson((Person)table.getValueAt(viewRow, 0));
         }
     }
 	

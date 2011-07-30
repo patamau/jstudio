@@ -10,7 +10,7 @@ import jstudio.model.Product;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
-public class TreatmentTableModel extends DefaultTableModel {
+public class ProductTableModel extends DefaultTableModel {
 	
 	private static final Object[] cols = new Object[]{
 			Language.string("Description"), 
@@ -18,7 +18,7 @@ public class TreatmentTableModel extends DefaultTableModel {
 			Language.string("Cost")
 			};
 	
-	public TreatmentTableModel(JTable table, Invoice invoice) {
+	public ProductTableModel(JTable table, Invoice invoice) {
 		super(cols, 0);
 		table.setModel(this);
 		//FIXME: translation!

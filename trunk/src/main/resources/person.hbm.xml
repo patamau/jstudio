@@ -12,6 +12,7 @@
         <property name="lastname" type="string"/>
         <property name="address" type="string"/>
         <property name="city" type="string"/>
+        <property name="province" type="string"/>
         <property name="cap" type="string"/>
         <property name="code" type="string"/>
         <property name="phone" type="string"/>

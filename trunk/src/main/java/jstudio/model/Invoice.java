@@ -15,14 +15,22 @@ public class Invoice implements DatabaseObject{
 	private Long id;
 	private Date date;
 	private Person person;
-	private String name, lastname, address, city, cap, code;
+	private String name, lastname, address, city, province, cap, code;
+	public String getProvince() {
+		return province;
+	}
+
+	public void setProvince(String province) {
+		this.province = province;
+	}
+
 	private Set<Product> products;
 	
 	public Invoice(){
 		
 	}
 
-	public Invoice(Date date, String name, String lastname, String address, String city, String cap, String code, Set<Product> treatments){
+	public Invoice(Date date, String name, String lastname, String address, String city, String cap, String code, Set<Product> products){
 		this.date=date;
 		this.name=name;
 		this.lastname=lastname;
@@ -30,10 +38,10 @@ public class Invoice implements DatabaseObject{
 		this.city=city;
 		this.cap=cap;
 		this.code=code;
-		this.products=treatments;
+		this.products=products;
 	}
 	
-	public Invoice(Date date, Person person, Set<Product> treatments){
+	public Invoice(Date date, Person person, Set<Product> products){
 		this.date=date;
 		this.person=person;
 		this.name=person.getName();
@@ -42,7 +50,7 @@ public class Invoice implements DatabaseObject{
 		this.city=person.getCity();
 		this.cap=person.getCap();
 		this.code=person.getCode();
-		this.products=treatments;
+		this.products=products;
 	}
 	
 	public String toString(){

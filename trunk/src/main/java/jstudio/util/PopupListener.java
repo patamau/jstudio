@@ -1,5 +1,6 @@
 package jstudio.util;
 
+import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -31,7 +32,6 @@ public class PopupListener<Context extends DatabaseObject> extends MouseAdapter 
         	@SuppressWarnings("unchecked")
 			Context c = (Context)table.getModel().getValueAt(row, 0);
         	popup.setContext(c);
-        	table.setRowSelectionInterval(row, row);
             popup.show(e.getComponent(), e.getX(), e.getY());
         }
     }

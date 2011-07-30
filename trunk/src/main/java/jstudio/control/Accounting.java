@@ -6,14 +6,14 @@ import jstudio.model.Product;
 
 public class Accounting extends Controller<Invoice>{
 	
-	private Controller<Product> treatmentManager;
+	private Controller<Product> products;
 
 	public Accounting(JStudio app){
 		super(app, Invoice.class.getName());
-		this.treatmentManager = new Controller<Product>(app, Product.class.getName());
+		this.products = new Controller<Product>(app, Product.class.getName());
 	}
 	
-	public Controller<Product> getTreatmentManager(){
-		return treatmentManager;
+	public Controller<Product> getProducts(){
+		return products;
 	}
 }

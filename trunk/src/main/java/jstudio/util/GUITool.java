@@ -78,8 +78,10 @@ public class GUITool {
 		f.setEditable(editable);
 		f.setColumns(0);
 		gc.gridy++;
+		gc.anchor=GridBagConstraints.EAST;
 		JLabel l = new JLabel(label, JLabel.RIGHT);
 		c.add(l,gc);
+		gc.anchor=GridBagConstraints.WEST;
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		gc.weightx=1.0f;
 		int px = gc.gridx;
@@ -98,13 +100,18 @@ public class GUITool {
 		f.setSelectedIndex(selected);
 		f.setPreferredSize(new Dimension(0,20));
 		gc.gridy++;
+		gc.anchor=GridBagConstraints.EAST;
 		c.add(new JLabel(label, JLabel.RIGHT),gc);
 		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.anchor=GridBagConstraints.WEST;
 		gc.weightx=1.0f;
 		int px = gc.gridx;
 		gc.gridx++;
 		if(!editable){
-			c.add(new JLabel(values[selected].toString(), JLabel.LEFT),gc);
+			if(values[selected]!=null)
+				c.add(new JLabel(values[selected].toString(), JLabel.LEFT),gc);
+			else
+				c.add(new JLabel(), gc);
 		}else{
 			c.add(f,gc);
 		}
@@ -119,8 +126,10 @@ public class GUITool {
 		f.setEditable(editable);
 		f.setColumns(0);
 		gc.gridy++;
+		gc.anchor=GridBagConstraints.EAST;
 		JLabel l = new JLabel(label, JLabel.RIGHT);
 		c.add(l,gc);
+		gc.anchor=GridBagConstraints.WEST;
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		gc.weightx=1.0f;
 		int px = gc.gridx;

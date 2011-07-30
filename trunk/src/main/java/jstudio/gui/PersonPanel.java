@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -30,7 +31,8 @@ public class PersonPanel extends JPanel implements ActionListener {
 	private static JDialog dialog;
 	private Person person;
 	private Controller<Person> controller;
-	private JComboBox 
+	private JComboBox
+		provinceBox,
 		genderBox;
 	private JTextField 
 		nameField, 
@@ -60,6 +62,14 @@ public class PersonPanel extends JPanel implements ActionListener {
 		birthdateField = GUITool.createDateField(this, gc, Language.string("Birthdate"), Person.birthdateFormat.format(this.person.getBirthdate()), editable, Person.birthdateFormat);
 		addressField = GUITool.createField(this, gc, Language.string("Address"), this.person.getAddress(), editable);
 		cityField = GUITool.createField(this, gc, Language.string("City"), this.person.getCity(), editable);
+		if(controller!=null){
+			List<String> pvs = controller.getApplication().getComuni().getProvinces();
+			int sel = pvs==null?0:pvs.indexOf(this.person.getProvince());
+			if(sel<0) sel=0;
+			provinceBox = GUITool.createCombo(this, gc, Language.string("Province"), sel, pvs.toArray(), editable);
+		}else{
+			provinceBox = GUITool.createCombo(this, gc, Language.string("Province"), 0, new Object[]{this.person.getProvince()}, editable);
+		}
 		capField = GUITool.createField(this, gc, Language.string("CAP"), this.person.getCap(), editable);
 		codeField = GUITool.createField(this, gc, Language.string("Code"), this.person.getCode(), editable);
 		if(editable){
@@ -70,7 +80,7 @@ public class PersonPanel extends JPanel implements ActionListener {
 			b.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent e) {
 					boolean male = genderBox.getSelectedIndex()==Person.Gender.Male.getId();
-					String pv = "TN"; //TODO: add province
+					String pv = (String)provinceBox.getSelectedItem();
 					String loc = controller.getApplication().getComuni().getCode(pv, cityField.getText());
 					Calendar c = Calendar.getInstance();
 					try{
@@ -117,8 +127,8 @@ public class PersonPanel extends JPanel implements ActionListener {
 			dialog = new JDialog(parent);
 			dialog.setTitle(Language.string("Person dialog"));
 			dialog.getContentPane().setLayout(new BorderLayout());
+			dialog.setLocationRelativeTo(parent);
 		}
-		dialog.setLocationRelativeTo(parent);
 		dialog.setModal(controller!=null);
 		dialog.getContentPane().removeAll();
 		dialog.getContentPane().add(new PersonPanel(p, controller),BorderLayout.CENTER);
@@ -140,6 +150,7 @@ public class PersonPanel extends JPanel implements ActionListener {
 			person.setLastname(lastnameField.getText());
 			person.setAddress(addressField.getText());
 			person.setCity(cityField.getText());
+			person.setProvince((String)provinceBox.getSelectedItem());
 			person.setCap(capField.getText());		
 			person.setCode(codeField.getText());
 			person.setPhone(phoneField.getText());
