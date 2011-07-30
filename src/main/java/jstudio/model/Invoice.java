@@ -1,9 +1,7 @@
 package jstudio.model;
 
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 import jstudio.db.DatabaseObject;
@@ -18,13 +16,13 @@ public class Invoice implements DatabaseObject{
 	private Date date;
 	private Person person;
 	private String name, lastname, address, city, cap, code;
-	private Set<Treatment> treatments;
+	private Set<Product> products;
 	
 	public Invoice(){
 		
 	}
 
-	public Invoice(Date date, String name, String lastname, String address, String city, String cap, String code, Set<Treatment> treatments){
+	public Invoice(Date date, String name, String lastname, String address, String city, String cap, String code, Set<Product> treatments){
 		this.date=date;
 		this.name=name;
 		this.lastname=lastname;
@@ -32,10 +30,10 @@ public class Invoice implements DatabaseObject{
 		this.city=city;
 		this.cap=cap;
 		this.code=code;
-		this.treatments=treatments;
+		this.products=treatments;
 	}
 	
-	public Invoice(Date date, Person person, Set<Treatment> treatments){
+	public Invoice(Date date, Person person, Set<Product> treatments){
 		this.date=date;
 		this.person=person;
 		this.name=person.getName();
@@ -44,7 +42,7 @@ public class Invoice implements DatabaseObject{
 		this.city=person.getCity();
 		this.cap=person.getCap();
 		this.code=person.getCode();
-		this.treatments=treatments;
+		this.products=treatments;
 	}
 	
 	public String toString(){
@@ -122,12 +120,12 @@ public class Invoice implements DatabaseObject{
 		this.person = person;
 	}
 
-	public Set<Treatment> getTreatments() {
-		return treatments;
+	public Set<Product> getProducts() {
+		return products;
 	}
 
-	public void setTreatments(Set<Treatment> treatments) {
-		this.treatments = treatments;
+	public void setProducts(Set<Product> products) {
+		this.products = products;
 	}
 
 	public void setId(Long id) {

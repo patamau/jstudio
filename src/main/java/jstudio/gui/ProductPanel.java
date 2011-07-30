@@ -1,7 +1,6 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,24 +15,24 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import jstudio.control.Controller;
-import jstudio.model.Treatment;
+import jstudio.model.Product;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
-public class TreatmentPanel extends JPanel implements ActionListener {
+public class ProductPanel extends JPanel implements ActionListener {
 	
 	private static JDialog dialog;
-	private Treatment treatment;
-	private Controller<Treatment> controller;
+	private Product product;
+	private Controller<Product> controller;
 	private JTextField 
 		descriptionField, 
 		quantityField,
 		costField;
 	private JButton okButton, cancelButton;
 
-	public TreatmentPanel(Treatment treatment, Controller<Treatment> _controller){
-		this.treatment = treatment;
+	public ProductPanel(Product product, Controller<Product> _controller){
+		this.product = product;
 		this.controller = _controller;
 		boolean editable = _controller!=null;
 		
@@ -43,9 +42,9 @@ public class TreatmentPanel extends JPanel implements ActionListener {
 		gc.gridy=0;
 		gc.insets= new Insets(4,4,4,4);
 		
-		descriptionField = GUITool.createField(this, gc, Language.string("Description"), this.treatment.getDescription(), editable);
-		quantityField = GUITool.createField(this, gc, Language.string("Quantity"), Integer.toString(this.treatment.getQuantity()), editable);
-		costField = GUITool.createField(this, gc, Language.string("Cost"), Float.toString(this.treatment.getCost()), editable);		
+		descriptionField = GUITool.createField(this, gc, Language.string("Description"), this.product.getDescription(), editable);
+		quantityField = GUITool.createField(this, gc, Language.string("Quantity"), Integer.toString(this.product.getQuantity()), editable);
+		costField = GUITool.createField(this, gc, Language.string("Cost"), Float.toString(this.product.getCost()), editable);		
 		if(editable){
 			okButton = GUITool.createButton(this, gc, Language.string("Ok"),this);
 			cancelButton = GUITool.createButton(this, gc, Language.string("Cancel"),this);
@@ -59,16 +58,16 @@ public class TreatmentPanel extends JPanel implements ActionListener {
 	 * @param parent
 	 * @return
 	 */
-	public static JDialog createDialog(JFrame parent, Treatment p, Controller<Treatment> controller){
+	public static JDialog createDialog(JFrame parent, Product p, Controller<Product> controller){
 		if(dialog==null){
 			dialog = new JDialog(parent);
-			dialog.setTitle(Language.string("Treatment dialog"));
+			dialog.setTitle(Language.string("Product dialog"));
 			dialog.getContentPane().setLayout(new BorderLayout());
 		}
 		dialog.setLocationRelativeTo(parent);
 		dialog.setModal(controller!=null);
 		dialog.getContentPane().removeAll();
-		dialog.getContentPane().add(new TreatmentPanel(p, controller),BorderLayout.CENTER);
+		dialog.getContentPane().add(new ProductPanel(p, controller),BorderLayout.CENTER);
 		dialog.pack();
 		return dialog;
 	}
@@ -77,10 +76,10 @@ public class TreatmentPanel extends JPanel implements ActionListener {
 		Object o = e.getSource();
 		if(o==okButton){
 			try{
-				treatment.setQuantity(Integer.parseInt(quantityField.getText()));
-				treatment.setCost(Float.parseFloat(costField.getText()));
-				treatment.setDescription(descriptionField.getText());
-				controller.store(treatment);
+				product.setQuantity(Integer.parseInt(quantityField.getText()));
+				product.setCost(Float.parseFloat(costField.getText()));
+				product.setDescription(descriptionField.getText());
+				controller.store(product);
 				dialog.dispose();
 			}catch(NumberFormatException ex){
 				String msg = Language.string("An number inserted has a bad format");

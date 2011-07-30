@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -20,11 +19,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Invoice;
-import jstudio.model.Person;
-import jstudio.model.Treatment;
+import jstudio.model.Product;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
-import jstudio.util.PopupListener;
 
 @SuppressWarnings("serial")
 public class InvoicePanel extends JPanel implements ListSelectionListener, ActionListener {
@@ -98,7 +95,7 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
 		
 		int quantity_tot = 0;
 		float cost_tot = 0f;
-		for(Treatment t: invoice.getTreatments()){
+		for(Product t: invoice.getProducts()){
 			model.addRow(new Object[]{
 					t,
 					t.getQuantity(),
@@ -153,7 +150,7 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
         if (0<=viewRow){        
         	if(viewRow==lastSelectedRow&&
         			200>(System.currentTimeMillis()-lastSelectionTime)){
-        		showTreatment((Treatment)table.getValueAt(viewRow, 0));	
+        		showProduct((Product)table.getValueAt(viewRow, 0));	
         		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
         		lastSelectedRow = -1;
         	}else{
@@ -164,8 +161,8 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
         }
     }
 	
-	public void showTreatment(Treatment t){
-		JDialog dialog = TreatmentPanel.createDialog(gui, t, gui.getApplication().getAccounting().getTreatmentManager());
+	public void showProduct(Product t){
+		JDialog dialog = ProductPanel.createDialog(gui, t, gui.getApplication().getAccounting().getTreatmentManager());
 		dialog.setVisible(true);
 	}
 

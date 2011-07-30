@@ -2,18 +2,18 @@ package jstudio.control;
 
 import jstudio.JStudio;
 import jstudio.model.Invoice;
-import jstudio.model.Treatment;
+import jstudio.model.Product;
 
 public class Accounting extends Controller<Invoice>{
 	
-	private Controller<Treatment> treatmentManager;
+	private Controller<Product> treatmentManager;
 
 	public Accounting(JStudio app){
 		super(app, Invoice.class.getName());
-		this.treatmentManager = new Controller<Treatment>(app, Treatment.class.getName());
+		this.treatmentManager = new Controller<Product>(app, Product.class.getName());
 	}
 	
-	public Controller<Treatment> getTreatmentManager(){
+	public Controller<Product> getTreatmentManager(){
 		return treatmentManager;
 	}
 }

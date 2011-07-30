@@ -6,7 +6,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Invoice;
-import jstudio.model.Treatment;
+import jstudio.model.Product;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
