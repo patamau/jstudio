@@ -3,7 +3,7 @@ package jstudio.db;
 import java.util.HashMap;
 import java.util.List;
 
-public interface DatabaseInterface<T> {
+public interface DatabaseInterface {
 	
 	public static final String
 		KEY_DRIVER = "db.driver",
@@ -24,9 +24,9 @@ public interface DatabaseInterface<T> {
 	public void connect(String host, String table, String user, String pass);
 	public boolean isConnected();
 	public DatabaseObject store(String table, DatabaseObject o);
-	public List<T> getAll(String table);
-	public List<T> getAll(String table, String column);
+	public List<? extends DatabaseObject> getAll(String table);
+	public List<? extends DatabaseObject> getAll(String table, String column);
 	public DatabaseObject get(String table, int id);
-	public List<T> getBetween(String table, String field, String from, String to);
-	public List<T> getAll(String table, HashMap<String, String> values);
+	public List<? extends DatabaseObject> getBetween(String table, String field, String from, String to);
+	public List<? extends DatabaseObject> getAll(String table, HashMap<String, String> values);
 }

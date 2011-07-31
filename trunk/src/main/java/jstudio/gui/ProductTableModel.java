@@ -1,12 +1,9 @@
 package jstudio.gui;
 
 import javax.swing.JTable;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Invoice;
-import jstudio.model.Product;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")

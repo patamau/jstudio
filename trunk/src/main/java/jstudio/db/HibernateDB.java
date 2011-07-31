@@ -14,7 +14,7 @@ import org.hibernate.cfg.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HibernateDB implements DatabaseInterface<DatabaseObject>{
+public class HibernateDB implements DatabaseInterface{
 
 	private static final Logger logger = LoggerFactory.getLogger(HibernateDB.class);
     private SessionFactory sessionFactory;

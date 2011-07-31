@@ -2,8 +2,8 @@ package jstudio.control;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import jstudio.JStudio;
 import jstudio.model.Event;
@@ -22,12 +22,12 @@ public class Agenda extends Controller<Event> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Collection<Event> getByDate(Date date){
+	public List<Event> getByDate(Date date){
 		Calendar c = Calendar.getInstance();
 		c.setTime(date);
 		c.add(Calendar.DAY_OF_YEAR, 1);
 		String from = dayDateFormat.format(date);
 		String to = dayDateFormat.format(c.getTime());
-		return (Collection<Event>)getApplication().getDatabase().getBetween(getSource(), "date", from, to);
+		return (List<Event>)getApplication().getDatabase().getBetween(getSource(), "date", from, to);
 	}
 }

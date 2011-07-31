@@ -13,7 +13,6 @@ import jstudio.control.Comuni;
 import jstudio.db.DatabaseInterface;
 import jstudio.db.HibernateDB;
 import jstudio.gui.JStudioGUI;
-import jstudio.model.Invoice;
 import jstudio.util.Configuration;
 import jstudio.util.FilteredStream;
 import jstudio.util.IconPanel;
