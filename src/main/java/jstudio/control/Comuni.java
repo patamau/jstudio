@@ -25,7 +25,7 @@ public class Comuni extends Controller<Comune>{
 	
 	@SuppressWarnings("unchecked")
 	public List<String> getProvinces(){
-		List<Comune> list = getApplication().getDatabase().getAll(getSource(), "provincia");
+		List<Comune> list = (List<Comune>) getApplication().getDatabase().getAll(getSource(), "provincia");
 		ArrayList<String> pvs = new ArrayList<String>();
 		for(Comune c: list){
 			pvs.add(c.getProvincia());

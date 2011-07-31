@@ -11,11 +11,12 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jstudio.JStudio;
-import jstudio.control.AddressBook;
-import jstudio.model.Person;
+import jstudio.control.Accounting;
+import jstudio.model.Product;
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
  
@@ -28,13 +29,13 @@ public class ReportGenerator<Entry> {
 	public static void main(String args[]){
 		JStudio app = new JStudio();
 		app.initialize();
-		AddressBook cts = app.getAddressBook();
+		Accounting acc = app.getAccounting();
 		
-		ReportGenerator<Person> rg = new ReportGenerator<Person>();
+		ReportGenerator<Product> rg = new ReportGenerator<Product>();
 		rg.setReport("/report1.jasper");
-		rg.setData(cts.getAll());
+		rg.setData(acc.getProducts().getAll());
 		try {
-			rg.generatePdf(".","sampleReportPerson.pdf");
+			rg.generatePdf(".","sampleReportInvoice.pdf");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -42,10 +43,17 @@ public class ReportGenerator<Entry> {
 	}
 	
 	private String reportName;
-	private Collection<Map<String,String>> data;
+	private Map<String,String> head;
+	private List<Map<String,String>> data;
 	
 	public ReportGenerator(){
 		reportName = null;
+		this.data = new ArrayList<Map<String,String>>();
+		head = new HashMap<String,String>();
+		head.put("id","124");
+		head.put("date","12/07/2011");
+		head.put("name", "Matteo");
+		head.put("lastname", "Pedrotti");
 	}
 	
 	public void setReport(String name){
@@ -53,10 +61,8 @@ public class ReportGenerator<Entry> {
 	}
 	
 	public void setData(Collection<Entry> data){
-		this.data = new ArrayList<Map<String,String>>();
-		Map<String,String> row;
-		for(Entry e: data){
-	        row = new HashMap<String,String>();
+		Map<String,String> row = this.head;
+		for(Entry e: data){	  
 	        for(Field f: e.getClass().getDeclaredFields()){
 	        	if(Modifier.isStatic(f.getModifiers())) continue;
 	        	try{
@@ -80,6 +86,7 @@ public class ReportGenerator<Entry> {
 				}
 	        }
     		this.data.add(row);
+    		row = new HashMap<String,String>();
 		}
 	}
  
