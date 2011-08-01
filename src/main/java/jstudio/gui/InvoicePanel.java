@@ -6,7 +6,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -18,17 +17,17 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import jstudio.control.Accounting;
+import jstudio.control.Controller;
+import jstudio.gui.generic.EntityPanel;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
-public class InvoicePanel extends JPanel implements ListSelectionListener, ActionListener {
+public class InvoicePanel extends EntityPanel<Invoice> implements ListSelectionListener {
 	
-	private static JDialog dialog;
-	private Invoice invoice;
-	private JStudioGUI gui;
 	private JTextField 
 		idField,
 		dateField, 
@@ -44,9 +43,9 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
 	private int lastSelectedRow = -1;
 	private long lastSelectionTime = 0;
 
-	public InvoicePanel(Invoice invoice, boolean editable, JStudioGUI gui){
-		this.invoice = invoice;
-		this.gui = gui;
+	public InvoicePanel(Invoice invoice, Controller<Invoice> controller){
+		super(invoice, controller);
+		boolean editable = controller!=null;
 		
 		this.setLayout(new BorderLayout());
 		
@@ -58,33 +57,33 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
 		
 		idField = GUITool.createField(head, gc, 
 				Language.string("Id"), 
-				Long.toString(this.invoice.getId()), false);
+				Long.toString(this.entity.getId()), false);
 		
 		dateField = GUITool.createField(head, gc, 
 				Language.string("Date"), 
-				Invoice.dateFormat.format(this.invoice.getDate()), editable);
+				Invoice.dateFormat.format(this.entity.getDate()), editable);
 		//TODO: add persons browse button
 		nameField = GUITool.createField(head, gc, 
 				Language.string("Name"), 
-				this.invoice.getName(), editable);
+				this.entity.getName(), editable);
 		lastnameField = GUITool.createField(head, gc,
 				Language.string("Lastname"),
-				this.invoice.getLastname(), editable);
+				this.entity.getLastname(), editable);
 		addressField = GUITool.createField(head, gc,
 				Language.string("Address"),
-				this.invoice.getAddress(), editable);
+				this.entity.getAddress(), editable);
 		cityField = GUITool.createField(head, gc,
 				Language.string("City"),
-				this.invoice.getCity(), editable);
+				this.entity.getCity(), editable);
 		provinceField = GUITool.createField(head, gc,
 				Language.string("Province"),
-				this.invoice.getProvince(), editable);
+				this.entity.getProvince(), editable);
 		capField = GUITool.createField(head, gc, 
 				Language.string("CAP"), 
-				this.invoice.getCap(), editable);
+				this.entity.getCap(), editable);
 		codeField = GUITool.createField(head, gc,
 				Language.string("Code"),
-				this.invoice.getCode(), editable);
+				this.entity.getCode(), editable);
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
@@ -128,27 +127,6 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
 		//table.addMouseListener(new PopupListener<Product>(table, new TreatmentPopup(this.gui, this.gui.getApplication().getAccounting().getProductManager())));
 	}
 	
-	/**
-	 * Creates a specific dialog for the person,
-	 * handling specifically changes, removal and additional links
-	 * The dialog is modal if it is editable
-	 * @param parent
-	 * @return
-	 */
-	public static JDialog createDialog(JStudioGUI gui, Invoice object, boolean editable){
-		if(dialog==null){
-			dialog = new JDialog(gui);
-			dialog.setTitle(Language.string("Invoice dialog"));
-			dialog.getContentPane().setLayout(new BorderLayout());
-			dialog.setLocationRelativeTo(gui);
-		}
-		dialog.setModal(editable);
-		dialog.getContentPane().removeAll();
-		dialog.getContentPane().add(new InvoicePanel(object, editable, gui),BorderLayout.CENTER);
-		dialog.pack();
-		return dialog;
-	}
-	
 	public void valueChanged(ListSelectionEvent event) {
         int viewRow = productTable.getSelectedRow();
         if (0<=viewRow){        
@@ -166,7 +144,9 @@ public class InvoicePanel extends JPanel implements ListSelectionListener, Actio
     }
 	
 	public void showProduct(Product t){
-		JDialog dialog = ProductPanel.createDialog(gui, t, gui.getApplication().getAccounting().getProducts());
+		//TODO:		
+		Controller<Product> cp = controller==null?null:((Accounting)controller).getProducts();
+		JDialog dialog = new ProductPanel(t, cp).createDialog(getDialog());
 		dialog.setVisible(true);
 	}
 

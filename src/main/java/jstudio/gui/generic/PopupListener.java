@@ -1,4 +1,4 @@
-package jstudio.util;
+package jstudio.gui.generic;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

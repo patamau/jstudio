@@ -1,9 +1,8 @@
-package jstudio.util;
+package jstudio.gui.generic;
 
 import java.awt.Font;
 import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
@@ -17,12 +16,11 @@ public abstract class ContextualMenu<Context extends DatabaseObject>
 	
 	protected JMenuItem
 		viewItem, editItem, removeItem;
-	protected JFrame
-		parent;
+	protected EntityManagerPanel<Context> parent;
 	protected Controller<Context> controller;
 	protected Context context;
 
-	public ContextualMenu(JFrame parent, Controller<Context> controller){
+	public ContextualMenu(EntityManagerPanel<Context> parent, Controller<Context> controller){
 		this.parent=parent;
 		this.controller=controller;
 		viewItem = new JMenuItem("View");

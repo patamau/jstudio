@@ -115,10 +115,6 @@ public class Person implements DatabaseObject, Comparable<Object> {
 		return phone;
 	}
 	
-	public String toString(){
-		return Long.toString(id);
-	}	
-	
 	public void setBirthdate(Date birthdate) {
 		this.birthdate = birthdate;
 	}
@@ -142,9 +138,13 @@ public class Person implements DatabaseObject, Comparable<Object> {
 	public int compareTo(Object o){
 		if(o instanceof Person){
 			Person p = (Person)o;
-			if(p.id==id) return 0;
-			if(p.id<id) return -1;
+			return p.lastname.compareTo(lastname);
 		}
 		return 1;
 	}
+	
+
+	public String toString(){
+		return lastname;
+	}	
 }

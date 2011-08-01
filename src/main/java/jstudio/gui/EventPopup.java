@@ -3,12 +3,12 @@ package jstudio.gui;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import jstudio.control.Controller;
+import jstudio.gui.generic.ContextualMenu;
+import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.model.Event;
-import jstudio.util.ContextualMenu;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
@@ -16,7 +16,7 @@ public class EventPopup extends ContextualMenu<Event> {
 
 	private Event event;
 	
-	public EventPopup(JFrame parent, Controller<Event> controller){
+	public EventPopup(EntityManagerPanel<Event> parent, Controller<Event> controller){
 		super(parent, controller);
 	}
 	
@@ -28,10 +28,10 @@ public class EventPopup extends ContextualMenu<Event> {
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==viewItem){
-			JDialog dialog = EventPanel.createDialog(parent, event, false);
+			JDialog dialog = new EventPanel(event, null).createDialog(parent.getGui());
 			dialog.setVisible(true);
 		}else if(o==editItem){
-			JDialog dialog = EventPanel.createDialog(parent, event, true);
+			JDialog dialog = new EventPanel(event, controller).createDialog(parent.getGui());
 			dialog.setVisible(true);
 		}else if(o==removeItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
