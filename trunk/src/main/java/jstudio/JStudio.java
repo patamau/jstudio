@@ -193,4 +193,8 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 	public Comuni getComuni(){
 		return comuni;
 	}
+	
+	public JStudioGUI getGUI(){
+		return gui;
+	}
 }

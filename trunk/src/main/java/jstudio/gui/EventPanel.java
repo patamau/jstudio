@@ -1,26 +1,21 @@
 package jstudio.gui;
 
-import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import jstudio.control.Controller;
+import jstudio.gui.generic.EntityPanel;
 import jstudio.model.Event;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
-public class EventPanel extends JPanel implements ActionListener {
+public class EventPanel extends EntityPanel<Event> {
 	
-	private static JDialog dialog;
-	private Event event;
 	private JTextField 
 		dateField, 
 		nameField,
@@ -28,8 +23,9 @@ public class EventPanel extends JPanel implements ActionListener {
 		phoneField,
 		descriptionField;
 
-	public EventPanel(Event event, boolean editable){
-		this.event = event;
+	public EventPanel(Event event, Controller<Event> controller){
+		super(event, controller);
+		boolean editable = controller!=null;
 		
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -39,41 +35,20 @@ public class EventPanel extends JPanel implements ActionListener {
 		
 		dateField = GUITool.createField(this, gc, 
 				Language.string("Date"), 
-				Event.timeFormat.format(this.event.getDate()), editable);
+				Event.timeFormat.format(this.entity.getDate()), editable);
 		//TODO: add persons browse button
 		nameField = GUITool.createField(this, gc, 
 				Language.string("Name"), 
-				this.event.getName(), editable);
+				this.entity.getName(), editable);
 		lastnameField = GUITool.createField(this, gc,
 				Language.string("Lastname"),
-				this.event.getLastname(), editable);
+				this.entity.getLastname(), editable);
 		descriptionField = GUITool.createField(this, gc, 
 				Language.string("Description"), 
-				this.event.getDescription(), editable);
+				this.entity.getDescription(), editable);
 		phoneField = GUITool.createField(this, gc,
 				Language.string("Phone"),
-				this.event.getPhone(), editable);
-	}
-	
-	/**
-	 * Creates a specific dialog for the person,
-	 * handling specifically changes, removal and additional links
-	 * The dialog is modal if it is editable
-	 * @param parent
-	 * @return
-	 */
-	public static JDialog createDialog(JFrame parent, Event e, boolean editable){
-		if(dialog==null){
-			dialog = new JDialog(parent);
-			dialog.setTitle(Language.string("Event dialog"));
-			dialog.getContentPane().setLayout(new BorderLayout());
-			dialog.setLocationRelativeTo(parent);
-		}
-		dialog.setModal(editable);
-		dialog.getContentPane().removeAll();
-		dialog.getContentPane().add(new EventPanel(e, editable),BorderLayout.CENTER);
-		dialog.pack();
-		return dialog;
+				this.entity.getPhone(), editable);
 	}
 
 	public void actionPerformed(ActionEvent e) {

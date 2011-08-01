@@ -2,7 +2,6 @@ package jstudio.gui;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,40 +15,35 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 
+import jstudio.gui.generic.EntityManagerPanel;
+import jstudio.gui.generic.PopupListener;
 import jstudio.model.Event;
 import jstudio.util.DatePicker;
 import jstudio.util.Language;
-import jstudio.util.PopupListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
 public class AgendaPanel 
-		extends JPanel 
-		implements ListSelectionListener, ActionListener {
+		extends EntityManagerPanel<Event> {
 	
 	//time format for event entries
 	public static final SimpleDateFormat 
 		dateFormat = new SimpleDateFormat("EEEE dd MMMM yyyy");
 	private static final Logger logger = LoggerFactory.getLogger(AgendaPanel.class);
 	
-	private DefaultTableModel model;
-	private JTable table;
 	private JButton dateButton;
 	private JButton refreshButton;
 	private JTextField filterField;
-	private JStudioGUI gui;
 	
 	// internally used to catch a double click on the table
 	private int lastSelectedRow = -1;
 	private long lastSelectionTime = 0;
 
 	public AgendaPanel(JStudioGUI gui){
-		this.gui = gui;
+		super(gui);
 		this.setLayout(new BorderLayout());
 
 		table = new JTable();
@@ -83,7 +77,7 @@ public class AgendaPanel
 		
 		this.add(topPanel, BorderLayout.NORTH);
 		
-		table.addMouseListener(new PopupListener<Event>(table, new EventPopup(this.gui, this.gui.getApplication().getAgenda())));
+		table.addMouseListener(new PopupListener<Event>(table, new EventPopup(this, this.gui.getApplication().getAgenda())));
 	}
 	
 	public void setDate(Date date){
@@ -104,7 +98,7 @@ public class AgendaPanel
         if (0<=viewRow){        
         	if(viewRow==lastSelectedRow&&
         			200>(System.currentTimeMillis()-lastSelectionTime)){
-        		showEvent((Event)table.getValueAt(viewRow, 0));	
+        		showEntity((Event)table.getValueAt(viewRow, 0));	
         		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
         		lastSelectedRow = -1;
         	}else{
@@ -115,54 +109,38 @@ public class AgendaPanel
         }
     }
 	
-	public void showEvent(Event e){
-		JDialog dialog = EventPanel.createDialog(gui, e, false);
+	public void showEntity(Event e){
+		JDialog dialog = new EventPanel(e,null).createDialog(gui);
 		dialog.setVisible(true);
 	}
-	
-	public synchronized void clear(){
-		while(model.getRowCount()>0) model.removeRow(0);
-	}
 
-	public synchronized void addEvent(Event e){
+	public synchronized void addEntity(Event e){
 		model.addRow(new Object[]{
 				e,
 				e.getName()+" "+e.getLastname(),
 				e.getDescription()
 		});
 	}
-	
-	public synchronized void removeEvent(int id){
-		Event e;
-		int frow = -1;
-		for(int i=0; i<model.getRowCount(); i++){
-			e = (Event)model.getValueAt(i, 0);
-			if(e.getId()==id){
-				frow = i;
-				break;
-			}
-		}
-		if(frow>-1){
-			model.removeRow(frow);
-		}
-	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==refreshButton){
-			gui.loadEvents(getDate());
+			refresh();
 		}else if(o==dateButton){
 			DatePicker dp = new DatePicker(this);
 			dp.setDate(this.getDate());
 			Date d = dp.getDate();
 			if(d!=null){
 				this.setDate(d);
-				gui.loadEvents(d);
-			}else{
-				gui.loadEvents(getDate()); //refresh
 			}
+			refresh();
 		}else{
 			logger.warn("Event source not mapped: "+o);
 		}
+	}
+
+	@Override
+	public void refresh() {
+		gui.loadEvents(getDate());
 	}
 }

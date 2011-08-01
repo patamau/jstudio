@@ -6,8 +6,9 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import jstudio.control.Controller;
+import jstudio.gui.generic.ContextualMenu;
+import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.model.Invoice;
-import jstudio.util.ContextualMenu;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
@@ -15,7 +16,7 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 
 	private Invoice invoice;
 	
-	public InvoicePopup(JStudioGUI parent, Controller<Invoice> controller){
+	public InvoicePopup(EntityManagerPanel<Invoice> parent, Controller<Invoice> controller){
 		super(parent, controller);
 	}
 	
@@ -27,10 +28,10 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==viewItem){
-			JDialog dialog = InvoicePanel.createDialog((JStudioGUI)parent, invoice, false);
+			JDialog dialog = new InvoicePanel(invoice, null).createDialog(parent.getGui());
 			dialog.setVisible(true);
 		}else if(o==editItem){
-			JDialog dialog = InvoicePanel.createDialog((JStudioGUI)parent, invoice, true);
+			JDialog dialog = new InvoicePanel(invoice, controller).createDialog(parent.getGui());
 			dialog.setVisible(true);
 		}else if(o==removeItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 

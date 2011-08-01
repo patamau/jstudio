@@ -1,47 +1,40 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 
+import jstudio.gui.generic.EntityManagerPanel;
+import jstudio.gui.generic.PopupListener;
 import jstudio.model.Person;
 import jstudio.util.Language;
-import jstudio.util.PopupListener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
-public class AddressBookPanel 
-		extends JPanel 
-		implements ListSelectionListener, ActionListener {
+public class AddressBookPanel extends EntityManagerPanel<Person> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AddressBookPanel.class);
 
-	private DefaultTableModel model;
-	private JTable table;
 	private JButton refreshButton;
 	private JTextField filterField;
-	private JStudioGUI gui;
 	
 	// internally used to catch a double click on the table
 	private int lastSelectedRow = -1;
 	private long lastSelectionTime = 0;
 	
 	public AddressBookPanel(JStudioGUI gui){
-		this.gui = gui;
+		super(gui);
 		this.setLayout(new BorderLayout());
 		
 		table = new JTable();
@@ -57,60 +50,56 @@ public class AddressBookPanel
 		actionPanel.setFloatable(false);
 		refreshButton = new JButton(Language.string("Refresh"));
 		refreshButton.addActionListener(this);
+		refreshButton.setPreferredSize(new Dimension(60,25));
 		actionPanel.add(refreshButton);
 		filterField = new JTextField();
 		filterField.addActionListener(this);
+		filterField.setPreferredSize(new Dimension(0,25));
 		actionPanel.add(filterField);
+		actionPanel.setPreferredSize(new Dimension(0,25));
 		this.add(actionPanel, BorderLayout.NORTH);
 		
-	    table.addMouseListener(new PopupListener<Person>(table, new PersonPopup(this.gui, this.gui.getApplication().getAddressBook())));
+	    table.addMouseListener(new PopupListener<Person>(table, new PersonPopup(this, this.gui.getApplication().getAddressBook())));
 	}
 	
 	public void valueChanged(ListSelectionEvent event) {
-        int viewRow = table.getSelectedRow();
-        if (0<=viewRow){        
-        	showPerson((Person)table.getValueAt(viewRow, 0));
-        }
+//        int viewRow = table.getSelectedRow();
+//        if (0<=viewRow){        
+//        	if(viewRow==lastSelectedRow&&
+//        			200>(System.currentTimeMillis()-lastSelectionTime)){
+//        		showPerson((Person)table.getValueAt(viewRow, 0));	
+//        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
+//        		lastSelectedRow = -1;
+//        	}else{
+//            	lastSelectedRow = viewRow;
+//            	lastSelectionTime = System.currentTimeMillis();
+//        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
+//        	}
+//        }
     }
 	
-	public void showPerson(Person p){
-		JDialog dialog = PersonPanel.createDialog(gui, p, null);
+	public void showEntity(Person p){
+		JDialog dialog = new PersonPanel(p,null).createDialog(this.gui);
 		dialog.setVisible(true);
 	}
-	
-	public synchronized void clear(){
-		while(model.getRowCount()>0) model.removeRow(0);
-	}
 
-	public synchronized void addPerson(Person p){
+	public synchronized void addEntity(Person p){
 		model.addRow(new Object[]{
 				p,
 				p.getName(),
-				p.getLastname(),
 				p.getBirthdate(),
 				p.getCity(),
 				p.getPhone()});
 	}
 	
-	public synchronized void removePerson(int id){
-		Person p;
-		int frow = -1;
-		for(int i=0; i<model.getRowCount(); i++){
-			p = (Person)model.getValueAt(i, 0);
-			if(p.getId()==id){
-				frow = i;
-				break;
-			}
-		}
-		if(frow>-1){
-			model.removeRow(frow);
-		}
+	public synchronized void refresh(){
+		gui.loadContacts();
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==refreshButton){
-			gui.loadContacts();
+			refresh();
 		}else if(o==filterField){
 			//TODO: apply filter
 		}else{

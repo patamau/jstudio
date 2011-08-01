@@ -149,7 +149,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		Collection<Person> pps = app.getAddressBook().getAll();
 		if(pps!=null){
 			for(Person p: pps){
-				addressBookPanel.addPerson(p);
+				addressBookPanel.addEntity(p);
 			}
 		}else{
 			JOptionPane.showMessageDialog(this, Language.string("Unable to load contacts"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
@@ -161,7 +161,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		Collection<Event> list = app.getAgenda().getByDate(date);
 		if(list!=null){
 			for(Event e: list){
-				agendaPanel.addEvent(e);
+				agendaPanel.addEntity(e);
 			}
 		}else{
 			JOptionPane.showMessageDialog(this, Language.string("Unable to load events"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
