@@ -11,7 +11,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
 
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
@@ -29,10 +28,6 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 	private JButton refreshButton;
 	private JTextField filterField;
 	
-	// internally used to catch a double click on the table
-	private int lastSelectedRow = -1;
-	private long lastSelectionTime = 0;
-	
 	public AddressBookPanel(JStudioGUI gui){
 		super(gui);
 		this.setLayout(new BorderLayout());
@@ -40,7 +35,6 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 		table = new JTable();
 		model = new AddressBookTableModel(table);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.getSelectionModel().addListSelectionListener(this);
 
 		JScrollPane scrollpane = new JScrollPane(table);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
@@ -59,24 +53,10 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 		actionPanel.setPreferredSize(new Dimension(0,25));
 		this.add(actionPanel, BorderLayout.NORTH);
 		
-	    table.addMouseListener(new PopupListener<Person>(table, new PersonPopup(this, this.gui.getApplication().getAddressBook())));
+		this.addMouseListener(this);
+		this.popup = new PersonPopup(this, this.gui.getApplication().getAddressBook());
+	    table.addMouseListener(new PopupListener<Person>(table, super.popup));
 	}
-	
-	public void valueChanged(ListSelectionEvent event) {
-//        int viewRow = table.getSelectedRow();
-//        if (0<=viewRow){        
-//        	if(viewRow==lastSelectedRow&&
-//        			200>(System.currentTimeMillis()-lastSelectionTime)){
-//        		showPerson((Person)table.getValueAt(viewRow, 0));	
-//        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
-//        		lastSelectedRow = -1;
-//        	}else{
-//            	lastSelectedRow = viewRow;
-//            	lastSelectionTime = System.currentTimeMillis();
-//        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
-//        	}
-//        }
-    }
 	
 	public void showEntity(Person p){
 		JDialog dialog = new PersonPanel(p,null).createDialog(this.gui);

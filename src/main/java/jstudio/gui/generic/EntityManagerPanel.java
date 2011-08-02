@@ -1,11 +1,16 @@
 package jstudio.gui.generic;
 
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jstudio.db.DatabaseObject;
 import jstudio.gui.JStudioGUI;
@@ -13,11 +18,14 @@ import jstudio.gui.JStudioGUI;
 @SuppressWarnings("serial")
 public abstract class EntityManagerPanel<T extends DatabaseObject> 
 		extends JPanel
-		implements ListSelectionListener, ActionListener {
+		implements ActionListener, MouseListener {
+	
+	private static Logger logger = LoggerFactory.getLogger(EntityManagerPanel.class);
 	
 	protected DefaultTableModel model;
 	protected JTable table;
 	protected JStudioGUI gui;
+	protected ContextualMenu<T> popup;
 	
 	public EntityManagerPanel(JStudioGUI gui){
 		this.gui=gui;
@@ -54,4 +62,37 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	public abstract void addEntity(T entity);
 	
 	public abstract void showEntity(T entity);
+	
+	@SuppressWarnings("unchecked")
+	public void mouseClicked(MouseEvent e){ 
+		int row = table.getSelectedRow();
+		if(e.getClickCount()==2){
+			if(row>=0){
+				showEntity((T)table.getValueAt(row, 0));
+			}
+		}
+	}
+
+	public void mouseEntered(MouseEvent e){ }
+	public void mouseExited(MouseEvent e){ }
+	public void mousePressed(MouseEvent e){ }
+	public void mouseReleased(final MouseEvent e){ 
+		logger.warn("Mouse released");
+		if(SwingUtilities.isRightMouseButton(e)){
+			int row = table.getSelectedRow();
+			System.out.println("RMouse clicked at row "+row);
+			if(row<0){
+				System.out.println("Popup is null? "+(popup==null));
+				if(popup!=null){
+					popup.setContext(null);
+					System.out.println("Popup showing now!");
+					SwingUtilities.invokeLater(new Runnable(){
+						public void run(){
+							popup.show(e.getComponent(), e.getX(), e.getY());	
+						}
+					});
+				}
+			}
+		}
+	}
 }

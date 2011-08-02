@@ -184,4 +184,13 @@ public class HibernateDB implements DatabaseInterface{
     	return l;
 	}
 
+	@Override
+	public void delete(String table, DatabaseObject o) {
+    	// source is ignored because hibernate mapping already takes care of this
+    	Session session = sessionFactory.getCurrentSession();
+    	Transaction t = session.beginTransaction();
+    	session.delete(o);
+    	commit(t);
+	}
+
 }

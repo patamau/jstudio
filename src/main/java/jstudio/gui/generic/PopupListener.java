@@ -28,10 +28,13 @@ public class PopupListener<Context extends DatabaseObject> extends MouseAdapter 
     private void maybeShowPopup(MouseEvent e) {
         if (e.isPopupTrigger()) {
         	int row = table.rowAtPoint(e.getPoint());
-        	@SuppressWarnings("unchecked")
-			Context c = (Context)table.getModel().getValueAt(row, 0);
-        	popup.setContext(c);
-            popup.show(e.getComponent(), e.getX(), e.getY());
+        	if(row>=0){
+	        	table.setRowSelectionInterval(row, row);
+	        	@SuppressWarnings("unchecked")
+				Context c = (Context)table.getModel().getValueAt(row, 0);
+	        	popup.setContext(c);
+	            popup.show(e.getComponent(), e.getX(), e.getY());
+        	}
         }
     }
 }

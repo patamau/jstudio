@@ -10,7 +10,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
 
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
@@ -28,10 +27,6 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 	
 	private JButton refreshButton;
 	private JTextField filterField;
-	
-	// internally used to catch a double click on the table
-	private int lastSelectedRow = -1;
-	private long lastSelectionTime = 0;
 
 	public AccountingPanel(JStudioGUI gui){
 		super(gui);
@@ -40,7 +35,6 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		table = new JTable();
 		model = new AccountingTableModel(table);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.getSelectionModel().addListSelectionListener(this);
 
 		JScrollPane scrollpane = new JScrollPane(table);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
@@ -57,26 +51,11 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		
 		this.add(actionPanel, BorderLayout.NORTH);
 		
+		table.addMouseListener(this);
 		table.addMouseListener(new PopupListener<Invoice>(table, new InvoicePopup(this, this.gui.getApplication().getAccounting())));
 	}
 	
-	public void valueChanged(ListSelectionEvent event) {
-        int viewRow = table.getSelectedRow();
-        if (0<=viewRow){        
-        	if(viewRow==lastSelectedRow&&
-        			200>(System.currentTimeMillis()-lastSelectionTime)){
-        		showInvoice((Invoice)table.getValueAt(viewRow, 0));	
-        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
-        		lastSelectedRow = -1;
-        	}else{
-            	lastSelectedRow = viewRow;
-            	lastSelectionTime = System.currentTimeMillis();
-        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
-        	}
-        }
-    }
-	
-	public void showInvoice(Invoice i){
+	public void showEntity(Invoice i){
 		JDialog dialog = new InvoicePanel(i, null).createDialog(gui);
 		dialog.setVisible(true);
 	}
@@ -85,7 +64,7 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		while(model.getRowCount()>0) model.removeRow(0);
 	}
 
-	public synchronized void addInvoice(Invoice i){
+	public synchronized void addEntity(Invoice i){
 		StringBuffer sb = new StringBuffer();
 		float total = 0f;
 		for(Product t: i.getProducts()){
@@ -121,7 +100,7 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==refreshButton){
-			gui.loadInvoices();
+			refresh();
 		}else{
 			logger.warn("Event source not mapped: "+o);
 		}
@@ -129,19 +108,6 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 
 	@Override
 	public void refresh() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void addEntity(Invoice entity) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void showEntity(Invoice entity) {
-		// TODO Auto-generated method stub
-		
+		gui.loadInvoices();
 	}
 }

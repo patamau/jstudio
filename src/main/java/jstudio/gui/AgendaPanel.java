@@ -49,7 +49,6 @@ public class AgendaPanel
 		table = new JTable();
 		model = new AgendaTableModel(table);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		table.getSelectionModel().addListSelectionListener(this);
 
 		JScrollPane scrollpane = new JScrollPane(table);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
@@ -77,6 +76,7 @@ public class AgendaPanel
 		
 		this.add(topPanel, BorderLayout.NORTH);
 		
+		table.addMouseListener(this);
 		table.addMouseListener(new PopupListener<Event>(table, new EventPopup(this, this.gui.getApplication().getAgenda())));
 	}
 	

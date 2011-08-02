@@ -46,4 +46,8 @@ public class Controller<E extends DatabaseObject> {
 	public void store(E o){
 		app.getDatabase().store(source, o);
 	}
+	
+	public void delete(E o){
+		app.getDatabase().delete(source, o);
+	}
 }

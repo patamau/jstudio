@@ -33,9 +33,13 @@ public class PersonPopup extends ContextualMenu<Person> {
 					Language.string("Romove person?"), 
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if(ch==JOptionPane.YES_OPTION){
-				//TODO: remove the entry
+				controller.delete(context);
 				parent.refresh();
 			}
+		}else if(o==newItem){
+			JDialog dialog = new PersonPanel(new Person(), controller).createDialog(parent.getGui());
+			dialog.setVisible(true);
+			parent.refresh();
 		}
 	}
 

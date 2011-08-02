@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 
 import jstudio.control.Controller;
 import jstudio.db.DatabaseObject;
@@ -15,7 +16,7 @@ public abstract class ContextualMenu<Context extends DatabaseObject>
 		implements ActionListener {
 	
 	protected JMenuItem
-		viewItem, editItem, removeItem;
+		viewItem, editItem, removeItem, newItem;
 	protected EntityManagerPanel<Context> parent;
 	protected Controller<Context> controller;
 	protected Context context;
@@ -33,10 +34,19 @@ public abstract class ContextualMenu<Context extends DatabaseObject>
 	    removeItem = new JMenuItem("Remove");
 	    removeItem.setFont(removeItem.getFont().deriveFont(Font.PLAIN));
 	    removeItem.addActionListener(this);
-	    this.add(removeItem);
+	    this.add(removeItem);	    
+	    this.add(new JSeparator());
+	    newItem = new JMenuItem("New");
+	    newItem.setFont(removeItem.getFont().deriveFont(Font.PLAIN));
+	    newItem.addActionListener(this);
+	    this.add(newItem);
 	}
 	
 	public void setContext(Context context){
 		this.context = context;
+		boolean enable = context!=null;
+		viewItem.setEnabled(enable);
+		editItem.setEnabled(enable);
+		removeItem.setEnabled(enable);
 	}
 }
