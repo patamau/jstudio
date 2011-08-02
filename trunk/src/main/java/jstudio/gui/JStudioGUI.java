@@ -173,7 +173,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		Collection<Invoice> list = app.getAccounting().getAll();
 		if(list!=null){
 			for(Invoice i: list){
-				accountingPanel.addInvoice(i);
+				accountingPanel.addEntity(i);
 			}
 		}else{
 			JOptionPane.showMessageDialog(this, Language.string("Unable to load invoices"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);

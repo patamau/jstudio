@@ -35,7 +35,17 @@ public class Person implements DatabaseObject, Comparable<Object> {
 	private Integer gender;
 	
 	public Person(){
-		
+		id=null;
+		birthdate=new Date();
+		name="";
+		lastname="";
+		address="";
+		city="";
+		province="";
+		cap="";
+		code="";
+		phone="";
+		gender=Gender.Male.getId();
 	}
 	
 	public String getProvince() {

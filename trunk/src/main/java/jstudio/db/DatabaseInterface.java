@@ -24,6 +24,7 @@ public interface DatabaseInterface {
 	public void connect(String host, String table, String user, String pass);
 	public boolean isConnected();
 	public DatabaseObject store(String table, DatabaseObject o);
+	public void delete(String table, DatabaseObject o);
 	public List<? extends DatabaseObject> getAll(String table);
 	public List<? extends DatabaseObject> getAll(String table, String column);
 	public DatabaseObject get(String table, int id);
