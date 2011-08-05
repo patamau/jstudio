@@ -7,6 +7,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -26,7 +27,7 @@ import jstudio.util.GUITool;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
-public class InvoicePanel extends EntityPanel<Invoice> implements ListSelectionListener {
+public class InvoicePanel extends EntityPanel<Invoice> {
 	
 	private JTextField 
 		idField,
@@ -38,10 +39,8 @@ public class InvoicePanel extends EntityPanel<Invoice> implements ListSelectionL
 		provinceField,
 		capField,
 		codeField;
-	private JTable productTable;
-	// internally used to catch a double click on the table
-	private int lastSelectedRow = -1;
-	private long lastSelectionTime = 0;
+	private ProductTable productTable;
+	private JButton okButton, cancelButton;
 
 	public InvoicePanel(Invoice invoice, Controller<Invoice> controller){
 		super(invoice, controller);
@@ -87,28 +86,20 @@ public class InvoicePanel extends EntityPanel<Invoice> implements ListSelectionL
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
-		productTable = new JTable(){
-		  public Dimension getPreferredScrollableViewportSize() {
-			  return getPreferredSize();
-		  }
-		};
-		DefaultTableModel model = new ProductTableModel(productTable, invoice);
-		productTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		productTable.getSelectionModel().addListSelectionListener(this);
+		if(controller==null)
+			productTable = new ProductTable(null, invoice);
+		else
+			productTable = new ProductTable(controller.getApplication().getGUI(), invoice);
 		
 		int quantity_tot = 0;
 		float cost_tot = 0f;
 		for(Product t: invoice.getProducts()){
-			model.addRow(new Object[]{
-					t,
-					t.getQuantity(),
-					t.getCost()
-			});
+			productTable.addEntity(t);
 			quantity_tot += t.getQuantity();
 			cost_tot += t.getCost();
 		}
 		
-		body.add(new JScrollPane(productTable), BorderLayout.CENTER);
+		body.add(productTable, BorderLayout.CENTER);
 		
 		JTable total = new JTable();
 		DefaultTableModel tmodel = new ProductTableModel(total, null);
@@ -124,24 +115,14 @@ public class InvoicePanel extends EntityPanel<Invoice> implements ListSelectionL
 		this.add(head, BorderLayout.NORTH);
 		this.add(body, BorderLayout.CENTER);
 		
+		JPanel buttons = new JPanel(new GridBagLayout());
+		gc.gridx=0;
+		gc.gridy=0;
+		okButton = GUITool.createButton(buttons, gc, Language.string("Ok"), this);
+		cancelButton = GUITool.createButton(buttons, gc, Language.string("Cancel"), this);
+		
 		//table.addMouseListener(new PopupListener<Product>(table, new TreatmentPopup(this.gui, this.gui.getApplication().getAccounting().getProductManager())));
 	}
-	
-	public void valueChanged(ListSelectionEvent event) {
-        int viewRow = productTable.getSelectedRow();
-        if (0<=viewRow){        
-        	if(viewRow==lastSelectedRow&&
-        			200>(System.currentTimeMillis()-lastSelectionTime)){
-        		showProduct((Product)productTable.getValueAt(viewRow, 0));	
-        		productTable.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
-        		lastSelectedRow = -1;
-        	}else{
-            	lastSelectedRow = viewRow;
-            	lastSelectionTime = System.currentTimeMillis();
-        		productTable.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
-        	}
-        }
-    }
 	
 	public void showProduct(Product t){
 		//TODO:		

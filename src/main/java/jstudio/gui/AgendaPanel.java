@@ -37,10 +37,6 @@ public class AgendaPanel
 	private JButton dateButton;
 	private JButton refreshButton;
 	private JTextField filterField;
-	
-	// internally used to catch a double click on the table
-	private int lastSelectedRow = -1;
-	private long lastSelectionTime = 0;
 
 	public AgendaPanel(JStudioGUI gui){
 		super(gui);
@@ -76,8 +72,10 @@ public class AgendaPanel
 		
 		this.add(topPanel, BorderLayout.NORTH);
 		
+		this.popup = new EventPopup(this, this.gui.getApplication().getAgenda());
+		scrollpane.addMouseListener(this);
 		table.addMouseListener(this);
-		table.addMouseListener(new PopupListener<Event>(table, new EventPopup(this, this.gui.getApplication().getAgenda())));
+		table.addMouseListener(new PopupListener<Event>(table, popup));
 	}
 	
 	public void setDate(Date date){
@@ -93,22 +91,6 @@ public class AgendaPanel
 		}
 	}
 	
-	public void valueChanged(ListSelectionEvent event) {
-        int viewRow = table.getSelectedRow();
-        if (0<=viewRow){        
-        	if(viewRow==lastSelectedRow&&
-        			200>(System.currentTimeMillis()-lastSelectionTime)){
-        		showEntity((Event)table.getValueAt(viewRow, 0));	
-        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
-        		lastSelectedRow = -1;
-        	}else{
-            	lastSelectedRow = viewRow;
-            	lastSelectionTime = System.currentTimeMillis();
-        		table.getSelectionModel().removeSelectionInterval(viewRow, viewRow);
-        	}
-        }
-    }
-	
 	public void showEntity(Event e){
 		JDialog dialog = new EventPanel(e,null).createDialog(gui);
 		dialog.setVisible(true);
@@ -117,7 +99,7 @@ public class AgendaPanel
 	public synchronized void addEntity(Event e){
 		model.addRow(new Object[]{
 				e,
-				e.getName()+" "+e.getLastname(),
+				e.getLastname()+" "+e.getName(),
 				e.getDescription()
 		});
 	}

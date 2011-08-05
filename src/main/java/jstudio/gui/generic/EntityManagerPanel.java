@@ -65,8 +65,10 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	
 	@SuppressWarnings("unchecked")
 	public void mouseClicked(MouseEvent e){ 
-		int row = table.getSelectedRow();
+		System.out.println("Mouse clicked...");
 		if(e.getClickCount()==2){
+			int row = table.rowAtPoint(e.getPoint());
+			System.out.println("Row at point = "+row);
 			if(row>=0){
 				showEntity((T)table.getValueAt(row, 0));
 			}
@@ -77,15 +79,11 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	public void mouseExited(MouseEvent e){ }
 	public void mousePressed(MouseEvent e){ }
 	public void mouseReleased(final MouseEvent e){ 
-		logger.warn("Mouse released");
 		if(SwingUtilities.isRightMouseButton(e)){
-			int row = table.getSelectedRow();
-			System.out.println("RMouse clicked at row "+row);
+			int row = table.rowAtPoint(e.getPoint());
 			if(row<0){
-				System.out.println("Popup is null? "+(popup==null));
 				if(popup!=null){
 					popup.setContext(null);
-					System.out.println("Popup showing now!");
 					SwingUtilities.invokeLater(new Runnable(){
 						public void run(){
 							popup.show(e.getComponent(), e.getX(), e.getY());	
