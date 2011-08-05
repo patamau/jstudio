@@ -3,6 +3,7 @@ package jstudio.gui;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import jstudio.model.Event;
 import jstudio.util.Language;
 import jstudio.util.TableSorter;
 
@@ -30,6 +31,7 @@ public class AgendaTableModel extends DefaultTableModel {
 	
 	public Class<?> getColumnClass(int col){
 		switch(col){
+		case 0: return Event.class;
 		default: return String.class;
 		}
 	}

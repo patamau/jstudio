@@ -10,22 +10,23 @@ import jstudio.control.Controller;
 import jstudio.gui.generic.ContextualMenu;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.model.Event;
+import jstudio.model.Product;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
-public class EventPopup extends ContextualMenu<Event> {
+public class ProductPopup extends ContextualMenu<Product> {
 	
-	public EventPopup(EntityManagerPanel<Event> parent, Controller<Event> controller){
+	public ProductPopup(EntityManagerPanel<Product> parent, Controller<Product> controller){
 		super(parent, controller);
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==viewItem){
-			JDialog dialog = new EventPanel(context, null).createDialog(parent.getGui());
+			JDialog dialog = new ProductPanel(context, null).createDialog(parent.getGui());
 			dialog.setVisible(true);
 		}else if(o==editItem){
-			JDialog dialog = new EventPanel(context, controller).createDialog(parent.getGui());
+			JDialog dialog = new ProductPanel(context, controller).createDialog(parent.getGui());
 			dialog.setVisible(true);
 			parent.refresh();
 		}else if(o==removeItem){
@@ -38,11 +39,7 @@ public class EventPopup extends ContextualMenu<Event> {
 				parent.refresh();
 			}
 		}else if(o==newItem){
-			//override default event date using the current agendapanel date
-			Date d = ((AgendaPanel)parent).getDate();
-			Event ev = new Event();
-			ev.setDate(d);
-			JDialog dialog = new EventPanel(ev, controller).createDialog(parent.getGui());
+			JDialog dialog = new ProductPanel(new Product(), controller).createDialog(parent.getGui());
 			dialog.setVisible(true);
 			parent.refresh();
 		}

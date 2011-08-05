@@ -154,7 +154,7 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		initializeStreams();
 		panel.setText(Language.string("Loading configuration..."));
 		initializeConfiguration();
-		panel.setText(Language.string("Intializing data..."));
+		panel.setText(Language.string("Initializing data..."));
 		initializeData();
 		panel.setText(Language.string("Generating graphic interface..."));
 		initializeGUI();

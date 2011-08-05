@@ -53,7 +53,8 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 		actionPanel.setPreferredSize(new Dimension(0,25));
 		this.add(actionPanel, BorderLayout.NORTH);
 		
-		this.addMouseListener(this);
+		scrollpane.addMouseListener(this);
+		table.addMouseListener(this);
 		this.popup = new PersonPopup(this, this.gui.getApplication().getAddressBook());
 	    table.addMouseListener(new PopupListener<Person>(table, super.popup));
 	}
