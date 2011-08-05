@@ -11,6 +11,7 @@ import javax.swing.JTextField;
 
 import jstudio.control.Controller;
 import jstudio.gui.generic.EntityPanel;
+import jstudio.model.Invoice;
 import jstudio.model.Product;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
@@ -18,15 +19,18 @@ import jstudio.util.Language;
 @SuppressWarnings("serial")
 public class ProductPanel extends EntityPanel<Product> {
 	
+	private Invoice invoice;
+	
 	private JTextField 
 		descriptionField, 
 		quantityField,
 		costField;
 	private JButton okButton, cancelButton;
 
-	public ProductPanel(Product product, Controller<Product> _controller){
-		super(product, _controller);
-		boolean editable = _controller!=null;
+	public ProductPanel(Product product, Invoice invoice, Controller<Product> controller){
+		super(product, controller);
+		boolean editable = invoice!=null;
+		this.invoice = invoice;
 		
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -36,7 +40,8 @@ public class ProductPanel extends EntityPanel<Product> {
 		
 		descriptionField = GUITool.createField(this, gc, Language.string("Description"), this.entity.getDescription(), editable);
 		quantityField = GUITool.createField(this, gc, Language.string("Quantity"), Integer.toString(this.entity.getQuantity()), editable);
-		costField = GUITool.createField(this, gc, Language.string("Cost"), Float.toString(this.entity.getCost()), editable);		
+		costField = GUITool.createField(this, gc, Language.string("Cost"), Float.toString(this.entity.getCost()), editable);	
+		
 		if(editable){
 			okButton = GUITool.createButton(this, gc, Language.string("Ok"),this);
 			cancelButton = GUITool.createButton(this, gc, Language.string("Cancel"),this);
@@ -50,10 +55,12 @@ public class ProductPanel extends EntityPanel<Product> {
 				entity.setQuantity(Integer.parseInt(quantityField.getText()));
 				entity.setCost(Float.parseFloat(costField.getText()));
 				entity.setDescription(descriptionField.getText());
-				controller.store(entity);
+				if(entity.getId()==0){
+					invoice.getProducts().add(entity);
+				}
 				getDialog().dispose();
 			}catch(NumberFormatException ex){
-				String msg = Language.string("An number inserted has a bad format");
+				String msg = Language.string("A number inserted has a bad format");
 				JOptionPane.showMessageDialog(this, msg, Language.string("Wrong value"), JOptionPane.ERROR_MESSAGE);
 			}
 		}else if(o==cancelButton){

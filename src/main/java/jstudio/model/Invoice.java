@@ -2,6 +2,7 @@ package jstudio.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import jstudio.db.DatabaseObject;
@@ -16,6 +17,8 @@ public class Invoice implements DatabaseObject{
 	private Date date;
 	private Person person;
 	private String name, lastname, address, city, province, cap, code;
+	private Set<Product> products;
+	
 	public String getProvince() {
 		return province;
 	}
@@ -23,34 +26,18 @@ public class Invoice implements DatabaseObject{
 	public void setProvince(String province) {
 		this.province = province;
 	}
-
-	private Set<Product> products;
 	
 	public Invoice(){
-		
-	}
-
-	public Invoice(Date date, String name, String lastname, String address, String city, String cap, String code, Set<Product> products){
-		this.date=date;
-		this.name=name;
-		this.lastname=lastname;
-		this.address=address;
-		this.city=city;
-		this.cap=cap;
-		this.code=code;
-		this.products=products;
-	}
-	
-	public Invoice(Date date, Person person, Set<Product> products){
-		this.date=date;
-		this.person=person;
-		this.name=person.getName();
-		this.lastname=person.getLastname();
-		this.address=person.getAddress();
-		this.city=person.getCity();
-		this.cap=person.getCap();
-		this.code=person.getCode();
-		this.products=products;
+		this.id=0l;
+		this.date=new Date();
+		this.name="";
+		this.lastname="";
+		this.address="";
+		this.city="";
+		this.cap="";
+		this.province="";
+		this.code="";
+		this.products = new HashSet<Product>();
 	}
 	
 	public String toString(){

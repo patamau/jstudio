@@ -51,8 +51,10 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		
 		this.add(actionPanel, BorderLayout.NORTH);
 		
+		this.popup = new InvoicePopup(this, this.gui.getApplication().getAccounting());
+		scrollpane.addMouseListener(this);
 		table.addMouseListener(this);
-		table.addMouseListener(new PopupListener<Invoice>(table, new InvoicePopup(this, this.gui.getApplication().getAccounting())));
+		table.addMouseListener(new PopupListener<Invoice>(table, popup));
 	}
 	
 	public void showEntity(Invoice i){

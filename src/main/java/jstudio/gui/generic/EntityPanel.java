@@ -40,7 +40,7 @@ public abstract class EntityPanel<T extends DatabaseObject>
 			dialog.setVisible(false);
 			//before rendering a modal dialog, ensure the old non-modal one is disabled
 		}
-		dialog.setModal(modal);
+		dialog.setModal(false); //XXX
 		dialog.getContentPane().removeAll();
 		dialog.getContentPane().add(this,BorderLayout.CENTER);
 		dialog.pack();
