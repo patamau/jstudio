@@ -1,27 +1,23 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.text.ParseException;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableModel;
 
-import jstudio.control.Accounting;
 import jstudio.control.Controller;
 import jstudio.gui.generic.EntityPanel;
 import jstudio.model.Invoice;
+import jstudio.model.Person;
 import jstudio.model.Product;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
@@ -30,7 +26,7 @@ import jstudio.util.Language;
 public class InvoicePanel extends EntityPanel<Invoice> {
 	
 	private JTextField 
-		idField,
+		//idField,
 		dateField, 
 		nameField,
 		lastnameField,
@@ -54,7 +50,8 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		gc.gridy=0;
 		gc.insets= new Insets(4,4,4,4);
 		
-		idField = GUITool.createField(head, gc, 
+		//id field
+		GUITool.createField(head, gc, 
 				Language.string("Id"), 
 				Long.toString(this.entity.getId()), false);
 		
@@ -86,53 +83,60 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
-		if(controller==null)
+		if(controller==null){
 			productTable = new ProductTable(null, invoice);
-		else
+		} else {
 			productTable = new ProductTable(controller.getApplication().getGUI(), invoice);
-		
-		int quantity_tot = 0;
-		float cost_tot = 0f;
-		for(Product t: invoice.getProducts()){
-			productTable.addEntity(t);
-			quantity_tot += t.getQuantity();
-			cost_tot += t.getCost();
 		}
+		productTable.refresh();
 		
 		body.add(productTable, BorderLayout.CENTER);
-		
-		JTable total = new JTable();
-		DefaultTableModel tmodel = new ProductTableModel(total, null);
-		total.setRowSelectionAllowed(false);		
-		tmodel.addRow(new Object[]{
-				Language.string("Total"),
-				quantity_tot,
-				cost_tot
-		});
-		
-		body.add(total, BorderLayout.SOUTH);
 		
 		this.add(head, BorderLayout.NORTH);
 		this.add(body, BorderLayout.CENTER);
 		
-		JPanel buttons = new JPanel(new GridBagLayout());
-		gc.gridx=0;
-		gc.gridy=0;
-		okButton = GUITool.createButton(buttons, gc, Language.string("Ok"), this);
-		cancelButton = GUITool.createButton(buttons, gc, Language.string("Cancel"), this);
+		JPanel footer = new JPanel(new GridBagLayout());
+		if(editable){
+			okButton = GUITool.createButton(footer, gc, Language.string("Ok"), this);
+			cancelButton = GUITool.createButton(footer, gc, Language.string("Cancel"), this);
+		}
+		this.add(footer, BorderLayout.SOUTH);
 		
 		//table.addMouseListener(new PopupListener<Product>(table, new TreatmentPopup(this.gui, this.gui.getApplication().getAccounting().getProductManager())));
 	}
 	
 	public void showProduct(Product t){
-		//TODO:		
-		Controller<Product> cp = controller==null?null:((Accounting)controller).getProducts();
-		JDialog dialog = new ProductPanel(t, cp).createDialog(getDialog());
+		JDialog dialog = new ProductPanel(t, entity, controller.getApplication().getAccounting().getProducts()).createDialog(getDialog());
 		dialog.setVisible(true);
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
-		//TODO: ok, cancel, edit
+		if(o==okButton){
+			try {
+				Date d = Person.birthdateFormat.parse(dateField.getText());
+				entity.setDate(d);
+			} catch (ParseException e1) {
+				String msg = Language.string("Wrong date format for {0}, expected {1}",dateField.getText(),Person.birthdateFormat.toPattern());
+				JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			entity.setName(nameField.getText());
+			entity.setLastname(lastnameField.getText());
+			entity.setAddress(addressField.getText());
+			entity.setCity(cityField.getText());
+			entity.setProvince(provinceField.getText());
+			entity.setCap(capField.getText());
+			entity.setCode(codeField.getText());
+			controller.store(entity);
+			for(Product p: entity.getProducts()){
+				p.setInvoice(entity);
+				//controller.getApplication().getAccounting().getProducts().store(p);
+			}
+			controller.store(entity);
+			getDialog().dispose();
+		}else if(o==cancelButton){
+			getDialog().dispose();
+		}
 	}
 }

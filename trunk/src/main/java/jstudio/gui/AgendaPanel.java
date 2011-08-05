@@ -14,7 +14,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
 
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;

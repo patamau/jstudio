@@ -9,9 +9,6 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jstudio.db.DatabaseObject;
 import jstudio.gui.JStudioGUI;
 
@@ -19,8 +16,6 @@ import jstudio.gui.JStudioGUI;
 public abstract class EntityManagerPanel<T extends DatabaseObject> 
 		extends JPanel
 		implements ActionListener, MouseListener {
-	
-	private static Logger logger = LoggerFactory.getLogger(EntityManagerPanel.class);
 	
 	protected DefaultTableModel model;
 	protected JTable table;

@@ -13,15 +13,15 @@ public class Product implements DatabaseObject{
 	private Float cost;
 	
 	public Product(){
-		
+		this(null);
 	}
 	
-	public Product(Invoice invoice, String description, Integer quantity, Float cost){
+	public Product(Invoice invoice){
 		this.id=0l;
 		this.invoice=invoice;
-		this.description=description;
-		this.quantity=quantity!=null?quantity:0;
-		this.cost=cost!=null?cost:0f;
+		this.description="";
+		this.quantity=0;
+		this.cost=0f;
 	}
 	
 	public Integer getQuantity() {

@@ -1,5 +1,6 @@
 package jstudio.util;
 
+import java.io.InputStream;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
@@ -24,5 +25,15 @@ public class Resources {
 			}
 		}
 		return i;
+	}
+	
+	public static final InputStream getFile(String path){
+		try{
+			return ClassLoader.getSystemResourceAsStream(path);
+		}catch(Exception e){
+			System.err.println("Cannot locate "+path);
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
