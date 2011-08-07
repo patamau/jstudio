@@ -15,18 +15,17 @@ import jstudio.util.Language;
 public class PersonPopup extends ContextualMenu<Person> {
 	
 	public PersonPopup(EntityManagerPanel<Person> parent, Controller<Person> controller){
-		super(parent, controller);
+		super(parent);
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==viewItem){
-			JDialog dialog = new PersonPanel(context, null).createDialog(parent.getGui());
+			JDialog dialog = new PersonPanel(context, parent, false).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
 		}else if(o==editItem){
-			JDialog dialog = new PersonPanel(context, controller).createDialog(parent.getGui());
+			JDialog dialog = new PersonPanel(context, parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
-			parent.refresh();
 		}else if(o==removeItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
 					Language.string("Are you sure you want to remove {0} {1}?",context.getName(),context.getLastname()),
@@ -37,9 +36,8 @@ public class PersonPopup extends ContextualMenu<Person> {
 				parent.refresh();
 			}
 		}else if(o==newItem){
-			JDialog dialog = new PersonPanel(new Person(), controller).createDialog(parent.getGui());
+			JDialog dialog = new PersonPanel(new Person(), parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
-			parent.refresh();
 		}
 	}
 

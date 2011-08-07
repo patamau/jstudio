@@ -6,7 +6,6 @@ import java.util.Date;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import jstudio.control.Controller;
 import jstudio.gui.generic.ContextualMenu;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.model.Event;
@@ -15,19 +14,18 @@ import jstudio.util.Language;
 @SuppressWarnings("serial")
 public class EventPopup extends ContextualMenu<Event> {
 	
-	public EventPopup(EntityManagerPanel<Event> parent, Controller<Event> controller){
-		super(parent, controller);
+	public EventPopup(EntityManagerPanel<Event> parent){
+		super(parent);
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==viewItem){
-			JDialog dialog = new EventPanel(context, null).createDialog(parent.getGui());
+			JDialog dialog = new EventPanel(context, parent, false).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
 		}else if(o==editItem){
-			JDialog dialog = new EventPanel(context, controller).createDialog(parent.getGui());
+			JDialog dialog = new EventPanel(context, parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
-			parent.refresh();
 		}else if(o==removeItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
 					Language.string("Are you sure you want to remove the event {0}?",context.getDescription()),
@@ -42,9 +40,8 @@ public class EventPopup extends ContextualMenu<Event> {
 			Date d = ((AgendaPanel)parent).getDate();
 			Event ev = new Event();
 			ev.setDate(d);
-			JDialog dialog = new EventPanel(ev, controller).createDialog(parent.getGui());
+			JDialog dialog = new EventPanel(ev, parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
-			parent.refresh();
 		}
 	}
 

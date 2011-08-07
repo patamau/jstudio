@@ -2,7 +2,7 @@ package jstudio.model;
 
 import jstudio.db.DatabaseObject;
 
-public class Product implements DatabaseObject{
+public class Product implements DatabaseObject, Comparable<Product> {
 
 	private static final long serialVersionUID = -3847404193905268779L;
 	
@@ -68,6 +68,11 @@ public class Product implements DatabaseObject{
 
 	public Long getId() {
 		return id;
+	}
+
+	@Override
+	public int compareTo(Product o) {
+		return id.compareTo(o.id);
 	}
 
 }

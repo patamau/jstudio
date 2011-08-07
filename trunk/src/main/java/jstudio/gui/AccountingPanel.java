@@ -3,6 +3,7 @@ package jstudio.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
@@ -11,11 +12,13 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
+import jstudio.control.Controller;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
 import jstudio.util.Language;
+import jstudio.util.Resources;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,17 +28,22 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AccountingPanel.class);
 	
+	public static final String
+		LABEL_ACCOUNTING="Accounting",
+		PIC_ACCOUNTING="invoiceicon.png";
+	
 	private JButton refreshButton;
 	private JTextField filterField;
 
-	public AccountingPanel(JStudioGUI gui){
-		super(gui);
+	public AccountingPanel(Controller<Invoice> controller){
+		super(controller);
 		this.setLayout(new BorderLayout());
 
 		table = new JTable();
 		model = new AccountingTableModel(table);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+	
 		JScrollPane scrollpane = new JScrollPane(table);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 		this.add(scrollpane, BorderLayout.CENTER);
@@ -51,14 +59,22 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		
 		this.add(actionPanel, BorderLayout.NORTH);
 		
-		this.popup = new InvoicePopup(this, this.gui.getApplication().getAccounting());
+		this.popup = new InvoicePopup(this);
 		scrollpane.addMouseListener(this);
 		table.addMouseListener(this);
 		table.addMouseListener(new PopupListener<Invoice>(table, popup));
 	}
 	
+	public String getLabel(){
+		return Language.string(LABEL_ACCOUNTING);
+	}
+	
+	public ImageIcon getIcon(){
+		return Resources.getImage(PIC_ACCOUNTING);
+	}
+	
 	public void showEntity(Invoice i){
-		JDialog dialog = new InvoicePanel(i, null).createDialog(gui);
+		JDialog dialog = new InvoicePanel(i, this, false).createDialog(this.getTopLevelAncestor());
 		dialog.setVisible(true);
 	}
 	
@@ -106,10 +122,5 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		}else{
 			logger.warn("Event source not mapped: "+o);
 		}
-	}
-
-	@Override
-	public void refresh() {
-		gui.loadInvoices();
 	}
 }

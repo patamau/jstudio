@@ -21,9 +21,9 @@ public abstract class ContextualMenu<Context extends DatabaseObject>
 	protected Controller<Context> controller;
 	protected Context context;
 
-	public ContextualMenu(EntityManagerPanel<Context> parent, Controller<Context> controller){
+	public ContextualMenu(EntityManagerPanel<Context> parent){
 		this.parent=parent;
-		this.controller=controller;
+		this.controller=parent.getController();
 		viewItem = new JMenuItem("View");
 	    viewItem.addActionListener(this);
 	    this.add(viewItem);

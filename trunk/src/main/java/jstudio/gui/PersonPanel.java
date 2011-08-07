@@ -15,7 +15,7 @@ import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import jstudio.control.Controller;
+import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
 import jstudio.model.Person;
 import jstudio.util.CodeGenerator;
@@ -39,9 +39,8 @@ public class PersonPanel extends EntityPanel<Person> {
 		phoneField;
 	private JButton okButton, cancelButton;
 
-	public PersonPanel(Person person, Controller<Person> _controller){
-		super(person, _controller);
-		boolean editable = _controller!=null;
+	public PersonPanel(Person person, EntityManagerPanel<Person> manager, boolean editable){
+		super(person, manager);
 		
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -129,6 +128,7 @@ public class PersonPanel extends EntityPanel<Person> {
 			entity.setGender(genderBox.getSelectedIndex());
 			controller.store(entity);
 			getDialog().dispose();
+			manager.refresh();
 		}else if(o==cancelButton){
 			getDialog().dispose();
 		}

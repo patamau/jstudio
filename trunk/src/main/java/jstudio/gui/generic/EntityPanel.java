@@ -1,6 +1,7 @@
 package jstudio.gui.generic;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.event.ActionListener;
@@ -22,11 +23,13 @@ public abstract class EntityPanel<T extends DatabaseObject>
 	private static Map<Class<? extends DatabaseObject>,JDialog> 
 		dialogs = new HashMap<Class<? extends DatabaseObject>,JDialog>();
 	protected T entity;
+	protected EntityManagerPanel<T> manager;
 	protected Controller<T> controller;
 	
-	public EntityPanel(T entity, Controller<T> controller){
+	public EntityPanel(T entity, EntityManagerPanel<T> manager){
 		this.entity = entity;
-		this.controller = controller;
+		this.manager = manager;
+		this.controller = manager.getController();
 	}
 	
 	private void initializeDialog(JDialog dialog){
@@ -54,29 +57,20 @@ public abstract class EntityPanel<T extends DatabaseObject>
 		dialogs.put(entity.getClass(),dialog);
 	}
 	
-	/**
-	 * Sub dialog
-	 * @param parent
-	 * @return
-	 */
-	public JDialog createDialog(Dialog parent){
+	public JDialog createDialog(Container container){
 		JDialog dialog = getDialog();
 		if(dialog==null){
-			dialog = new JDialog(parent);
+			if(container == null){
+				throw new NullPointerException("Expected Frame or Dialog, found Null");
+			}else if(container instanceof Dialog){
+				dialog = new JDialog((Dialog)container);
+			}else if(container instanceof Frame){
+				dialog = new JDialog((Frame)container);
+			}else {
+				throw new IllegalArgumentException("Frame or Dialog expected, found "+container.getClass());
+			}
 			setDialog(dialog);
-			dialog.setLocationRelativeTo(parent);
-			initializeDialog(dialog);
-		}
-		prepareDialog(dialog);
-		return dialog;
-	}
-	
-	public JDialog createDialog(Frame parent){
-		JDialog dialog = getDialog();
-		if(dialog==null){
-			dialog = new JDialog(parent);
-			setDialog(dialog);
-			dialog.setLocationRelativeTo(parent);
+			dialog.setLocationRelativeTo(container);
 			initializeDialog(dialog);
 		}
 		prepareDialog(dialog);

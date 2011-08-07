@@ -37,6 +37,7 @@ public class AccountingTableModel extends DefaultTableModel {
 		switch(col){
 		case 0: return Invoice.class;
 		case 1: return Date.class;
+		case 4: return Float.class;
 		default: return String.class;
 		}
 	}

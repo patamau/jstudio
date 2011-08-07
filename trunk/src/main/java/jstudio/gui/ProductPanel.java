@@ -9,7 +9,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import jstudio.control.Controller;
+import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
@@ -20,6 +20,7 @@ import jstudio.util.Language;
 public class ProductPanel extends EntityPanel<Product> {
 	
 	private Invoice invoice;
+	private EntityManagerPanel<Invoice> accountingManager;
 	
 	private JTextField 
 		descriptionField, 
@@ -27,10 +28,11 @@ public class ProductPanel extends EntityPanel<Product> {
 		costField;
 	private JButton okButton, cancelButton;
 
-	public ProductPanel(Product product, Invoice invoice, Controller<Product> controller){
-		super(product, controller);
+	public ProductPanel(Product product, EntityManagerPanel<Product> manager, Invoice invoice, EntityManagerPanel<Invoice> accountingManager){
+		super(product, manager);
 		boolean editable = invoice!=null;
 		this.invoice = invoice;
+		this.accountingManager = accountingManager;
 		
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -55,10 +57,13 @@ public class ProductPanel extends EntityPanel<Product> {
 				entity.setQuantity(Integer.parseInt(quantityField.getText()));
 				entity.setCost(Float.parseFloat(costField.getText()));
 				entity.setDescription(descriptionField.getText());
-				if(entity.getId()==0){
+				if(!invoice.getProducts().contains(entity)){
 					invoice.getProducts().add(entity);
 				}
+				accountingManager.getController().store(invoice);
 				getDialog().dispose();
+				accountingManager.refresh();
+				manager.refresh();
 			}catch(NumberFormatException ex){
 				String msg = Language.string("A number inserted has a bad format");
 				JOptionPane.showMessageDialog(this, msg, Language.string("Wrong value"), JOptionPane.ERROR_MESSAGE);

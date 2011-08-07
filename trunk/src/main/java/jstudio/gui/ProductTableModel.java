@@ -25,7 +25,7 @@ public class ProductTableModel extends DefaultTableModel {
 		table.getColumn("Cost").setMinWidth(50);
 		table.getColumn("Description").setPreferredWidth(150);
 	}
-
+	
 	public boolean isCellEditable(int row, int col){
 		return false;
 	}

@@ -4,10 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -15,11 +18,14 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
+import jstudio.control.Agenda;
+import jstudio.control.Controller;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Event;
 import jstudio.util.DatePicker;
 import jstudio.util.Language;
+import jstudio.util.Resources;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +39,14 @@ public class AgendaPanel
 		dateFormat = new SimpleDateFormat("EEEE dd MMMM yyyy");
 	private static final Logger logger = LoggerFactory.getLogger(AgendaPanel.class);
 	
+	public static final String PIC_AGENDA="eventicon.png";
+	
 	private JButton dateButton;
 	private JButton refreshButton;
 	private JTextField filterField;
 
-	public AgendaPanel(JStudioGUI gui){
-		super(gui);
+	public AgendaPanel(Controller<Event> controller){
+		super(controller);
 		this.setLayout(new BorderLayout());
 
 		table = new JTable();
@@ -71,10 +79,18 @@ public class AgendaPanel
 		
 		this.add(topPanel, BorderLayout.NORTH);
 		
-		this.popup = new EventPopup(this, this.gui.getApplication().getAgenda());
+		this.popup = new EventPopup(this);
 		scrollpane.addMouseListener(this);
 		table.addMouseListener(this);
 		table.addMouseListener(new PopupListener<Event>(table, popup));
+	}
+	
+	public String getLabel(){
+		return Language.string("Agenda");
+	}
+	
+	public ImageIcon getIcon(){
+		return Resources.getImage(PIC_AGENDA);
 	}
 	
 	public void setDate(Date date){
@@ -91,7 +107,7 @@ public class AgendaPanel
 	}
 	
 	public void showEntity(Event e){
-		JDialog dialog = new EventPanel(e,null).createDialog(gui);
+		JDialog dialog = new EventPanel(e,this,false).createDialog(this.getTopLevelAncestor());
 		dialog.setVisible(true);
 	}
 
@@ -122,6 +138,14 @@ public class AgendaPanel
 
 	@Override
 	public void refresh() {
-		gui.loadEvents(getDate());
+		this.clear();
+		Collection<Event> list = ((Agenda)controller).getByDate(getDate());
+		if(list!=null){
+			for(Event e: list){
+				this.addEntity(e);
+			}
+		}else{
+			JOptionPane.showMessageDialog(this, Language.string("Unable to load events"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
+		}
 	}
 }
