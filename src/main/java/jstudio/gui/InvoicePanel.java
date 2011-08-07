@@ -14,7 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import jstudio.control.Controller;
+import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
 import jstudio.model.Invoice;
 import jstudio.model.Person;
@@ -38,9 +38,8 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 	private ProductTable productTable;
 	private JButton okButton, cancelButton;
 
-	public InvoicePanel(Invoice invoice, Controller<Invoice> controller){
-		super(invoice, controller);
-		boolean editable = controller!=null;
+	public InvoicePanel(Invoice invoice, EntityManagerPanel<Invoice> manager, boolean editable){
+		super(invoice, manager);
 		
 		this.setLayout(new BorderLayout());
 		
@@ -83,11 +82,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
-		if(controller==null){
-			productTable = new ProductTable(null, invoice);
-		} else {
-			productTable = new ProductTable(controller.getApplication().getGUI(), invoice);
-		}
+		productTable = new ProductTable(invoice, manager);
 		productTable.refresh();
 		
 		body.add(productTable, BorderLayout.CENTER);
@@ -106,7 +101,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 	}
 	
 	public void showProduct(Product t){
-		JDialog dialog = new ProductPanel(t, entity, controller.getApplication().getAccounting().getProducts()).createDialog(getDialog());
+		JDialog dialog = new ProductPanel(t, productTable, entity, manager).createDialog(getDialog());
 		dialog.setVisible(true);
 	}
 
@@ -131,10 +126,10 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			controller.store(entity);
 			for(Product p: entity.getProducts()){
 				p.setInvoice(entity);
-				//controller.getApplication().getAccounting().getProducts().store(p);
 			}
 			controller.store(entity);
 			getDialog().dispose();
+			manager.refresh();
 		}else if(o==cancelButton){
 			getDialog().dispose();
 		}

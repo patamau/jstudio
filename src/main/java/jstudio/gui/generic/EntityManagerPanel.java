@@ -3,14 +3,18 @@ package jstudio.gui.generic;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Collection;
 
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
+import jstudio.control.Controller;
 import jstudio.db.DatabaseObject;
-import jstudio.gui.JStudioGUI;
+import jstudio.util.Language;
 
 @SuppressWarnings("serial")
 public abstract class EntityManagerPanel<T extends DatabaseObject> 
@@ -19,15 +23,21 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	
 	protected DefaultTableModel model;
 	protected JTable table;
-	protected JStudioGUI gui;
 	protected ContextualMenu<T> popup;
+	protected Controller<T> controller;
 	
-	public EntityManagerPanel(JStudioGUI gui){
-		this.gui=gui;
+	public EntityManagerPanel(Controller<T> controller){
+		this.controller=controller;
 	}
 	
-	public JStudioGUI getGui(){
-		return gui;
+	public abstract String getLabel();
+	
+	public ImageIcon getIcon(){
+		return null;
+	}
+	
+	public Controller<T> getController(){
+		return controller;
 	}
 	
 	public synchronized void clear(){
@@ -52,7 +62,17 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 		}
 	}
 	
-	public abstract void refresh();
+	public void refresh(){
+		this.clear();
+		Collection<T> ts = controller.getAll();
+		if(ts!=null){
+			for(T t: ts){
+				this.addEntity(t);
+			}
+		}else{
+			JOptionPane.showMessageDialog(this, Language.string("Unable to load data"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
+		}
+	}
 	
 	public abstract void addEntity(T entity);
 	
@@ -60,10 +80,8 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	
 	@SuppressWarnings("unchecked")
 	public void mouseClicked(MouseEvent e){ 
-		System.out.println("Mouse clicked...");
 		if(e.getClickCount()==2){
 			int row = table.rowAtPoint(e.getPoint());
-			System.out.println("Row at point = "+row);
 			if(row>=0){
 				showEntity((T)table.getValueAt(row, 0));
 			}
@@ -73,6 +91,7 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	public void mouseEntered(MouseEvent e){ }
 	public void mouseExited(MouseEvent e){ }
 	public void mousePressed(MouseEvent e){ }
+	
 	public void mouseReleased(final MouseEvent e){ 
 		if(SwingUtilities.isRightMouseButton(e)){
 			int row = table.rowAtPoint(e.getPoint());

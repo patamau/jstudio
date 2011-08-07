@@ -12,6 +12,9 @@ import jstudio.control.AddressBook;
 import jstudio.control.Comuni;
 import jstudio.db.DatabaseInterface;
 import jstudio.db.HibernateDB;
+import jstudio.gui.AccountingPanel;
+import jstudio.gui.AddressBookPanel;
+import jstudio.gui.AgendaPanel;
 import jstudio.gui.JStudioGUI;
 import jstudio.util.Configuration;
 import jstudio.util.FilteredStream;
@@ -61,6 +64,10 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		//initialize GUI
 		gui = new JStudioGUI(this.getClass().getSimpleName()+" "+VERSION, this);
 		gui.setIconImage(Resources.getImage("appicon.png").getImage());
+		gui.createGUI();
+		gui.addPanel(new AddressBookPanel(addressBook));
+		gui.addPanel(new AgendaPanel(agenda));
+		gui.addPanel(new AccountingPanel(accounting));
 	}
 	
 	private void initializeData(){

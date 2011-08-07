@@ -4,10 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import jstudio.db.DatabaseObject;
 
-public class Invoice implements DatabaseObject{
+public class Invoice implements DatabaseObject {
 	
 	private static final long serialVersionUID = 2636840744342729819L;
 
@@ -120,7 +121,7 @@ public class Invoice implements DatabaseObject{
 	}
 
 	public void setProducts(Set<Product> products) {
-		this.products = products;
+		this.products = new TreeSet<Product>(products);
 	}
 
 	public void setId(Long id) {
@@ -130,5 +131,4 @@ public class Invoice implements DatabaseObject{
 	public Long getId() {
 		return id;
 	}
-
 }

@@ -12,7 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import jstudio.control.Controller;
+import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
 import jstudio.model.Event;
 import jstudio.model.Person;
@@ -31,9 +31,8 @@ public class EventPanel extends EntityPanel<Event> {
 		descriptionField;
 	private JButton okButton, cancelButton;
 
-	public EventPanel(Event event, Controller<Event> controller){
-		super(event, controller);
-		boolean editable = controller!=null;
+	public EventPanel(Event event, EntityManagerPanel<Event> manager, boolean editable){
+		super(event, manager);
 		
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -98,6 +97,7 @@ public class EventPanel extends EntityPanel<Event> {
 			entity.setDescription(descriptionField.getText());
 			controller.store(entity);
 			getDialog().dispose();
+			manager.refresh();
 		}else if(o==cancelButton){
 			getDialog().dispose();
 		}

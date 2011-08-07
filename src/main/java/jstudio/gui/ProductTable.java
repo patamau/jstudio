@@ -1,6 +1,7 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JButton;
@@ -11,6 +12,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
+import jstudio.control.Accounting;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Invoice;
@@ -24,12 +26,15 @@ public class ProductTable
 	private JTable totals;
 	private DefaultTableModel totalsModel;
 	private Invoice invoice;
+	private EntityManagerPanel<Invoice> accounting;
 
 	private JButton refreshButton;
 	
-	public ProductTable(JStudioGUI gui, Invoice invoice){
-		super(gui);
+	public ProductTable(Invoice invoice, EntityManagerPanel<Invoice> accounting){
+		super(((Accounting)accounting.getController()).getProducts());
 		this.invoice = invoice;
+		this.accounting = accounting;
+		
 		this.setLayout(new BorderLayout());
 		
 		JPanel buttonsPanel = new JPanel();
@@ -39,7 +44,11 @@ public class ProductTable
 		
 		this.add(buttonsPanel, BorderLayout.NORTH);
 
-		table = new JTable();
+		table = new JTable(){
+			public Dimension getPreferredScrollableViewportSize() {
+				return getPreferredSize();
+			}
+		};
 		model = new ProductTableModel(table, invoice);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -47,15 +56,7 @@ public class ProductTable
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 		this.add(scrollpane, BorderLayout.CENTER);
 		
-		if(gui!=null){
-		this.popup = new ProductPopup(this, 
-				invoice, 
-				super.gui.getApplication().getAccounting().getProducts());
-		}else{
-			this.popup = new ProductPopup(this, 
-				null, 
-				null);
-		}
+		this.popup = new ProductPopup(this, invoice, accounting);
 		scrollpane.addMouseListener(this);
 		table.addMouseListener(this);
 		table.addMouseListener(new PopupListener<Product>(table, popup));
@@ -67,8 +68,13 @@ public class ProductTable
 		this.add(totals, BorderLayout.SOUTH);
 	}
 	
+	public String getLabel(){
+		return Language.string("Products");
+	}
+	
 	public void showEntity(Product p){
-		JDialog dialog = new ProductPanel(p, invoice, gui.getApplication().getAccounting().getProducts()).createDialog(gui);
+		JDialog dialog;
+		dialog = new ProductPanel(p, this, invoice, accounting).createDialog(this.getTopLevelAncestor());
 		dialog.setVisible(true);
 	}
 

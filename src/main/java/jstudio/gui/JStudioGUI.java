@@ -3,28 +3,22 @@ package jstudio.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collection;
-import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 
 import jstudio.JStudio;
-import jstudio.model.Event;
-import jstudio.model.Invoice;
-import jstudio.model.Person;
+import jstudio.db.DatabaseObject;
+import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.util.Configuration;
 import jstudio.util.ConfigurationDialog;
 import jstudio.util.Language;
-import jstudio.util.Resources;
 
 @SuppressWarnings("serial")
 public class JStudioGUI extends JFrame implements ActionListener {
@@ -39,7 +33,6 @@ public class JStudioGUI extends JFrame implements ActionListener {
 	
 	public static final String
 		PIC_AGENDA="eventicon.png",
-		PIC_ADDRESSBOOK="personicon.png",
 		PIC_ACCOUNTING="invoiceicon.png";
 	
 	private boolean initialized = false;
@@ -47,16 +40,12 @@ public class JStudioGUI extends JFrame implements ActionListener {
 	private JMenuItem 
 		optionsItem,
 		connectionItem,
-		exitItem,
-		agendaItem,
-		addressBookItem,
-		accountingItem;
+		exitItem;
 		
+	private JMenu viewMenu;
 	private JLabel statusLabel;
 	private JTabbedPane tabbedPane;
-	private AgendaPanel agendaPanel;
-	private AddressBookPanel addressBookPanel;
-	private AccountingPanel accountingPanel;
+	//private ArrayList<EntityManagerPanel<? extends DatabaseObject>> panels;
 
 	public JStudioGUI(String title, JStudio app){
 		super(title);
@@ -73,7 +62,19 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		return app;
 	}
 	
-	private void createGUI(){
+	public void addPanel(final EntityManagerPanel<? extends DatabaseObject> panel){
+		tabbedPane.addTab(panel.getLabel(), panel.getIcon(), panel);
+		JMenuItem item = new JMenuItem(panel.getLabel(), panel.getIcon());
+		item.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				tabbedPane.setSelectedComponent(panel);
+			}			
+		});
+		viewMenu.add(item);
+		panel.refresh();
+	}
+	
+	public void createGUI(){
 		//only one gui created at a time
 		if(initialized) return;
 		initialized = true;
@@ -98,16 +99,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		menuBar.add(fileMenu);
 		
 		//create view menu
-		JMenu viewMenu = new JMenu(Language.string("View"));
-		addressBookItem = new JMenuItem(Language.string("Address book"), Resources.getImage(PIC_ADDRESSBOOK));
-		addressBookItem.addActionListener(this);
-		agendaItem = new JMenuItem(Language.string("Agenda"), Resources.getImage(PIC_AGENDA));
-		agendaItem.addActionListener(this);
-		accountingItem = new JMenuItem(Language.string("Accounting"), Resources.getImage(PIC_ACCOUNTING));
-		accountingItem.addActionListener(this);
-		viewMenu.add(addressBookItem);
-		viewMenu.add(agendaItem);
-		viewMenu.add(accountingItem);
+		viewMenu = new JMenu(Language.string("View"));
 		menuBar.add(viewMenu);
 		setJMenuBar(menuBar);
 		
@@ -119,81 +111,6 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		
 		tabbedPane = new JTabbedPane();
 		getContentPane().add(tabbedPane, BorderLayout.CENTER);
-		//initialize sub panels
-		addressBookPanel = new AddressBookPanel(this);
-		agendaPanel = new AgendaPanel(this);
-		accountingPanel = new AccountingPanel(this);
-		//by default show contacts
-		tabbedPane.addTab(Language.string("Address book"),
-				Resources.getImage(PIC_ADDRESSBOOK),
-				addressBookPanel);
-		tabbedPane.addTab(Language.string("Agenda"),
-				Resources.getImage(PIC_AGENDA),
-				agendaPanel);
-		tabbedPane.addTab(Language.string("Accounting"),
-				Resources.getImage(PIC_ACCOUNTING),
-				accountingPanel);
-	}
-	
-	@Override
-	public void setVisible(boolean visible){
-		createGUI();
-		super.setVisible(visible);
-		loadContacts();
-		loadEvents(new Date());
-		loadInvoices();
-	} 
-	
-	public void loadContacts(){
-		addressBookPanel.clear();
-		Collection<Person> pps = app.getAddressBook().getAll();
-		if(pps!=null){
-			for(Person p: pps){
-				addressBookPanel.addEntity(p);
-			}
-		}else{
-			JOptionPane.showMessageDialog(this, Language.string("Unable to load contacts"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
-		}
-	}
-	
-	public void loadEvents(Date date){
-		agendaPanel.clear();
-		Collection<Event> list = app.getAgenda().getByDate(date);
-		if(list!=null){
-			for(Event e: list){
-				agendaPanel.addEntity(e);
-			}
-		}else{
-			JOptionPane.showMessageDialog(this, Language.string("Unable to load events"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
-		}
-	}
-	
-	public void loadInvoices(){
-		accountingPanel.clear();
-		Collection<Invoice> list = app.getAccounting().getAll();
-		if(list!=null){
-			for(Invoice i: list){
-				accountingPanel.addEntity(i);
-			}
-		}else{
-			JOptionPane.showMessageDialog(this, Language.string("Unable to load invoices"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
-		}
-	}
-
-	private void showPanel(JPanel panel){
-		tabbedPane.setSelectedComponent(panel);
-	}
-	
-	public void showAddressBook(){
-		showPanel(addressBookPanel);
-	}
-	
-	public void showAgenda(){
-		showPanel(agendaPanel);
-	}
-	
-	public void showAccounting(){
-		showPanel(accountingPanel);
 	}
 
 	public void actionPerformed(ActionEvent event) {
@@ -205,12 +122,6 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		}else if(src==connectionItem){
 			DBDialog dbdialog = new DBDialog(this,app.getDatabase());
 			dbdialog.showDialog(Configuration.getGlobalConfiguration());			
-		}else if(src==addressBookItem){
-			showAddressBook();
-		}else if(src==agendaItem){
-			showAgenda();
-		}else if(src==accountingItem){
-			showAccounting();
 		}else if(src==exitItem){
 			this.dispose();
 		}

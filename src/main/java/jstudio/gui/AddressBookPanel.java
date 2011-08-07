@@ -2,8 +2,10 @@ package jstudio.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
@@ -12,10 +14,12 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
+import jstudio.control.Controller;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Person;
 import jstudio.util.Language;
+import jstudio.util.Resources;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,11 +29,13 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AddressBookPanel.class);
 
+	public static final String PIC_ADDRESSBOOK="personicon.png";
+	
 	private JButton refreshButton;
 	private JTextField filterField;
 	
-	public AddressBookPanel(JStudioGUI gui){
-		super(gui);
+	public AddressBookPanel(Controller<Person> controller){
+		super(controller);
 		this.setLayout(new BorderLayout());
 		
 		table = new JTable();
@@ -55,12 +61,20 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 		
 		scrollpane.addMouseListener(this);
 		table.addMouseListener(this);
-		this.popup = new PersonPopup(this, this.gui.getApplication().getAddressBook());
+		this.popup = new PersonPopup(this, controller);
 	    table.addMouseListener(new PopupListener<Person>(table, super.popup));
 	}
 	
+	public String getLabel(){
+		return Language.string("Address book");
+	}
+	
+	public ImageIcon getIcon(){
+		return Resources.getImage(PIC_ADDRESSBOOK);
+	}
+	
 	public void showEntity(Person p){
-		JDialog dialog = new PersonPanel(p,null).createDialog(this.gui);
+		JDialog dialog = new PersonPanel(p,this, false).createDialog((Frame)this.getTopLevelAncestor());
 		dialog.setVisible(true);
 	}
 
@@ -71,10 +85,6 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 				p.getBirthdate(),
 				p.getCity(),
 				p.getPhone()});
-	}
-	
-	public synchronized void refresh(){
-		gui.loadContacts();
 	}
 
 	public void actionPerformed(ActionEvent e) {
