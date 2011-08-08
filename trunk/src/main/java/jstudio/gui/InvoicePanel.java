@@ -19,6 +19,7 @@ import jstudio.gui.generic.EntityPanel;
 import jstudio.model.Invoice;
 import jstudio.model.Person;
 import jstudio.model.Product;
+import jstudio.report.ReportGenerator;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
@@ -36,7 +37,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		capField,
 		codeField;
 	private ProductTable productTable;
-	private JButton okButton, cancelButton;
+	private JButton okButton, cancelButton, printButton;
 
 	public InvoicePanel(Invoice invoice, EntityManagerPanel<Invoice> manager, boolean editable){
 		super(invoice, manager);
@@ -95,6 +96,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			okButton = GUITool.createButton(footer, gc, Language.string("Ok"), this);
 			cancelButton = GUITool.createButton(footer, gc, Language.string("Cancel"), this);
 		}
+		printButton = GUITool.createButton(footer, gc, Language.string("Print"), this);
 		this.add(footer, BorderLayout.SOUTH);
 		
 		//table.addMouseListener(new PopupListener<Product>(table, new TreatmentPopup(this.gui, this.gui.getApplication().getAccounting().getProductManager())));
@@ -132,6 +134,16 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			manager.refresh();
 		}else if(o==cancelButton){
 			getDialog().dispose();
+		}else if(o==printButton){
+			ReportGenerator rg = new ReportGenerator();
+			rg.setReport("/report1.jasper");
+			rg.setHead(entity);
+			rg.setData(entity.getProducts());
+			try {
+				rg.generatePdf(".", "invoice"+entity.getId()+".pdf");
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 }

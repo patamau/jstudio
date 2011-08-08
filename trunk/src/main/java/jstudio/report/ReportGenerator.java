@@ -10,12 +10,17 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jstudio.JStudio;
 import jstudio.control.Accounting;
+import jstudio.db.DatabaseObject;
+import jstudio.model.Invoice;
 import jstudio.model.Product;
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
@@ -24,16 +29,37 @@ import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
  * Hello world!
  *
  */
-public class ReportGenerator<Entry> {
+public class ReportGenerator {
 	
 	public static void main(String args[]){
-		JStudio app = new JStudio();
-		app.initialize();
-		Accounting acc = app.getAccounting();
-		
-		ReportGenerator<Product> rg = new ReportGenerator<Product>();
+		ReportGenerator rg = new ReportGenerator();
 		rg.setReport("/report1.jasper");
-		rg.setData(acc.getProducts().getAll());
+		Invoice i = new Invoice();
+		i.setId(23l);
+		i.setDate(new Date());
+		i.setName("Matteo");
+		i.setLastname("Pedrotti");
+		i.setAddress("Via del Bomport, 20");
+		i.setCity("Trento");
+		i.setCap("38123");
+		i.setProvince("TN");
+		Set<Product> set = new HashSet<Product>();
+		Product p = new Product();
+		p.setId(0l);
+		p.setDescription("Estrazione dente del giudizio");
+		p.setCost(150f);
+		p.setQuantity(1);
+		set.add(p);
+		Product p2 = new Product();
+		p2.setId(1l);
+		p2.setDescription("Pulizia dentale e sbiancamento");
+		p.setCost(200f);
+		p.setQuantity(1);
+		set.add(p2);
+		i.setProducts(set);
+		rg.setHead(i);
+		rg.setData(i.getProducts());
+		rg.setHeadValue("total", Float.toString(350f));
 		try {
 			rg.generatePdf(".","sampleReportInvoice.pdf");
 		} catch (Exception e) {
@@ -43,26 +69,53 @@ public class ReportGenerator<Entry> {
 	}
 	
 	private String reportName;
-	private Map<String,String> head;
-	private List<Map<String,String>> data;
+	private Map<String,String> head; //static header data
+	private List<Map<String,String>> data; //set of contents
 	
 	public ReportGenerator(){
 		reportName = null;
 		this.data = new ArrayList<Map<String,String>>();
-		head = new HashMap<String,String>();
-		head.put("id","124");
-		head.put("date","12/07/2011");
-		head.put("name", "Matteo");
-		head.put("lastname", "Pedrotti");
+		this.head = new HashMap<String,String>();
 	}
 	
 	public void setReport(String name){
 		reportName = name;
 	}
 	
-	public void setData(Collection<Entry> data){
+	public void setHeadValue(String key, String value){
+		head.put(key, value);
+	}
+	
+	public void setHead(DatabaseObject entry){
+		if(head.size()>0) head.clear();
+        for(Field f: entry.getClass().getDeclaredFields()){
+        	if(Modifier.isStatic(f.getModifiers())) continue;
+        	try{
+	        	String fname = f.getName();
+	        	String mname = "get"+fname.substring(0,1).toUpperCase()+fname.substring(1);
+	        	Method m = entry.getClass().getMethod(mname);
+	        	Object o = m.invoke(entry);
+	        	if(o!=null){
+	        		head.put(fname, o.toString());
+	        	}
+			} catch (SecurityException e1) {
+				e1.printStackTrace();
+			} catch (NoSuchMethodException e1) {
+				e1.printStackTrace();
+			} catch (IllegalArgumentException e1) {
+				e1.printStackTrace();
+			} catch (IllegalAccessException e1) {
+				e1.printStackTrace();
+			} catch (InvocationTargetException e1) {
+				e1.printStackTrace();
+			}
+        }
+	}
+	
+	public void setData(Set<? extends DatabaseObject> data){
+		if(this.data.size()>0) this.data.clear();
 		Map<String,String> row = this.head;
-		for(Entry e: data){	  
+		for(DatabaseObject e: data){	  
 	        for(Field f: e.getClass().getDeclaredFields()){
 	        	if(Modifier.isStatic(f.getModifiers())) continue;
 	        	try{
@@ -94,11 +147,10 @@ public class ReportGenerator<Entry> {
         InputStream is = getClass().getResourceAsStream(reportName);
         File outDir = new File(outputDir);
         outDir.mkdirs();
-        OutputStream os = new FileOutputStream(new File(outDir, outputFile));
- 
-        JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data);
- 
-        JasperRunManager.runReportToPdfStream(is, os, null, dataSource);
+        OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
+        JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
+        JasperRunManager.runReportToPdfStream(is, os, null, dataSource);       
+        os.close();
     }
 }
 
