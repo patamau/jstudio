@@ -4,9 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
-import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -27,8 +25,6 @@ public class ProductTable
 	private DefaultTableModel totalsModel;
 	private Invoice invoice;
 	private EntityManagerPanel<Invoice> accounting;
-
-	private JButton refreshButton;
 	
 	public ProductTable(Invoice invoice, EntityManagerPanel<Invoice> accounting){
 		super(((Accounting)accounting.getController()).getProducts());
@@ -36,13 +32,6 @@ public class ProductTable
 		this.accounting = accounting;
 		
 		this.setLayout(new BorderLayout());
-		
-		JPanel buttonsPanel = new JPanel();
-		refreshButton = new JButton(Language.string("Refresh"));
-		refreshButton.addActionListener(this);
-		buttonsPanel.add(refreshButton);
-		
-		this.add(buttonsPanel, BorderLayout.NORTH);
 
 		table = new JTable(){
 			public Dimension getPreferredScrollableViewportSize() {
@@ -87,10 +76,7 @@ public class ProductTable
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		Object o = e.getSource();
-		if(o==refreshButton){
-			refresh();
-		}
+		//Object o = e.getSource();
 	}
 
 	@Override
