@@ -70,7 +70,6 @@ public class Product implements DatabaseObject, Comparable<Product> {
 		return id;
 	}
 
-	@Override
 	public int compareTo(Product o) {
 		return id.compareTo(o.id);
 	}
