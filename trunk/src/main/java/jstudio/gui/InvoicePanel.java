@@ -141,6 +141,8 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			rg.setData(entity.getProducts());
 			try {
 				rg.generatePdf(".", "invoice"+entity.getId()+".pdf");
+				rg.generateRtf(".", "invoice"+entity.getId()+".rtf");
+				rg.generateText(".", "invoice"+entity.getId()+".doc");
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}

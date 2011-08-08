@@ -22,8 +22,20 @@ import jstudio.control.Accounting;
 import jstudio.db.DatabaseObject;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.export.JRRtfExporter;
+import net.sf.jasperreports.engine.export.JRTextExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
  
 /**
  * Hello world!
@@ -149,8 +161,58 @@ public class ReportGenerator {
         outDir.mkdirs();
         OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
         JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
-        JasperRunManager.runReportToPdfStream(is, os, null, dataSource);       
+        JasperRunManager.runReportToPdfStream(is, os, null, dataSource);
         os.close();
+    }
+    
+    public void generateRtf(String outputDir, String outputFile) throws Exception {
+        InputStream is = getClass().getResourceAsStream(reportName);
+        File outDir = new File(outputDir);
+        outDir.mkdirs();
+        OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
+        JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
+        runReportToRtfStream(is, os, null, dataSource);
+        os.close();
+    }
+    
+    public void generateText(String outputDir, String outputFile) throws Exception {
+        InputStream is = getClass().getResourceAsStream(reportName);
+        File outDir = new File(outputDir);
+        outDir.mkdirs();
+        OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
+        JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
+        runReportToRtfStream(is, os, null, dataSource);
+        os.close();
+    }
+    
+    public static void runReportToRtfStream(InputStream inputStream, 
+    		OutputStream outputStream, 
+    		Map parameters, 
+    		JRDataSource jrDataSource
+    		) throws JRException{
+    	JasperPrint jasperPrint = JasperFillManager.fillReport(inputStream, parameters, jrDataSource);
+
+		JRRtfExporter exporter = new JRRtfExporter();
+		
+		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outputStream);
+		
+		exporter.exportReport();
+    }
+    
+    public static void runReportToTextStream(InputStream inputStream, 
+    		OutputStream outputStream, 
+    		Map parameters, 
+    		JRDataSource jrDataSource
+    		) throws JRException{
+    	JasperPrint jasperPrint = JasperFillManager.fillReport(inputStream, parameters, jrDataSource);
+
+		JRTextExporter exporter = new JRTextExporter();
+		
+		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outputStream);
+		
+		exporter.exportReport();
     }
 }
 
