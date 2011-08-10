@@ -31,22 +31,22 @@
 	<columnHeader>
 		<band height="61" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="100" height="20"/>
+				<reportElement x="0" y="0" width="225" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{id}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="100" y="0" width="100" height="20"/>
-				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{date}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="20" width="100" height="20"/>
+				<reportElement x="0" y="20" width="225" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="100" y="20" width="100" height="20"/>
+				<reportElement x="225" y="0" width="270" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[ $F{date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="20" width="265" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{lastname}]]></textFieldExpression>
 			</textField>
@@ -55,7 +55,7 @@
 	<detail>
 		<band height="125" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="100" height="20"/>
+				<reportElement x="0" y="0" width="330" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>

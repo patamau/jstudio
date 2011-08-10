@@ -1,7 +1,7 @@
 package jstudio.db;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface DatabaseInterface {
 	
@@ -29,5 +29,6 @@ public interface DatabaseInterface {
 	public List<? extends DatabaseObject> getAll(String table, String column);
 	public DatabaseObject get(String table, int id);
 	public List<? extends DatabaseObject> getBetween(String table, String field, String from, String to);
-	public List<? extends DatabaseObject> getAll(String table, HashMap<String, String> values);
+	public List<? extends DatabaseObject> getAll(String table, Map<String, String> values);
+	public List<? extends DatabaseObject> findAll(String table, String[] values, String[] columns);
 }
