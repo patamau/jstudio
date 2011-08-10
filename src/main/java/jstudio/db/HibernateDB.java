@@ -2,6 +2,7 @@ package jstudio.db;
 
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 
 import jstudio.db.DatabaseInterface;
 
@@ -144,8 +145,7 @@ public class HibernateDB implements DatabaseInterface{
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<DatabaseObject> getAll(String source,
-			HashMap<String, String> values) {
+	public List<DatabaseObject> getAll(String source, Map<String, String> values) {
 		//if no values specified, bounce to default getAll
 		if(null==values||0==values.keySet().size()) return getAll(source);
     	Session session = sessionFactory.getCurrentSession();
@@ -190,6 +190,43 @@ public class HibernateDB implements DatabaseInterface{
     	Transaction t = session.beginTransaction();
     	session.delete(o);
     	commit(t);
+	}
+
+	@Override
+	public List<DatabaseObject> findAll(String source, String[] values, String[] columns) {
+		//if no values specified, bounce to default getAll
+		if(null==values||0==values.length||
+				null==columns||0==columns.length) return getAll(source);
+    	Session session = sessionFactory.getCurrentSession();
+    	Transaction t = session.beginTransaction();
+    	StringBuffer sb = new StringBuffer();
+    	sb.append("from ");
+    	sb.append(source);
+    	sb.append(" where ");
+    	int vsiz = values.length;
+    	for(String v: values){
+	    	int csiz = columns.length;
+    		sb.append("(");
+	    	for(String k: columns){
+	    		sb.append(k);
+	    		sb.append(" LIKE '%");
+	    		sb.append(v);
+	    		sb.append("%'");
+	    		csiz--;
+	    		if(csiz>0){
+	    			sb.append(" OR ");
+	    		}
+	    	}
+	    	sb.append(")");
+	    	vsiz--;
+	    	if(vsiz>0){
+	    		sb.append(" AND ");
+	    	}
+    	}
+    	@SuppressWarnings("unchecked")
+		List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery(sb.toString()).list();
+    	commit(t);
+    	return l;
 	}
 
 }

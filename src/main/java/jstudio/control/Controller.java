@@ -1,6 +1,7 @@
 package jstudio.control;
 
 import java.util.Collection;
+import java.util.Map;
 
 import jstudio.JStudio;
 import jstudio.db.DatabaseObject;
@@ -41,6 +42,16 @@ public class Controller<E extends DatabaseObject> {
 	@SuppressWarnings("unchecked")
 	public Collection<E> getAll(){
 		return (Collection<E>)app.getDatabase().getAll(source);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Collection<E> getAll(Map<String,String> map){
+		return (Collection<E>)app.getDatabase().getAll(source, map);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Collection<E> findAll(String[] values, String[] columns){
+		return (Collection<E>)app.getDatabase().findAll(source, values, columns);
 	}
 	
 	public void store(E o){

@@ -4,10 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.util.Collection;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -92,7 +94,20 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 		if(o==refreshButton){
 			refresh();
 		}else if(o==filterField){
-			//TODO: apply filter
+			this.clear();
+			String[] vals = filterField.getText().split(" ");
+			String[] cols = new String[]{
+					"name",
+					"lastname" };
+			logger.debug("Looking for "+vals[0]);
+			Collection<Person> ts = controller.findAll(vals, cols);
+			if(ts!=null){
+				for(Person t: ts){
+					this.addEntity(t);
+				}
+			}else{
+				JOptionPane.showMessageDialog(this, Language.string("Unable to load data"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
+			}
 		}else{
 			logger.warn("Event source not mapped: "+o);
 		}
