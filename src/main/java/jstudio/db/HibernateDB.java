@@ -1,7 +1,6 @@
 package jstudio.db;
 
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
 
 import jstudio.db.DatabaseInterface;

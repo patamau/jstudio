@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Collection;
 
 import javax.swing.ImageIcon;
@@ -27,7 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
-public class AddressBookPanel extends EntityManagerPanel<Person> {
+public class AddressBookPanel extends EntityManagerPanel<Person>
+		implements KeyListener {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AddressBookPanel.class);
 
@@ -35,9 +38,29 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 	
 	private JButton refreshButton;
 	private JTextField filterField;
+	private FilterThread filterThread;
+	
+	private class FilterThread extends Thread{
+		boolean stop = false;
+		public void run(){
+			try {
+				while(!stop){					
+					synchronized(this){
+						wait();
+						wait(100);
+					}		
+					filter(filterField.getText());
+				}
+			} catch (InterruptedException e) {
+				logger.error("Filter thread interrupted");
+			}
+		}
+	}
 	
 	public AddressBookPanel(Controller<Person> controller){
 		super(controller);
+		filterThread = new FilterThread(); 
+		filterThread.start();
 		this.setLayout(new BorderLayout());
 		
 		table = new JTable();
@@ -55,7 +78,7 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 		refreshButton.setPreferredSize(new Dimension(60,25));
 		actionPanel.add(refreshButton);
 		filterField = new JTextField();
-		filterField.addActionListener(this);
+		filterField.addKeyListener(this);
 		filterField.setPreferredSize(new Dimension(0,25));
 		actionPanel.add(filterField);
 		actionPanel.setPreferredSize(new Dimension(0,25));
@@ -88,28 +111,45 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 				p.getCity(),
 				p.getPhone()});
 	}
+	
+	public void filter(String text){
+		text = text.trim();
+		this.clear();
+		String[] vals = text.split(" ");
+		String[] cols = new String[]{
+				"name",
+				"lastname" };
+		Collection<Person> ts = controller.findAll(vals, cols);
+		if(ts!=null){
+			for(Person t: ts){
+				this.addEntity(t);
+			}
+		}else{
+			JOptionPane.showMessageDialog(this, Language.string("Unable to load data"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
+		}
+	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==refreshButton){
 			refresh();
-		}else if(o==filterField){
-			this.clear();
-			String[] vals = filterField.getText().split(" ");
-			String[] cols = new String[]{
-					"name",
-					"lastname" };
-			logger.debug("Looking for "+vals[0]);
-			Collection<Person> ts = controller.findAll(vals, cols);
-			if(ts!=null){
-				for(Person t: ts){
-					this.addEntity(t);
-				}
-			}else{
-				JOptionPane.showMessageDialog(this, Language.string("Unable to load data"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
-			}
-		}else{
+		} else {
 			logger.warn("Event source not mapped: "+o);
 		}
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		synchronized(filterThread){
+			filterThread.notify();
+		}
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
 	}
 }
