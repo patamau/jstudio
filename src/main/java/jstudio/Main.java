@@ -13,6 +13,6 @@ public class Main {
 		Options opts = new Options(args);
 		//TODO: load options from command line
 		JStudio jstudio = new JStudio();
-		jstudio.initialize();	
+		jstudio.initialize();
 	}
 }

@@ -33,7 +33,6 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		PIC_ACCOUNTING="invoiceicon.png";
 	
 	private JButton refreshButton;
-	private JTextField filterField;
 
 	public AccountingPanel(Controller<Invoice> controller){
 		super(controller);
@@ -54,6 +53,7 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		refreshButton.addActionListener(this);
 		actionPanel.add(refreshButton);
 		filterField = new JTextField();
+		filterField.addKeyListener(this);
 		filterField.addActionListener(this);
 		actionPanel.add(filterField);
 		
@@ -122,5 +122,10 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		}else{
 			logger.warn("Event source not mapped: "+o);
 		}
+	}
+
+	@Override
+	public void filter(String text) {
+		// TODO filter by name?
 	}
 }

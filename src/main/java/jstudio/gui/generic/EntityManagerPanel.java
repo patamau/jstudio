@@ -1,6 +1,8 @@
 package jstudio.gui.generic;
 
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Collection;
@@ -9,8 +11,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jstudio.control.Controller;
 import jstudio.db.DatabaseObject;
@@ -19,15 +25,67 @@ import jstudio.util.Language;
 @SuppressWarnings("serial")
 public abstract class EntityManagerPanel<T extends DatabaseObject> 
 		extends JPanel
-		implements ActionListener, MouseListener {
+		implements ActionListener, MouseListener, KeyListener {
+	
+	private static final Logger logger = LoggerFactory.getLogger(EntityManagerPanel.class);
 	
 	protected DefaultTableModel model;
 	protected JTable table;
 	protected ContextualMenu<T> popup;
 	protected Controller<T> controller;
 	
+	//filterig stuff
+	protected JTextField filterField;
+	private FilterThread filterThread;
+	
+	private class FilterThread extends Thread{
+		boolean stop = false;
+		public void run(){
+			try {
+				while(!stop){					
+					synchronized(this){
+						wait();
+						wait(100);
+					}		
+					filter(filterField.getText());
+				}
+			} catch (InterruptedException e) {
+				logger.error("Filter thread interrupted");
+			}
+		}
+	}
+	
+	public void keyPressed(KeyEvent e){}
+	public void keyReleased(KeyEvent e){}
+	public void keyTyped(KeyEvent e){
+		logger.debug("Key typed "+e.getKeyChar());
+		synchronized(filterThread){
+			filterThread.notify();
+		}
+	}
+	
 	public EntityManagerPanel(Controller<T> controller){
 		this.controller=controller;
+		filterThread = new FilterThread();
+		filterThread.start();
+	}
+	
+	public void filter(String text){
+		text = text.trim();
+		this.clear();
+		String[] vals = text.split(" ");
+		String[] cols = new String[]{
+				"name",
+				"lastname" };
+		Collection<T> ts = controller.findAll(vals, cols);
+		logger.debug("Filtering by "+text+" returned "+ts);
+		if(ts!=null){
+			for(T t: ts){
+				this.addEntity(t);
+			}
+		}else{
+			JOptionPane.showMessageDialog(this, Language.string("Unable to load data"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	public abstract String getLabel();
