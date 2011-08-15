@@ -37,30 +37,9 @@ public class AddressBookPanel extends EntityManagerPanel<Person>
 	public static final String PIC_ADDRESSBOOK="personicon.png";
 	
 	private JButton refreshButton;
-	private JTextField filterField;
-	private FilterThread filterThread;
-	
-	private class FilterThread extends Thread{
-		boolean stop = false;
-		public void run(){
-			try {
-				while(!stop){					
-					synchronized(this){
-						wait();
-						wait(100);
-					}		
-					filter(filterField.getText());
-				}
-			} catch (InterruptedException e) {
-				logger.error("Filter thread interrupted");
-			}
-		}
-	}
 	
 	public AddressBookPanel(Controller<Person> controller){
 		super(controller);
-		filterThread = new FilterThread(); 
-		filterThread.start();
 		this.setLayout(new BorderLayout());
 		
 		table = new JTable();
@@ -136,20 +115,5 @@ public class AddressBookPanel extends EntityManagerPanel<Person>
 		} else {
 			logger.warn("Event source not mapped: "+o);
 		}
-	}
-
-	@Override
-	public void keyTyped(KeyEvent e) {
-		synchronized(filterThread){
-			filterThread.notify();
-		}
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
 	}
 }

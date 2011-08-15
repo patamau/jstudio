@@ -43,7 +43,6 @@ public class AgendaPanel
 	
 	private JButton dateButton;
 	private JButton refreshButton;
-	private JTextField filterField;
 
 	public AgendaPanel(Controller<Event> controller){
 		super(controller);
@@ -73,7 +72,8 @@ public class AgendaPanel
 		refreshButton.addActionListener(this);
 		actionPanel.add(refreshButton);
 		filterField = new JTextField();
-		filterField.addActionListener(this);
+		filterField.addKeyListener(this);
+		//filterField.addActionListener(this);
 		actionPanel.add(filterField);
 		topPanel.add(actionPanel, BorderLayout.CENTER);
 		
@@ -147,5 +147,10 @@ public class AgendaPanel
 		}else{
 			JOptionPane.showMessageDialog(this, Language.string("Unable to load events"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	@Override
+	public void filter(String text) {
+		//TODO: filter by name?
 	}
 }
