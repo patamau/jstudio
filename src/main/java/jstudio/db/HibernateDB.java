@@ -5,6 +5,7 @@ import java.util.Map;
 
 import jstudio.db.DatabaseInterface;
 
+import org.apache.commons.logging.impl.Log4jFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
