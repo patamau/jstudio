@@ -47,6 +47,7 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 						wait();
 						wait(100);
 					}		
+					logger.debug("going to filter! "+filterField.getText());
 					filter(filterField.getText());
 				}
 			} catch (InterruptedException e) {

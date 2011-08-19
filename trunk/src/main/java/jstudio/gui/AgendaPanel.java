@@ -148,9 +148,4 @@ public class AgendaPanel
 			JOptionPane.showMessageDialog(this, Language.string("Unable to load events"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
 		}
 	}
-
-	@Override
-	public void filter(String text) {
-		//TODO: filter by name?
-	}
 }

@@ -6,8 +6,8 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>JStudio</name>
 	<properties>
-		<jasperreports.version>3.7.2</jasperreports.version>
-		<jasperreports.plugin.version>1.0-beta-2</jasperreports.plugin.version>
+		<jasperreports.version>3.5.3</jasperreports.version>
+		<jasperreports.plugin.version>1.0-beta-1</jasperreports.plugin.version>
 	</properties>
 	<build>
 		<plugins>
@@ -32,7 +32,7 @@
 				</executions>
 				<dependencies>
 					<dependency>
-						<groupId>net.sf.jasperreports</groupId>
+						<groupId>jasperreports</groupId>
 						<artifactId>jasperreports</artifactId>
 						<version>${jasperreports.version}</version>
 					</dependency>
@@ -63,7 +63,7 @@
 		</repository>
 		<repository>
 			<id>jasperreports</id>
-			<url>http://jasperreports.sourceforge.net/maven2</url>
+			<url>http://jasperreports.sourceforge.net/maven2</url>			
 		</repository>
 		<repository>
 			<id>jboss-public-repository-group</id>
@@ -73,19 +73,9 @@
 		</repository>
 	</repositories>
 	<dependencies>
-		<!-- 
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi</artifactId>
-			<version>3.5-FINAL</version>
-			<exclusions>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		-->
+		<!-- <dependency> <groupId>org.apache.poi</groupId> <artifactId>poi</artifactId> 
+			<version>3.5-FINAL</version> <exclusions> <exclusion> <groupId>log4j</groupId> 
+			<artifactId>log4j</artifactId> </exclusion> </exclusions> </dependency> -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -93,8 +83,20 @@
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
+			<artifactId>slf4j-api</artifactId>
 			<version>1.6.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.16</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -103,21 +105,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-annotations</artifactId>
-			<version>3.4.0.GA</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-commons-annotations</artifactId>
-			<version>3.3.0.ga</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
 			<version>3.4.0.GA</version>
 		</dependency>
 		<dependency>
-			<groupId>net.sf.jasperreports</groupId>
+			<groupId>jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
 			<version>${jasperreports.version}</version>
 		</dependency>

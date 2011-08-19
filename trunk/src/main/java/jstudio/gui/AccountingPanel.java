@@ -123,9 +123,4 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 			logger.warn("Event source not mapped: "+o);
 		}
 	}
-
-	@Override
-	public void filter(String text) {
-		// TODO filter by name?
-	}
 }
