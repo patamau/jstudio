@@ -1,11 +1,11 @@
 package jstudio.db;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import jstudio.db.DatabaseInterface;
 
-import org.apache.commons.logging.impl.Log4jFactory;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -191,9 +191,14 @@ public class HibernateDB implements DatabaseInterface{
     	session.delete(o);
     	commit(t);
 	}
+	
+	@Override
+	public List<DatabaseObject> findAll(String source, String[] values, String[] columns){
+		return findAll(source, values, columns, new HashMap<String,String>());
+	}
 
 	@Override
-	public List<DatabaseObject> findAll(String source, String[] values, String[] columns) {
+	public List<DatabaseObject> findAll(String source, String[] values, String[] columns, Map<String,String> constraints) {
 		//if no values specified, bounce to default getAll
 		if(null==values||0==values.length||
 				null==columns||0==columns.length) return getAll(source);
@@ -223,6 +228,16 @@ public class HibernateDB implements DatabaseInterface{
 	    		sb.append(" AND ");
 	    	}
     	}
+    	int ksiz = constraints.keySet().size();
+    	for(String k: constraints.keySet()){
+        	if(ksiz>0) sb.append(" AND ");
+    		sb.append(k);
+    		sb.append(" LIKE '%");
+    		sb.append(constraints.get(k));
+    		sb.append("%'");
+    		ksiz--;
+    	}
+    	
     	@SuppressWarnings("unchecked")
 		List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery(sb.toString()).list();
     	commit(t);
