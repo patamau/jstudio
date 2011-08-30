@@ -6,6 +6,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -146,6 +148,26 @@ public class AgendaPanel
 			}
 		}else{
 			JOptionPane.showMessageDialog(this, Language.string("Unable to load events"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public void filter(String text){
+		text = text.trim();
+		this.clear();
+		String[] vals = text.split(" ");
+		String[] cols = new String[]{
+				"name",
+				"lastname"};
+		Map<String,String> constraints = new HashMap<String,String>();
+		constraints.put("date", Agenda.dayDateFormat.format(getDate()));
+		Collection<Event> ts = ((Agenda)controller).findAll(vals, cols, constraints);
+		logger.debug("Filtering by "+text+" returned "+ts);
+		if(ts!=null){
+			for(Event t: ts){
+				this.addEntity(t);
+			}
+		}else{
+			JOptionPane.showMessageDialog(this, Language.string("Unable to load data"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

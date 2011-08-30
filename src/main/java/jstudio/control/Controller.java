@@ -54,6 +54,11 @@ public class Controller<E extends DatabaseObject> {
 		return (Collection<E>)app.getDatabase().findAll(source, values, columns);
 	}
 	
+	@SuppressWarnings("unchecked")
+	public Collection<E> findAll(String[] values, String[] columns, Map<String,String> constraints){
+		return (Collection<E>)app.getDatabase().findAll(source, values, columns, constraints);
+	}
+	
 	public void store(E o){
 		app.getDatabase().store(source, o);
 	}
