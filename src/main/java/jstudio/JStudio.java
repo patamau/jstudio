@@ -1,8 +1,5 @@
 package jstudio;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
 import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 
@@ -17,7 +14,6 @@ import jstudio.gui.AddressBookPanel;
 import jstudio.gui.AgendaPanel;
 import jstudio.gui.JStudioGUI;
 import jstudio.util.Configuration;
-import jstudio.util.FilteredStream;
 import jstudio.util.IconPanel;
 import jstudio.util.Language;
 import jstudio.util.Resources;
@@ -42,13 +38,13 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		DB_USER = "jstudio",
 		DB_PASS = "jstudio137";
 	
-	public static final long SHOW_TIMEOUT = 500;
+	public static final long SHOW_TIMEOUT = 1000;
 	
 	private static final Logger logger = LoggerFactory.getLogger(JStudio.class);
 	
 	//dedicated graphical user interface
 	private JStudioGUI gui;
-	//dedicated configuration (avoid using the global one
+	//dedicated configuration (avoid using the global one)
 	private Configuration configuration; 
 	
 	private DatabaseInterface database;
@@ -90,16 +86,6 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		addressBook = new AddressBook(this);
 		accounting = new Accounting(this);
 		comuni = new Comuni(this);
-		
-		//FIXME: this is just for quick internal testing
-//		if(database.isConnected()){
-//			//contacts.addPerson(new Person("Matteo","Pedrotti",new Date(),"Via bomport, 20", "12312424"));
-//			for(Invoice i: accounting.getAll()){
-//				logger.info(i.toString());
-//			}
-//			String code = comuni.getCode("TN", "Trento");
-//			logger.info("CODE: "+code);
-//		}
 	}
 	
 	private void initializeConfiguration(){
@@ -116,37 +102,6 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		Configuration.setGlobalConfiguration(configuration);
 	}
 	
-	private void initializeStreams(){
-		//redirect exceptions to this class
-		Thread.setDefaultUncaughtExceptionHandler(this);
-		//TODO: configure log4j to output of log file
-		//redirect all output to log file
-		FilteredStream stream = new FilteredStream(
-				new ByteArrayOutputStream(),
-				this.getClass().getSimpleName()+".log",
-				logger.isDebugEnabled());
-		PrintStream filteredPrintStream  =  new PrintStream(stream);
-		System.setErr(filteredPrintStream);
-		System.setOut(filteredPrintStream);
-		if(logger.isDebugEnabled()){
-			printSystemProperties();
-		}
-	}
-	
-	private void printSystemProperty(String key){
-		logger.debug(key+" "+System.getProperty(key));
-	}
-	
-	private void printSystemProperties(){
-		printSystemProperty("os.name");
-		printSystemProperty("os.version");
-		printSystemProperty("os.arch");
-		printSystemProperty("java.version");
-		printSystemProperty("java.vendor");
-		printSystemProperty("java.class.path");
-		printSystemProperty("java.library.path");
-	}
-	
 	public void initialize(){
 		JWindow splash = new JWindow();
 		IconPanel panel = new IconPanel(SPLASH_SCREEN);
@@ -157,8 +112,6 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		splash.pack();
 		splash.setLocationRelativeTo(null);
 		splash.setVisible(true);
-		panel.setText(Language.string("Preparing streams..."));
-		initializeStreams();
 		panel.setText(Language.string("Loading configuration..."));
 		initializeConfiguration();
 		panel.setText(Language.string("Initializing data..."));
