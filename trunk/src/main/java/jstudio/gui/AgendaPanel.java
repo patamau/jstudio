@@ -7,7 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -22,9 +24,11 @@ import javax.swing.ListSelectionModel;
 
 import jstudio.control.Agenda;
 import jstudio.control.Controller;
+import jstudio.db.DatabaseObject;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Event;
+import jstudio.report.ReportGenerator;
 import jstudio.util.DatePicker;
 import jstudio.util.Language;
 import jstudio.util.Resources;
@@ -41,10 +45,11 @@ public class AgendaPanel
 		dateFormat = new SimpleDateFormat("EEEE dd MMMM yyyy");
 	private static final Logger logger = LoggerFactory.getLogger(AgendaPanel.class);
 	
-	public static final String PIC_AGENDA="eventicon.png";
+	public static final String 
+		PIC_AGENDA="eventicon.png",
+		DAY_EVENTS_REPORT="/day.jasper";
 	
-	private JButton dateButton;
-	private JButton refreshButton;
+	private JButton dateButton, refreshButton, printButton;
 
 	public AgendaPanel(Controller<Event> controller){
 		super(controller);
@@ -67,12 +72,16 @@ public class AgendaPanel
 		datePanel.add(dateButton);
 		setDate(new Date());
 		topPanel.add(datePanel, BorderLayout.NORTH);
+		//TODO: add other days of the week
 
 		JToolBar actionPanel = new JToolBar(Language.string("Actions"));
 		actionPanel.setFloatable(false);
 		refreshButton = new JButton(Language.string("Refresh"));
 		refreshButton.addActionListener(this);
 		actionPanel.add(refreshButton);
+		printButton = new JButton(Language.string("Print"));
+		printButton.addActionListener(this);
+		actionPanel.add(printButton);
 		filterField = new JTextField();
 		filterField.addKeyListener(this);
 		//filterField.addActionListener(this);
@@ -133,6 +142,20 @@ public class AgendaPanel
 				this.setDate(d);
 			}
 			refresh();
+		}else if(o==printButton){
+			ReportGenerator rg = new ReportGenerator();
+			rg.setReport(DAY_EVENTS_REPORT);
+			rg.setHeadValue("day", dateFormat.format(getDate()));
+			Set<Event> events = new HashSet<Event>();
+			for(int i=0; i<model.getRowCount(); i++){
+				events.add((Event)model.getValueAt(i, 0));
+			}
+			rg.setData(events);
+			try {
+				rg.generatePdf(".","day.pdf");
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}else{
 			logger.warn("Event source not mapped: "+o);
 		}

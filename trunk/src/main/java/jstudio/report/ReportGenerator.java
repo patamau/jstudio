@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -116,7 +117,7 @@ public class ReportGenerator {
         }
 	}
 	
-	public void setData(Set<? extends DatabaseObject> data){
+	public void setData(Collection<? extends DatabaseObject> data){
 		if(this.data.size()>0) this.data.clear();
 		Map<String,String> row = this.head;
 		for(DatabaseObject e: data){	  
