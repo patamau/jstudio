@@ -24,7 +24,6 @@ import javax.swing.ListSelectionModel;
 
 import jstudio.control.Agenda;
 import jstudio.control.Controller;
-import jstudio.db.DatabaseObject;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Event;
