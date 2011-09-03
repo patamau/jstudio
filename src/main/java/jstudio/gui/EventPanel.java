@@ -30,6 +30,7 @@ public class EventPanel extends EntityPanel<Event> {
 		phoneField,
 		descriptionField;
 	private JButton okButton, cancelButton;
+	private JButton pickPersonButton;
 
 	public EventPanel(Event event, EntityManagerPanel<Event> manager, boolean editable){
 		super(event, manager);
@@ -46,19 +47,22 @@ public class EventPanel extends EntityPanel<Event> {
 		timeField = GUITool.createField(this, gc, 
 				Language.string("Time"), 
 				Event.timeFormat.format(this.entity.getDate()), editable);
-		//TODO: add persons browse button
+		if(editable){
+			pickPersonButton = GUITool.createButton(this, gc, 
+				Language.string("Pick"), this);
+		}
 		nameField = GUITool.createField(this, gc, 
 				Language.string("Name"), 
 				this.entity.getName(), editable);
 		lastnameField = GUITool.createField(this, gc,
 				Language.string("Lastname"),
 				this.entity.getLastname(), editable);
-		descriptionField = GUITool.createField(this, gc, 
-				Language.string("Description"), 
-				this.entity.getDescription(), editable);
 		phoneField = GUITool.createField(this, gc,
 				Language.string("Phone"),
 				this.entity.getPhone(), editable);
+		descriptionField = GUITool.createField(this, gc, 
+				Language.string("Description"), 
+				this.entity.getDescription(), editable);
 		
 		if(editable){
 			okButton = GUITool.createButton(this, gc, Language.string("Ok"), this);
@@ -68,7 +72,16 @@ public class EventPanel extends EntityPanel<Event> {
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
-		if(o==okButton){
+		if(o==pickPersonButton){
+			PersonSelectionPanel psp = new PersonSelectionPanel(controller.getApplication().getAddressBook());
+			psp.showDialog(nameField.getText()+" "+lastnameField.getText());
+			Person p = psp.getSelected();
+			if(p!=null){
+				nameField.setText(p.getName());
+				lastnameField.setText(p.getLastname());
+				phoneField.setText(p.getPhone());
+			}
+		}else if(o==okButton){
 			Calendar cd = Calendar.getInstance();
 			Calendar ct = Calendar.getInstance();
 			try {

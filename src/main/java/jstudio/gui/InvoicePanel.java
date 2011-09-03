@@ -38,6 +38,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		codeField;
 	private ProductTable productTable;
 	private JButton okButton, cancelButton, printButton;
+	private JButton pickPersonButton;
 
 	public InvoicePanel(Invoice invoice, EntityManagerPanel<Invoice> manager, boolean editable){
 		super(invoice, manager);
@@ -58,7 +59,10 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		dateField = GUITool.createField(head, gc, 
 				Language.string("Date"), 
 				Invoice.dateFormat.format(this.entity.getDate()), editable);
-		//TODO: add persons browse button
+		if(editable){
+			pickPersonButton = GUITool.createButton(head, gc, 
+				Language.string("Pick"), this);
+		}
 		nameField = GUITool.createField(head, gc, 
 				Language.string("Name"), 
 				this.entity.getName(), editable);
@@ -109,7 +113,20 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
-		if(o==okButton){
+		if(o==pickPersonButton){
+			PersonSelectionPanel psp = new PersonSelectionPanel(controller.getApplication().getAddressBook());
+			psp.showDialog(nameField.getText()+" "+lastnameField.getText());
+			Person p = psp.getSelected();
+			if(p!=null){
+				nameField.setText(p.getName());
+				lastnameField.setText(p.getLastname());
+				addressField.setText(p.getAddress());
+				capField.setText(p.getCap());
+				cityField.setText(p.getCity());
+				codeField.setText(p.getCode());
+				provinceField.setText(p.getProvince());
+			}
+		}else if(o==okButton){
 			try {
 				Date d = Person.birthdateFormat.parse(dateField.getText());
 				entity.setDate(d);
