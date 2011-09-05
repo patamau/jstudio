@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyListener;
 import java.util.Collection;
 
 import javax.swing.ImageIcon;
@@ -28,8 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
-public class AddressBookPanel extends EntityManagerPanel<Person>
-		implements KeyListener {
+public class AddressBookPanel extends EntityManagerPanel<Person> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AddressBookPanel.class);
 

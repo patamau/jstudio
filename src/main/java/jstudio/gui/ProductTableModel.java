@@ -18,12 +18,12 @@ public class ProductTableModel extends DefaultTableModel {
 	public ProductTableModel(JTable table, Invoice invoice) {
 		super(cols, 0);
 		table.setModel(this);
-		//FIXME: translation!
-		table.getColumn("Quantity").setMaxWidth(50);
-		table.getColumn("Quantity").setMinWidth(50);
-		table.getColumn("Cost").setMaxWidth(50);
-		table.getColumn("Cost").setMinWidth(50);
-		table.getColumn("Description").setPreferredWidth(150);
+		table.getColumn(table.getColumnName(1)).setMaxWidth(50);
+		table.getColumn(table.getColumnName(1)).setMinWidth(50);
+		table.getColumn(table.getColumnName(2)).setMaxWidth(100);
+		table.getColumn(table.getColumnName(2)).setPreferredWidth(100);
+		table.getColumn(table.getColumnName(2)).setMinWidth(50);
+		table.getColumn(table.getColumnName(0)).setPreferredWidth(150);
 	}
 	
 	public boolean isCellEditable(int row, int col){

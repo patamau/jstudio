@@ -115,7 +115,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		Object o = e.getSource();
 		if(o==pickPersonButton){
 			PersonSelectionPanel psp = new PersonSelectionPanel(controller.getApplication().getAddressBook());
-			psp.showDialog(nameField.getText()+" "+lastnameField.getText());
+			psp.showDialog(this, nameField.getText()+" "+lastnameField.getText());
 			Person p = psp.getSelected();
 			if(p!=null){
 				nameField.setText(p.getName());
