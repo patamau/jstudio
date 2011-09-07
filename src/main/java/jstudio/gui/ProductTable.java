@@ -26,6 +26,8 @@ public class ProductTable
 	private Invoice invoice;
 	private EntityManagerPanel<Invoice> accounting;
 	
+	private float total;
+	
 	public ProductTable(Invoice invoice, EntityManagerPanel<Invoice> accounting){
 		super(((Accounting)accounting.getController()).getProducts());
 		this.invoice = invoice;
@@ -78,22 +80,26 @@ public class ProductTable
 	public void actionPerformed(ActionEvent e) {
 		//Object o = e.getSource();
 	}
+	
+	public float getTotal(){
+		return total;
+	}
 
 	@Override
 	public void refresh() {
 		this.clear();
 		int quantity_tot = 0;
-		float cost_tot = 0f;
+		total = 0f;
 		for(Product t: invoice.getProducts()){
 			addEntity(t);
 			quantity_tot += t.getQuantity();
-			cost_tot += t.getQuantity()*t.getCost();
+			total += t.getQuantity()*t.getCost();
 		}
 		while(totalsModel.getRowCount()>0) totalsModel.removeRow(0);
 		totalsModel.addRow(new Object[]{
 				Language.string("Total"),
 				quantity_tot,
-				cost_tot
+				total
 		});
 	}
 }
