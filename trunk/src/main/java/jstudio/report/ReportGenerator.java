@@ -88,7 +88,11 @@ public class ReportGenerator {
 	}
 	
 	public void setHeadValue(String key, String value){
-		head.put(key, value);
+		if(this.data.size()==0){
+			this.head.put(key, value);
+		}else{
+			this.data.get(this.data.size()-1).put(key, value);
+		}
 	}
 	
 	public void setHead(DatabaseObject entry){
@@ -117,6 +121,26 @@ public class ReportGenerator {
         }
 	}
 	
+	/**
+	 * Custom method
+	 * @param entry
+	 */
+	public void addData(Map<String, String> entry){
+		this.data.add(entry);
+	}
+	
+	/**
+	 * Retrieve all the data being printed
+	 * @return
+	 */
+	public List<Map<String,String>> getData(){
+		return this.data;
+	}
+	
+	/**
+	 * Uses reflection to quickly take out variables of class
+	 * @param data
+	 */
 	public void setData(Collection<? extends DatabaseObject> data){
 		if(this.data.size()>0) this.data.clear();
 		Map<String,String> row = this.head;

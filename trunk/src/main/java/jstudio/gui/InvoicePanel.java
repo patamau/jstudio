@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
 import java.util.Date;
@@ -13,6 +14,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
@@ -20,6 +22,7 @@ import jstudio.model.Invoice;
 import jstudio.model.Person;
 import jstudio.model.Product;
 import jstudio.report.ReportGenerator;
+import jstudio.report.ReportGeneratorGUI;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
@@ -156,13 +159,9 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			rg.setReport("/report1.jasper");
 			rg.setHead(entity);
 			rg.setData(entity.getProducts());
-			try {
-				rg.generatePdf(".", "invoice"+entity.getId()+".pdf");
-				rg.generateRtf(".", "invoice"+entity.getId()+".rtf");
-				rg.generateText(".", "invoice"+entity.getId()+".doc");
-			} catch (Exception e1) {
-				e1.printStackTrace();
-			}
+			rg.setHeadValue("totalcost", Float.toString(productTable.getTotal()));
+			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice"+entity.getId());
+			rgui.showGUI((Window)SwingUtilities.getRoot(this));
 		}
 	}
 }

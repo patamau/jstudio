@@ -1,5 +1,6 @@
 package jstudio.db;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +86,7 @@ public class HibernateDB implements DatabaseInterface{
     }
     
     public DatabaseObject store(String source, DatabaseObject o){
+    	if(!isConnected()) return null;
     	// source is ignored because hibernate mapping already takes care of this
     	Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
@@ -110,6 +112,7 @@ public class HibernateDB implements DatabaseInterface{
     
     @SuppressWarnings("unchecked")
 	public List<DatabaseObject> getAll(String source){
+    	if(!isConnected()) return null;
     	Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
     	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery("from "+source).list();
@@ -118,6 +121,7 @@ public class HibernateDB implements DatabaseInterface{
     }
 
 	public DatabaseObject get(String source, int id) {
+		if(!isConnected()) return null;
 		Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
     	DatabaseObject o = (DatabaseObject)session.createQuery("from "+source+" where id="+id).uniqueResult();
@@ -127,7 +131,8 @@ public class HibernateDB implements DatabaseInterface{
 	
 	@SuppressWarnings("unchecked")
 	public List<DatabaseObject> getBetween(String source, String field, String from, String to){
-    	Session session = sessionFactory.getCurrentSession();
+		if(!isConnected()) return null;
+		Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
     	StringBuffer sb = new StringBuffer();
     	sb.append("from ");
@@ -148,6 +153,7 @@ public class HibernateDB implements DatabaseInterface{
 	public List<DatabaseObject> getAll(String source, Map<String, String> values) {
 		//if no values specified, bounce to default getAll
 		if(null==values||0==values.keySet().size()) return getAll(source);
+		if(!isConnected()) return null;
     	Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
     	StringBuffer sb = new StringBuffer();
@@ -172,7 +178,8 @@ public class HibernateDB implements DatabaseInterface{
 
 	@SuppressWarnings("unchecked")
 	public List<DatabaseObject> getAll(String source, String column) {
-    	Session session = sessionFactory.getCurrentSession();
+		if(!isConnected()) return null;
+		Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
     	StringBuffer sb = new StringBuffer();
     	sb.append("from ");
@@ -185,6 +192,7 @@ public class HibernateDB implements DatabaseInterface{
 	}
 
 	public void delete(String table, DatabaseObject o) {
+		if(!isConnected()) return;
     	// source is ignored because hibernate mapping already takes care of this
     	Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
@@ -203,6 +211,9 @@ public class HibernateDB implements DatabaseInterface{
 		if(null==values||0==values.length||
 				null==columns||0==columns.length) return getAll(source);
     	Session session = sessionFactory.getCurrentSession();
+    	if(!session.isConnected()){
+    		return null;
+    	}
     	Transaction t = session.beginTransaction();
     	StringBuffer sb = new StringBuffer();
     	sb.append("from ");
