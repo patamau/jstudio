@@ -1,5 +1,7 @@
 package jstudio.report;
 
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,7 +17,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import jstudio.util.Configuration;
-import jstudio.util.GUITool;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
@@ -36,18 +37,30 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	 */
 	public ReportGeneratorGUI(ReportGenerator rg, String filename){
 		this.rg = rg;
+		this.setLayout(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
 		String defaultPath = Configuration.getGlobal(PRINT_PATH_LAST_KEY, ".");
 		fileField = new JTextField(defaultPath+File.separator+filename);
-		fileField
+		fileField.setText(defaultPath+File.separator+filename);
+		gc.gridx=0;
+		gc.gridy=0;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=1.0;
+		this.add(fileField,gc);
+		gc.gridx++;
+		gc.weightx=0.0;
 		browseButton = new JButton("...");
 		browseButton.addActionListener(this);
-		this.add(browseButton);
+		this.add(browseButton,gc);
+		gc.gridy++;
+		gc.gridx=0;
 		okButton = new JButton(Language.string("Ok"));
 		okButton.addActionListener(this);
-		this.add(okButton);
+		this.add(okButton,gc);
+		gc.gridx++;
 		cancelButton = new JButton(Language.string("Cancel"));
 		cancelButton.addActionListener(this);
-		this.add(cancelButton);
+		this.add(cancelButton,gc);
 		//TODO: add output formats
 		//TODO: tables
 	}
@@ -79,13 +92,13 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 			fc.showSaveDialog(this);
 			File sf = fc.getSelectedFile();
 			if(f!=null){
-				browseButton.setText(sf.getAbsolutePath());
+				fileField.setText(sf.getAbsolutePath());
 			}
 		}else if(src==cancelButton){
 			((Window)SwingUtilities.getRoot(this)).dispose();
 		}else if(src==okButton){
 			Configuration.getGlobalConfiguration().setProperty(PRINT_PATH_LAST_KEY, browseButton.getText());
-			File f = new File(browseButton.getText());
+			File f = new File(fileField.getText());
 			if(f.exists()){
 				int ch = JOptionPane.showConfirmDialog(this,
 						Language.string("A file with the same name already exists: confirm overwrite?"),
