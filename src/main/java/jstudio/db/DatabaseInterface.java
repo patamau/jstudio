@@ -1,5 +1,6 @@
 package jstudio.db;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,9 @@ public interface DatabaseInterface {
 
 	public void connect(String host, String table, String user, String pass);
 	public boolean isConnected();
+	public void dump(File dest) throws Exception;
+	public void restore(File src) throws Exception;
+	public void clear();
 	public DatabaseObject store(String table, DatabaseObject o);
 	public void delete(String table, DatabaseObject o);
 	public List<? extends DatabaseObject> getAll(String table);

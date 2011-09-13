@@ -1,11 +1,18 @@
 package jstudio.db;
 
-import java.util.ArrayList;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import jstudio.db.DatabaseInterface;
+import jstudio.util.Language;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -13,6 +20,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
+import org.hibernate.mapping.PersistentClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,11 +29,71 @@ public class HibernateDB implements DatabaseInterface{
 	private static final Logger logger = LoggerFactory.getLogger(HibernateDB.class);
     private SessionFactory sessionFactory;
     private String protocol, driver;
+    private Configuration configuration;
     
     public HibernateDB(String protocol, String driver){
     	sessionFactory = null;
     	this.protocol = protocol;
     	this.driver = driver;
+    }
+    
+    public void dump(File dest) throws IOException{
+    	if(!isConnected()) throw new RuntimeException(Language.string("Not connected"));
+    	if(dest==null) throw new NullPointerException(Language.string("No destination selected"));
+
+		FileOutputStream fos = new FileOutputStream(dest);
+		ObjectOutputStream oos = new ObjectOutputStream(fos);
+    	for (@SuppressWarnings("unchecked")
+		Iterator<PersistentClass> iter=configuration.getClassMappings(); iter.hasNext();) {
+    		PersistentClass persistentClass = iter.next();
+    		String source = persistentClass.getClassName();
+    		logger.info("Starting to dump "+source);
+    		List<DatabaseObject> data = getAll(source);
+    		for(DatabaseObject d : data){
+    			oos.writeObject(d);
+    		}
+    		logger.info(source+" dump finished ("+data.size()+" objects)");
+    	}
+		oos.close();
+    }
+    
+    public void clear(){
+    	if(!isConnected()) return;
+		for(@SuppressWarnings("unchecked")
+		Iterator<PersistentClass> iter=configuration.getClassMappings(); iter.hasNext();) {
+    		PersistentClass persistentClass = iter.next();
+    		String source = persistentClass.getClassName();
+    		logger.info("Clearing "+source);
+    		List<DatabaseObject> data = getAll(source);
+    		for(DatabaseObject d : data){
+    			logger.debug("Removing "+d.getClass().getName()+" id:"+d.getId());
+    			delete(null, d); //empty source thanks to mappings
+    		}
+    		logger.info(source+" clear finished (removed "+data.size()+" objects)");
+    	}
+    }
+    
+    public void restore(File src) throws Exception{
+    	if(!isConnected()) throw new RuntimeException(Language.string("Not connected"));
+    	if(src==null) throw new NullPointerException(Language.string("No source selected"));
+    	FileInputStream fis = new FileInputStream(src);
+    	ObjectInputStream ios = new ObjectInputStream(fis);
+    	DatabaseObject o;
+    	int nobjs = 0;
+    	try{
+	    	while((o = (DatabaseObject)ios.readObject())!=null){
+	    		try{
+	    			this.store(null, o); //empty source thanks to mappings
+	    		}catch(Exception e){
+	    			this.forceStore(null, o);
+	    		}
+	    		nobjs++;
+	    	}
+    	}catch(EOFException eof){
+    		//end of file reached!
+    	}
+    	logger.info("Loaded "+nobjs+" objects");
+    	ios.close();
     }
     
     /**
@@ -35,29 +103,29 @@ public class HibernateDB implements DatabaseInterface{
        	//override default configuration property
        	String url = protocol+"://"+host+"/"+dbname;
     	// load the standard configuration
-       	Configuration c = new Configuration();
-       	c.addResource("person.hbm.xml");
-       	c.addResource("event.hbm.xml");
-       	c.addResource("product.hbm.xml");
-       	c.addResource("invoice.hbm.xml");
-       	c.addResource("comune.hbm.xml");
+        configuration = new Configuration();
+       	configuration.addResource("person.hbm.xml");
+       	configuration.addResource("event.hbm.xml");
+       	configuration.addResource("product.hbm.xml");
+       	configuration.addResource("invoice.hbm.xml");
+       	configuration.addResource("comune.hbm.xml");
        	
-       	c.setProperty(Environment.DRIVER, driver);
-       	c.setProperty(Environment.CACHE_PROVIDER, "org.hibernate.cache.NoCacheProvider");
-       	c.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
-       	c.setProperty(Environment.POOL_SIZE, "1");
+       	configuration.setProperty(Environment.DRIVER, driver);
+       	configuration.setProperty(Environment.CACHE_PROVIDER, "org.hibernate.cache.NoCacheProvider");
+       	configuration.setProperty(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+       	configuration.setProperty(Environment.POOL_SIZE, "1");
        	//XXX: I'm forcing mysql dialect here
-       	c.setProperty(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");
-       	c.setProperty(Environment.HBM2DDL_AUTO, "update");
-       	c.setProperty(Environment.URL, url);
-       	c.setProperty(Environment.USER, user);
-       	c.setProperty(Environment.PASS, password);       	
+       	configuration.setProperty(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");
+       	configuration.setProperty(Environment.HBM2DDL_AUTO, "update");
+       	configuration.setProperty(Environment.URL, url);
+       	configuration.setProperty(Environment.USER, user);
+       	configuration.setProperty(Environment.PASS, password);       	
        	if(logger.isDebugEnabled()){
        		//XXX: enhance debugging for hibernate queries
-       		c.setProperty(Environment.SHOW_SQL, Boolean.toString(true));
+       		configuration.setProperty(Environment.SHOW_SQL, Boolean.toString(true));
        	}
         try {
-        	sessionFactory = c.buildSessionFactory();
+        	sessionFactory = configuration.buildSessionFactory();
         }catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed.", ex);
         }
@@ -83,6 +151,15 @@ public class HibernateDB implements DatabaseInterface{
     		}
     	}
     	return false;
+    }
+    
+    public void forceStore(String source, DatabaseObject o){
+    	if(!isConnected()) return;
+    	// source is ignored because hibernate mapping already takes care of this
+    	Session session = sessionFactory.getCurrentSession();
+    	Transaction t = session.beginTransaction();
+    	session.save(o);
+    	commit(t);
     }
     
     public DatabaseObject store(String source, DatabaseObject o){
