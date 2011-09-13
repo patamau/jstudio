@@ -1,12 +1,16 @@
 package jstudio.report;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -35,34 +39,52 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	 * @param rg
 	 * @param filename
 	 */
-	public ReportGeneratorGUI(ReportGenerator rg, String filename){
+	public ReportGeneratorGUI(ReportGenerator rg, final String filename){
 		this.rg = rg;
-		this.setLayout(new GridBagLayout());
+		this.setLayout(new BorderLayout());
+		this.add(getFilePanel(filename),BorderLayout.CENTER);
+		this.add(getButtonsPanel(), BorderLayout.SOUTH);
+		//TODO: add output formats
+		//TODO: tables
+	}
+	
+	private Component getButtonsPanel(){
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx=0;
+		gc.gridy=0;
+		gc.insets = new Insets(5,5,5,5);
+		okButton = new JButton(Language.string("Ok"));
+		okButton.addActionListener(this);
+		panel.add(okButton,gc);
+		gc.gridx++;
+		cancelButton = new JButton(Language.string("Cancel"));
+		cancelButton.addActionListener(this);
+		panel.add(cancelButton,gc);
+		return panel;
+	}
+	
+	private Component getFilePanel(final String filename){
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+		panel.setBorder(BorderFactory.createEtchedBorder());
 		GridBagConstraints gc = new GridBagConstraints();
 		String defaultPath = Configuration.getGlobal(PRINT_PATH_LAST_KEY, ".");
 		fileField = new JTextField(defaultPath+File.separator+filename);
 		fileField.setText(defaultPath+File.separator+filename);
 		gc.gridx=0;
 		gc.gridy=0;
+		gc.insets = new Insets(5,5,5,5);
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		gc.weightx=1.0;
-		this.add(fileField,gc);
+		panel.add(fileField,gc);
 		gc.gridx++;
 		gc.weightx=0.0;
 		browseButton = new JButton("...");
 		browseButton.addActionListener(this);
-		this.add(browseButton,gc);
-		gc.gridy++;
-		gc.gridx=0;
-		okButton = new JButton(Language.string("Ok"));
-		okButton.addActionListener(this);
-		this.add(okButton,gc);
-		gc.gridx++;
-		cancelButton = new JButton(Language.string("Cancel"));
-		cancelButton.addActionListener(this);
-		this.add(cancelButton,gc);
-		//TODO: add output formats
-		//TODO: tables
+		panel.add(browseButton,gc);
+		return panel;
 	}
 	
 	public void update(){
@@ -97,7 +119,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		}else if(src==cancelButton){
 			((Window)SwingUtilities.getRoot(this)).dispose();
 		}else if(src==okButton){
-			Configuration.getGlobalConfiguration().setProperty(PRINT_PATH_LAST_KEY, browseButton.getText());
+			Configuration.getGlobalConfiguration().setProperty(PRINT_PATH_LAST_KEY, fileField.getText());
 			File f = new File(fileField.getText());
 			if(f.exists()){
 				int ch = JOptionPane.showConfirmDialog(this,
