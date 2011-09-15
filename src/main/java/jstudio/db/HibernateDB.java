@@ -288,10 +288,10 @@ public class HibernateDB implements DatabaseInterface{
 		if(null==values||0==values.length||
 				null==columns||0==columns.length) return getAll(source);
     	Session session = sessionFactory.getCurrentSession();
+    	Transaction t = session.beginTransaction();
     	if(!session.isConnected()){
     		return null;
     	}
-    	Transaction t = session.beginTransaction();
     	StringBuffer sb = new StringBuffer();
     	sb.append("from ");
     	sb.append(source);

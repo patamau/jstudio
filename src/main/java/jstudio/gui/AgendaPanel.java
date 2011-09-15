@@ -1,6 +1,7 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,6 +22,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import jstudio.control.Agenda;
 import jstudio.control.Controller;
@@ -28,6 +30,7 @@ import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Event;
 import jstudio.report.ReportGenerator;
+import jstudio.report.ReportGeneratorGUI;
 import jstudio.util.DatePicker;
 import jstudio.util.Language;
 import jstudio.util.Resources;
@@ -41,6 +44,7 @@ public class AgendaPanel
 	
 	//time format for event entries
 	public static final SimpleDateFormat 
+		timestampFormat = new SimpleDateFormat("yyyyMMdd"),
 		dateFormat = new SimpleDateFormat("EEEE dd MMMM yyyy");
 	private static final Logger logger = LoggerFactory.getLogger(AgendaPanel.class);
 	
@@ -150,11 +154,8 @@ public class AgendaPanel
 				events.add((Event)model.getValueAt(i, 0));
 			}
 			rg.setData(events);
-			try {
-				rg.generatePdf(".","day.pdf");
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+			ReportGeneratorGUI rggui = new ReportGeneratorGUI(rg,"day_"+timestampFormat.format(getDate()));
+			rggui.showGUI((Window)SwingUtilities.getRoot(this));
 		}else{
 			logger.warn("Event source not mapped: "+o);
 		}

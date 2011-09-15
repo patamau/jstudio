@@ -13,7 +13,6 @@ public class Event implements DatabaseObject {
 
 	private Long id;
 	private Date date;
-	private Person person;
 	private String name, lastname, phone;
 	private String description;
 	
@@ -24,7 +23,6 @@ public class Event implements DatabaseObject {
 	public Event(Date date, String name, String lastname, String phone, String description){
 		this.id=0l;
 		this.date = date;
-		this.person = null;
 		this.name = name;
 		this.lastname = lastname;
 		this.phone = phone;
@@ -34,7 +32,6 @@ public class Event implements DatabaseObject {
 	public Event(Date date, Person person, String description){
 		this.id=0l;
 		this.date = date;
-		this.person = person;
 		this.name = person.getName();
 		this.lastname = person.getLastname();
 		this.phone = person.getAddress();
@@ -77,10 +74,6 @@ public class Event implements DatabaseObject {
 		return date;
 	}
 	
-	public Person getPerson(){
-		return person;
-	}
-	
 	public String getDescription(){
 		return description;
 	}
@@ -91,10 +84,6 @@ public class Event implements DatabaseObject {
 
 	public void setDate(Date date) {
 		this.date = date;
-	}
-
-	public void setPerson(Person person) {
-		this.person = person;
 	}
 
 	public void setDescription(String description) {

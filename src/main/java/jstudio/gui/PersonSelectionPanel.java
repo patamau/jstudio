@@ -99,11 +99,17 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 	public void filter(String text){
 		text = text.trim();
 		this.clear();
-		String[] vals = text.split(" ");
-		String[] cols = new String[]{
-				"name",
-				"lastname" };
-		Collection<Person> ts = controller.findAll(vals, cols);
+		Collection<Person> ts;
+		if(text.length()>0){
+			String[] vals = text.split(" ");
+			String[] cols = new String[]{
+					"name",
+					"lastname" };
+			ts = controller.findAll(vals, cols);
+		}else{
+			ts = controller.getAll();
+		}
+		
 		if(ts!=null){
 			for(Person t: ts){
 				this.addEntity(t);

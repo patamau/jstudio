@@ -97,8 +97,10 @@ public class GUITool {
 		JComboBox f = new JComboBox(values);
 		f.setEditable(false);
 		f.setEnabled(editable);
-		f.setSelectedIndex(selected);
 		f.setPreferredSize(new Dimension(0,20));
+		if(values.length>0){
+			f.setSelectedIndex(selected);
+		}
 		gc.gridy++;
 		gc.anchor=GridBagConstraints.EAST;
 		c.add(new JLabel(label, JLabel.RIGHT),gc);
@@ -108,7 +110,7 @@ public class GUITool {
 		int px = gc.gridx;
 		gc.gridx++;
 		if(!editable){
-			if(values[selected]!=null)
+			if(values.length>0&&values[selected]!=null)
 				c.add(new JLabel(values[selected].toString(), JLabel.LEFT),gc);
 			else
 				c.add(new JLabel(), gc);

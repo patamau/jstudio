@@ -16,7 +16,6 @@ public class Invoice implements DatabaseObject {
 
 	private Long id;
 	private Date date;
-	private Person person;
 	private String name, lastname, address, city, province, cap, code;
 	private Set<Product> products;
 	
@@ -106,14 +105,6 @@ public class Invoice implements DatabaseObject {
 
 	public void setDate(Date date) {
 		this.date = date;
-	}
-
-	public Person getPerson() {
-		return person;
-	}
-
-	public void setPerson(Person person) {
-		this.person = person;
 	}
 
 	public Set<Product> getProducts() {
