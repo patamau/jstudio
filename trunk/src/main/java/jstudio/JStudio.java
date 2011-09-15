@@ -80,8 +80,8 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		try {
 			database.connect(hostname, dbname, user, password);
 			//database.dump(new File("db.dump"));
-			database.clear();
-			database.restore(new File("db.dump"));
+			//database.clear();
+			//database.restore(new File("db.dump"));
 		} catch (Throwable e) {
 			logger.error("Database connection error",e);
 			JOptionPane.showMessageDialog(null, Language.string("Database connection error")+": "+e.getLocalizedMessage(), Language.string("Data initialization"), JOptionPane.ERROR_MESSAGE);

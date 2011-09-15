@@ -70,10 +70,10 @@ public abstract class EntityPanel<T extends DatabaseObject>
 				throw new IllegalArgumentException("Frame or Dialog expected, found "+container.getClass());
 			}
 			setDialog(dialog);
-			dialog.setLocationRelativeTo(container);
 			initializeDialog(dialog);
 		}
 		prepareDialog(dialog);
+		dialog.setLocationRelativeTo(container);
 		return dialog;
 	}
 }
