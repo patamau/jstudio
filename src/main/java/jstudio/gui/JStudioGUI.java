@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -101,8 +102,21 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		//create view menu
 		viewMenu = new JMenu(Language.string("View"));
 		menuBar.add(viewMenu);
-		setJMenuBar(menuBar);
 		
+		//create tools menu		
+		JMenu toolsMenu = new JMenu(Language.string("Tools"));		
+		toolsMenu.add(new JMenuItem("Backup"));
+		toolsMenu.add(new JMenuItem("Restore"));
+		toolsMenu.add(new JMenuItem("Clear"));		
+		menuBar.add(toolsMenu);
+		
+		//create help menu		
+		JMenu helpMenu = new JMenu(Language.string("Help"));
+		helpMenu.add(new JMenuItem("Credits"));
+		menuBar.add(Box.createHorizontalGlue());
+		menuBar.add(helpMenu);
+
+		setJMenuBar(menuBar);
 		JToolBar statusBar = new JToolBar();
 		statusBar.setFloatable(false);
 		statusBar.add(statusLabel);
