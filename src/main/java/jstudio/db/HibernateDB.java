@@ -167,8 +167,15 @@ public class HibernateDB implements DatabaseInterface{
     	// source is ignored because hibernate mapping already takes care of this
     	Session session = sessionFactory.getCurrentSession();
     	Transaction t = session.beginTransaction();
-    	session.saveOrUpdate(o);
-    	commit(t);
+    	try{
+    		session.saveOrUpdate(o);
+    		t.commit();
+    	}catch(Throwable e){
+    		session.clear();
+    		session.save(o);
+    		commit(t);
+    	}
+    	
     	return o;
     }
     
