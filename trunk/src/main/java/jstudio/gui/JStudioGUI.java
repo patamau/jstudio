@@ -3,6 +3,7 @@ package jstudio.gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 import javax.swing.Box;
 import javax.swing.JFrame;
@@ -42,6 +43,10 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		optionsItem,
 		connectionItem,
 		exitItem;
+	private JMenuItem
+		backupItem,
+		restoreItem,
+		clearItem;
 		
 	private JMenu viewMenu;
 	private JLabel statusLabel;
@@ -105,9 +110,15 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		
 		//create tools menu		
 		JMenu toolsMenu = new JMenu(Language.string("Tools"));		
-		toolsMenu.add(new JMenuItem("Backup"));
-		toolsMenu.add(new JMenuItem("Restore"));
-		toolsMenu.add(new JMenuItem("Clear"));		
+		backupItem = new JMenuItem(Language.string("Backup"));
+		backupItem.addActionListener(this);
+		toolsMenu.add(backupItem);
+		restoreItem = new JMenuItem(Language.string("Restore"));
+		restoreItem.addActionListener(this);
+		toolsMenu.add(restoreItem);
+		clearItem = new JMenuItem(Language.string("Clear"));
+		clearItem.addActionListener(this);
+		toolsMenu.add(clearItem);
 		menuBar.add(toolsMenu);
 		
 		//create help menu		
@@ -129,7 +140,23 @@ public class JStudioGUI extends JFrame implements ActionListener {
 
 	public void actionPerformed(ActionEvent event) {
 		Object src = event.getSource();
-		if(src==optionsItem){
+		if(src==backupItem){
+			//FIXME: add gui to choose destination file
+			try {
+				app.getDatabase().dump(new File("dump.db"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if(src==restoreItem){
+			//FIXME: add gui to choose source file
+			try {
+				app.getDatabase().restore(new File("dump.db"));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if(src==clearItem){
+			app.getDatabase().clear();
+		}else if(src==optionsItem){
 			ConfigurationDialog cdialog = new ConfigurationDialog(this);
 			Configuration c = cdialog.showDialog(Configuration.getGlobalConfiguration());
 			Configuration.setGlobalConfiguration(c);

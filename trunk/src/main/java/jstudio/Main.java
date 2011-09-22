@@ -42,6 +42,7 @@ public class Main {
 		if(opts.isSet(DEBUG_OPT)){
 			//force debug and enable console
 			Logger.getRootLogger().setLevel(Level.DEBUG);
+			Logger.getLogger("org.hibernate").setLevel(Level.INFO);
 			console = true;
 		}
 		
@@ -63,6 +64,11 @@ public class Main {
 		//redirect exceptions to jstudio
 		Thread.setDefaultUncaughtExceptionHandler(jstudio);
 		//start up
-		jstudio.initialize();
+		try{
+			jstudio.initialize();
+		}catch(Exception e){
+			e.printStackTrace();
+			System.exit(1);
+		}
 	}
 }
