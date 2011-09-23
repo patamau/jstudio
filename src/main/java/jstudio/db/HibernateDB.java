@@ -65,11 +65,14 @@ public class HibernateDB implements DatabaseInterface{
     		String source = persistentClass.getClassName();
     		logger.info("Clearing "+source);
     		List<DatabaseObject> data = getAll(source);
+		   	Session session = sessionFactory.getCurrentSession();
+	    	Transaction t = session.beginTransaction();
     		for(DatabaseObject d : data){
     			logger.debug("Removing "+d.getClass().getName()+" id:"+d.getId());
-    			delete(null, d); //empty source thanks to mappings
+    	    	session.delete(d);
     		}
-    		logger.info(source+" clear finished (removed "+data.size()+" objects)");
+	    	commit(t);
+    		//logger.info(source+" clear finished (removed "+data.size()+" objects)");
     	}
     }
     
@@ -81,14 +84,20 @@ public class HibernateDB implements DatabaseInterface{
     	DatabaseObject o;
     	int nobjs = 0;
     	try{
+    		Session session = sessionFactory.getCurrentSession();
+        	Transaction t = session.beginTransaction();
 	    	while((o = (DatabaseObject)ios.readObject())!=null){
+	    		session.save(o);
+	    		/*
 	    		try{
 	    			this.store(null, o); //empty source thanks to mappings
 	    		}catch(Exception e){
 	    			this.forceStore(null, o);
 	    		}
+	    		*/
 	    		nobjs++;
 	    	}
+	    	commit(t);
     	}catch(EOFException eof){
     		//end of file reached!
     	}
