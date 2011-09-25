@@ -96,6 +96,7 @@ public class HibernateDB implements DatabaseInterface{
 	    		}
 	    		*/
 	    		nobjs++;
+	    		logger.debug("Loaded "+o.getClass().getName()+" "+o);
 	    	}
 	    	commit(t);
     	}catch(EOFException eof){
@@ -138,6 +139,12 @@ public class HibernateDB implements DatabaseInterface{
         }catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed.", ex);
         }
+    }
+    
+    public void close(){
+    	if(sessionFactory!=null&&!sessionFactory.isClosed()){
+    		sessionFactory.close();
+    	}
     }
     
     public boolean isConnected(){

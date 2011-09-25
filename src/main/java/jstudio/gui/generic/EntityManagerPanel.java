@@ -45,6 +45,7 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 				while(!stop){					
 					synchronized(this){
 						wait();
+						if(stop) break;
 						wait(100);
 					}		
 					logger.debug("going to filter! "+filterField.getText());
@@ -52,6 +53,15 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 				}
 			} catch (InterruptedException e) {
 				logger.error("Filter thread interrupted");
+			}
+		}
+	}
+	
+	public void finalize(){
+		if(filterThread!=null){
+			filterThread.stop=true;
+			synchronized(filterThread){
+				filterThread.notify();
 			}
 		}
 	}

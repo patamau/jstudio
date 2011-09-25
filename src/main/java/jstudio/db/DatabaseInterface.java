@@ -23,6 +23,7 @@ public interface DatabaseInterface {
 		DEF_PASS = "";
 
 	public void connect(String host, String table, String user, String pass);
+	public void close();
 	public boolean isConnected();
 	public void dump(File dest) throws Exception;
 	public void restore(File src) throws Exception;

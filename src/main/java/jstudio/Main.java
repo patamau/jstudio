@@ -59,10 +59,15 @@ public class Main {
 			printSystemProperties();
 		}
 		
-		//TODO: load options from command line (?)
-		JStudio jstudio = new JStudio();
+		final JStudio jstudio = new JStudio();
 		//redirect exceptions to jstudio
 		Thread.setDefaultUncaughtExceptionHandler(jstudio);
+		Runtime.getRuntime().addShutdownHook(new Thread(){
+			public void run(){
+				jstudio.finalize();
+			}
+		});
+		
 		//start up
 		try{
 			jstudio.initialize();
@@ -70,5 +75,7 @@ public class Main {
 			e.printStackTrace();
 			System.exit(1);
 		}
+		//waiting for threads to finish
+		//finalization is called by the shutdown hook
 	}
 }
