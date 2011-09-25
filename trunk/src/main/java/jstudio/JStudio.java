@@ -1,7 +1,9 @@
 package jstudio;
 
 import java.io.File;
+import java.util.Date;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 
@@ -16,6 +18,7 @@ import jstudio.gui.AddressBookPanel;
 import jstudio.gui.AgendaPanel;
 import jstudio.gui.JStudioGUI;
 import jstudio.util.Configuration;
+import jstudio.util.DatePicker;
 import jstudio.util.IconPanel;
 import jstudio.util.Language;
 import jstudio.util.Resources;
@@ -39,6 +42,11 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		DB_NAME = "jstudio",
 		DB_USER = "jstudio",
 		DB_PASS = "jstudio137";
+	
+	public static final String
+		BACKUPFILE_KEY = "backup.file",
+		BACKUPFILE_DEF = "jstudio.bak",
+		BACKUP_EXT = ".jsbak";
 	
 	public static final long SHOW_TIMEOUT = 1000;
 	
@@ -139,6 +147,18 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), Language.string("Uncaught exception"), JOptionPane.ERROR_MESSAGE);
 	}
 	
+	/**
+	 * BEWARE: After this call initialize() is required for the rest of the stuff to work properly again :)
+	 */
+	public void finalize(){
+		//kill all gui listeners
+		gui.finalize();
+		//async call, dont care
+		database.close();
+		// I dont care if overwrite
+		Configuration.getGlobalConfiguration().save(new File(this.getClass().getSimpleName()+Configuration.FILE_SUFFIX));		
+	}
+	
 	public DatabaseInterface getDatabase(){
 		return database;
 	}
@@ -161,5 +181,85 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 	
 	public JStudioGUI getGUI(){
 		return gui;
+	}
+	
+	public void doRestore(){
+		JFileChooser fc = new JFileChooser();
+		File lastBackup = new File(Configuration.getGlobal(BACKUPFILE_KEY, BACKUPFILE_DEF));
+		fc.setSelectedFile(lastBackup);
+		fc.setCurrentDirectory(lastBackup);
+		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		int ch = fc.showOpenDialog(gui);
+		if(ch!=JFileChooser.APPROVE_OPTION){
+			logger.info("Restore canceled by user");
+			return;
+		}
+		File f = fc.getSelectedFile();
+		if(!f.exists()||!f.canRead()){
+			JOptionPane.showMessageDialog(gui, 
+					Language.string("Unable to access backup file"),
+					Language.string("Restore error"),
+					JOptionPane.ERROR_MESSAGE);
+		}else{
+			if(doClear()){
+				try {
+					database.restore(f);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	public boolean doClear(){
+		int ch = JOptionPane.showConfirmDialog(gui, 
+				Language.string("Are you really-really sure you want to remove all the data from the database?\n Everything lost forever?\n Are you Sure?"),
+				Language.string("Really-really sure?"),
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE);
+		if(ch==JOptionPane.YES_OPTION){
+			database.clear();
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public void doBackup(){
+		JFileChooser fc = new JFileChooser();
+		File lastBackup = new File(Configuration.getGlobal(BACKUPFILE_KEY, BACKUPFILE_DEF));
+		fc.setSelectedFile(lastBackup);
+		fc.setCurrentDirectory(lastBackup);
+		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		int ch = fc.showSaveDialog(gui);
+		if(ch!=JFileChooser.APPROVE_OPTION){
+			logger.info("Backup canceled by user");
+			return;
+		}
+		File sf = fc.getSelectedFile();
+		Configuration.getGlobalConfiguration().setProperty(BACKUPFILE_KEY, sf.getAbsolutePath());
+		String filename = sf.getName();
+		int extpos = filename.lastIndexOf('.');
+		if(extpos>=0){
+			filename = filename.substring(0, extpos);
+			filename += DatePicker.getTimestamp(new Date());
+			filename += BACKUP_EXT;
+		}
+		String fullpath = sf.getParentFile().getAbsolutePath()+File.separatorChar+filename;
+		File actualBackupFile = new File(fullpath); //TODO
+		if(actualBackupFile.exists()){
+			ch = JOptionPane.showConfirmDialog(gui, 
+					Language.string("A file with the same name already exists: are you sure you want to overwrite?"),
+					Language.string("Overwrite?"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			if(ch!=JOptionPane.YES_OPTION){
+				logger.info("Backup overwrite aborted by user");
+				return;
+			}
+		}
+		try {
+			database.dump(actualBackupFile);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

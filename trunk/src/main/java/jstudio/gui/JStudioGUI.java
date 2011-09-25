@@ -1,10 +1,9 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-
 import javax.swing.Box;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -15,6 +14,8 @@ import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 
+import org.apache.log4j.Logger;
+
 import jstudio.JStudio;
 import jstudio.db.DatabaseObject;
 import jstudio.gui.generic.EntityManagerPanel;
@@ -24,6 +25,8 @@ import jstudio.util.Language;
 
 @SuppressWarnings("serial")
 public class JStudioGUI extends JFrame implements ActionListener {
+	
+	private static final Logger logger = Logger.getLogger(JStudioGUI.class);
 	
 	public static final String
 		WIDTH_KEY = "window.width",
@@ -51,7 +54,6 @@ public class JStudioGUI extends JFrame implements ActionListener {
 	private JMenu viewMenu;
 	private JLabel statusLabel;
 	private JTabbedPane tabbedPane;
-	//private ArrayList<EntityManagerPanel<? extends DatabaseObject>> panels;
 
 	public JStudioGUI(String title, JStudio app){
 		super(title);
@@ -81,7 +83,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 	}
 	
 	public void createGUI(){
-		//only one gui created at a time
+		//only one gui created at a time please
 		if(initialized) return;
 		initialized = true;
 		
@@ -141,21 +143,11 @@ public class JStudioGUI extends JFrame implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		Object src = event.getSource();
 		if(src==backupItem){
-			//FIXME: add gui to choose destination file
-			try {
-				app.getDatabase().dump(new File("dump.db"));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			app.doBackup();
 		}else if(src==restoreItem){
-			//FIXME: add gui to choose source file
-			try {
-				app.getDatabase().restore(new File("dump.db"));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			app.doRestore();
 		}else if(src==clearItem){
-			app.getDatabase().clear();
+			app.doClear();
 		}else if(src==optionsItem){
 			ConfigurationDialog cdialog = new ConfigurationDialog(this);
 			Configuration c = cdialog.showDialog(Configuration.getGlobalConfiguration());
@@ -164,11 +156,19 @@ public class JStudioGUI extends JFrame implements ActionListener {
 			DBDialog dbdialog = new DBDialog(this,app.getDatabase());
 			dbdialog.showDialog(Configuration.getGlobalConfiguration());			
 		}else if(src==exitItem){
+			app.finalize();
 			this.dispose();
 		}
 	}
 	
 	public void setStatusLabel(String text){
 		statusLabel.setText(text);
+	}
+	
+	public void finalize(){
+		for(Component c: tabbedPane.getComponents()){
+			EntityManagerPanel<?> p = (EntityManagerPanel<?>)c;
+			p.finalize();
+		}
 	}
 }

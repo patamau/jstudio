@@ -11,7 +11,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class DatePicker {
-	private static final SimpleDateFormat sdf = new SimpleDateFormat("MMMM yyyy");
+	private static final SimpleDateFormat 
+		sdf = new SimpleDateFormat("MMMM yyyy"),
+		timestamp = new SimpleDateFormat("yyyyMMddhhmm");
+		
 	
 	public static Color 
 		sundayColor = Color.RED,
@@ -24,6 +27,10 @@ public class DatePicker {
 	private JButton[] buttons;
 	private JLabel[] labels;
 	private int originalDayOfMonth, originalMonth, originalYear;
+	
+	public static String getTimestamp(Date date){
+		return timestamp.format(date);
+	}
 
 	public DatePicker(Component parent) {
 		calendar = Calendar.getInstance();
