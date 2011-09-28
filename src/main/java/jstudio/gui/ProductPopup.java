@@ -26,15 +26,15 @@ public class ProductPopup extends ContextualMenu<Product> {
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
 		if(o==viewItem){
-			JDialog dialog = new ProductPanel(context, null, invoice, accounting).createDialog(parent.getTopLevelAncestor());
+			JDialog dialog = new ProductPanel(context, parent, null, accounting).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
 		}else if(o==editItem){
-			JDialog dialog = new ProductPanel(context, null, invoice, accounting).createDialog(parent.getTopLevelAncestor());
+			JDialog dialog = new ProductPanel(context, parent, invoice, accounting).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
 		}else if(o==removeItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
-					Language.string("Are you sure you want to remove the event {0}?",context.getDescription()),
-					Language.string("Romove event?"), 
+					Language.string("Are you sure you want to remove the product {0}?",context.getDescription()),
+					Language.string("Romove product?"), 
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if(ch==JOptionPane.YES_OPTION){
 				if(!invoice.getProducts().remove(context)){

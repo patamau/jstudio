@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -150,7 +151,10 @@ public class GUITool {
 					} catch (ParseException e1) {
 						//ignore errors here!
 					}
-					f.setText(dateFormat.format(d.getDate()));
+					Date pd = d.getDate();
+					if(pd!=null){
+						f.setText(dateFormat.format(pd));
+					}
 				}
 			});
 			gc.weightx=0.0f;

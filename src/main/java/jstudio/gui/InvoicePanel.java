@@ -90,7 +90,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
-		productTable = new ProductTable(invoice, manager);
+		productTable = new ProductTable(invoice, manager, editable);
 		productTable.refresh();
 		
 		body.add(productTable, BorderLayout.CENTER);
