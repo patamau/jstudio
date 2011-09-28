@@ -60,9 +60,9 @@ public class ProductPanel extends EntityPanel<Product> {
 				if(!invoice.getProducts().contains(entity)){
 					invoice.getProducts().add(entity);
 				}
-				accountingManager.getController().store(invoice);
+				//accountingManager.getController().store(invoice);
 				getDialog().dispose();
-				accountingManager.refresh();
+				//accountingManager.refresh();
 				manager.refresh();
 			}catch(NumberFormatException ex){
 				String msg = Language.string("A number inserted has a bad format");

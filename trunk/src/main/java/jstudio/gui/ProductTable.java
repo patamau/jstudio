@@ -28,7 +28,7 @@ public class ProductTable
 	
 	private float total;
 	
-	public ProductTable(Invoice invoice, EntityManagerPanel<Invoice> accounting){
+	public ProductTable(Invoice invoice, EntityManagerPanel<Invoice> accounting, boolean editable){
 		super(((Accounting)accounting.getController()).getProducts());
 		this.invoice = invoice;
 		this.accounting = accounting;
@@ -47,10 +47,12 @@ public class ProductTable
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 		this.add(scrollpane, BorderLayout.CENTER);
 		
-		this.popup = new ProductPopup(this, invoice, accounting);
-		scrollpane.addMouseListener(this);
-		table.addMouseListener(this);
-		table.addMouseListener(new PopupListener<Product>(table, popup));
+		if(editable){
+			this.popup = new ProductPopup(this, invoice, accounting);
+			scrollpane.addMouseListener(this);
+			table.addMouseListener(this);
+			table.addMouseListener(new PopupListener<Product>(table, popup));
+		}
 		
 		totals = new JTable();
 		totalsModel = new ProductTableModel(totals, null);
