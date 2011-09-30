@@ -1,6 +1,9 @@
 package jstudio;
 
+import java.awt.HeadlessException;
 import java.io.File;
+import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Date;
 
 import javax.swing.JFileChooser;
@@ -45,8 +48,9 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 	
 	public static final String
 		BACKUPFILE_KEY = "backup.file",
-		BACKUPFILE_DEF = "jstudio.bak",
-		BACKUP_EXT = ".jsbak";
+		BACKUPFILE_DEF = ".";
+	
+	public static final MessageFormat backupNameFormat = new MessageFormat("jstudio_{0}.bak"); 
 	
 	public static final long SHOW_TIMEOUT = 1000;
 	
@@ -187,7 +191,7 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		JFileChooser fc = new JFileChooser();
 		File lastBackup = new File(Configuration.getGlobal(BACKUPFILE_KEY, BACKUPFILE_DEF));
 		fc.setSelectedFile(lastBackup);
-		fc.setCurrentDirectory(lastBackup);
+		fc.setCurrentDirectory(lastBackup.getParentFile());
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		int ch = fc.showOpenDialog(gui);
 		if(ch!=JFileChooser.APPROVE_OPTION){
@@ -229,25 +233,25 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		JFileChooser fc = new JFileChooser();
 		File lastBackup = new File(Configuration.getGlobal(BACKUPFILE_KEY, BACKUPFILE_DEF));
 		fc.setSelectedFile(lastBackup);
-		fc.setCurrentDirectory(lastBackup);
-		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		fc.setCurrentDirectory(lastBackup.getParentFile());
+		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		int ch = fc.showSaveDialog(gui);
 		if(ch!=JFileChooser.APPROVE_OPTION){
 			logger.info("Backup canceled by user");
 			return;
 		}
 		File sf = fc.getSelectedFile();
-		Configuration.getGlobalConfiguration().setProperty(BACKUPFILE_KEY, sf.getAbsolutePath());
-		String filename = sf.getName();
-		int extpos = filename.lastIndexOf('.');
-		if(extpos>=0){
-			filename = filename.substring(0, extpos);
-			filename += DatePicker.getTimestamp(new Date());
-			filename += BACKUP_EXT;
+		if(!sf.exists()||!sf.canWrite()||!sf.isDirectory()){
+			logger.error("Wrong folder "+sf.getAbsolutePath());
+			JOptionPane.showMessageDialog(gui,
+					Language.string("Unable to write to the specified folder"),
+					Language.string("Write error"),
+					JOptionPane.ERROR_MESSAGE);
+			return;
 		}
-		String fullpath = sf.getParentFile().getAbsolutePath()+File.separatorChar+filename;
-		File actualBackupFile = new File(fullpath); //TODO
-		if(actualBackupFile.exists()){
+		String filename = backupNameFormat.format(new Object[]{DatePicker.getTimestamp(new Date())});
+		sf = new File(sf.getAbsoluteFile()+File.separator+filename);
+		if(sf.exists()){
 			ch = JOptionPane.showConfirmDialog(gui, 
 					Language.string("A file with the same name already exists: are you sure you want to overwrite?"),
 					Language.string("Overwrite?"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
@@ -256,8 +260,23 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 				return;
 			}
 		}
+		boolean created = false;
 		try {
-			database.dump(actualBackupFile);
+			created = sf.createNewFile();
+		} catch (Exception e1) {
+			logger.error("Creating new dump file "+sf.getAbsolutePath(),e1);
+		} 
+		if(!created){
+			logger.error("Cannot create file "+sf.getAbsolutePath());
+			JOptionPane.showMessageDialog(gui,
+					Language.string("Unable to create the target file"),
+					Language.string("Write error"),
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+		Configuration.getGlobalConfiguration().setProperty(BACKUPFILE_KEY, sf.getAbsolutePath());
+		try {
+			database.dump(sf);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

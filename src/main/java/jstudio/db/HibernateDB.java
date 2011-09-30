@@ -43,8 +43,7 @@ public class HibernateDB implements DatabaseInterface{
 
 		FileOutputStream fos = new FileOutputStream(dest);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
-    	for (@SuppressWarnings("unchecked")
-		Iterator<PersistentClass> iter=configuration.getClassMappings(); iter.hasNext();) {
+    	for (Iterator<PersistentClass> iter=configuration.getClassMappings(); iter.hasNext();) {
     		PersistentClass persistentClass = iter.next();
     		String source = persistentClass.getClassName();
     		logger.info("Starting to dump "+source);
@@ -59,8 +58,7 @@ public class HibernateDB implements DatabaseInterface{
     
     public void clear(){
     	if(!isConnected()) return;
-		for(@SuppressWarnings("unchecked")
-		Iterator<PersistentClass> iter=configuration.getClassMappings(); iter.hasNext();) {
+		for(Iterator<PersistentClass> iter=configuration.getClassMappings(); iter.hasNext();) {
     		PersistentClass persistentClass = iter.next();
     		String source = persistentClass.getClassName();
     		logger.info("Clearing "+source);

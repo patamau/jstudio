@@ -13,7 +13,7 @@ import javax.swing.border.EmptyBorder;
 public class DatePicker {
 	private static final SimpleDateFormat 
 		sdf = new SimpleDateFormat("MMMM yyyy"),
-		timestamp = new SimpleDateFormat("yyyyMMddhhmm");
+		timestamp = new SimpleDateFormat("yyyyMMddkkmm");
 		
 	
 	public static Color 
