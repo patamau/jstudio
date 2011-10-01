@@ -5,9 +5,7 @@
         
 <hibernate-mapping package="jstudio.model">
     <class name="Person" table="contacts">
-        <id name="id" column="id" type="long">
-        	<generator class="increment"/>
-        </id>
+        <id name="id" column="id" type="long" />
         <property name="name" type="string"/>
         <property name="lastname" type="string"/>
         <property name="address" type="string"/>

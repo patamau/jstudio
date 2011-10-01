@@ -13,11 +13,15 @@ public class Product implements DatabaseObject, Comparable<Product> {
 	private Float cost;
 	
 	public Product(){
-		this(null);
+		this(0l);
 	}
 	
-	public Product(Invoice invoice){
-		this.id=0l;
+	public Product(Long id){
+		this(id, null);
+	}
+	
+	public Product(Long id, Invoice invoice){
+		this.id=id;
 		this.invoice=invoice;
 		this.description="";
 		this.quantity=0;

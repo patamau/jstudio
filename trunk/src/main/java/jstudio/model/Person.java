@@ -35,7 +35,11 @@ public class Person implements DatabaseObject, Comparable<Object> {
 	private Integer gender;
 	
 	public Person(){
-		id=null;
+		this(0l);
+	}
+	
+	public Person(Long id){
+		this.id=id;
 		birthdate=new Date();
 		name="";
 		lastname="";

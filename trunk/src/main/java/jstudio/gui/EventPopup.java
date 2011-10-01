@@ -38,7 +38,7 @@ public class EventPopup extends ContextualMenu<Event> {
 		}else if(o==newItem){
 			//override default event date using the current agendapanel date
 			Date d = ((AgendaPanel)parent).getDate();
-			Event ev = new Event();
+			Event ev = new Event(parent.getController().getNextId());
 			ev.setDate(d);
 			JDialog dialog = new EventPanel(ev, parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);

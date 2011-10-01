@@ -25,6 +25,7 @@ public interface DatabaseInterface {
 	public void connect(String host, String table, String user, String pass);
 	public void close();
 	public boolean isConnected();
+	public Object execute(String query);
 	public void dump(File dest) throws Exception;
 	public void restore(File src) throws Exception;
 	public void clear();
