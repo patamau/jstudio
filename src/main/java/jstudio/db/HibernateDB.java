@@ -15,6 +15,7 @@ import java.util.Map;
 import jstudio.util.Language;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -35,6 +36,15 @@ public class HibernateDB implements DatabaseInterface{
     	sessionFactory = null;
     	this.protocol = protocol;
     	this.driver = driver;
+    }
+    
+    public Object execute(String sql){
+    	if(!isConnected()) return null;
+    	Session session = sessionFactory.openSession();
+    	Query query = session.createQuery(sql);
+    	List<?> list = query.list();
+    	if(list.size()==0) return null;
+    	return list.get(0);
     }
     
     public void dump(File dest) throws IOException{
@@ -63,7 +73,7 @@ public class HibernateDB implements DatabaseInterface{
     		String source = persistentClass.getClassName();
     		logger.info("Clearing "+source);
     		List<DatabaseObject> data = getAll(source);
-		   	Session session = sessionFactory.getCurrentSession();
+		   	Session session = sessionFactory.openSession();
 	    	Transaction t = session.beginTransaction();
     		for(DatabaseObject d : data){
     			logger.debug("Removing "+d.getClass().getName()+" id:"+d.getId());
@@ -71,7 +81,10 @@ public class HibernateDB implements DatabaseInterface{
     		}
 	    	commit(t);
     		//logger.info(source+" clear finished (removed "+data.size()+" objects)");
+	    	session.flush();
     	}
+		sessionFactory.close();
+		sessionFactory = configuration.buildSessionFactory();
     }
     
     public void restore(File src) throws Exception{
@@ -96,7 +109,7 @@ public class HibernateDB implements DatabaseInterface{
 	    		nobjs++;
 	    		logger.debug("Loaded "+o.getClass().getName()+" "+o);
 	    	}
-	    	commit(t);
+    		commit(t);
     	}catch(EOFException eof){
     		//end of file reached!
     	}
@@ -179,7 +192,7 @@ public class HibernateDB implements DatabaseInterface{
     public DatabaseObject store(String source, DatabaseObject o){
     	if(!isConnected()) return null;
     	// source is ignored because hibernate mapping already takes care of this
-    	Session session = sessionFactory.getCurrentSession();
+    	Session session = sessionFactory.openSession();
     	Transaction t = session.beginTransaction();
     	try{
     		session.saveOrUpdate(o);
@@ -189,6 +202,7 @@ public class HibernateDB implements DatabaseInterface{
     		session.save(o);
     		commit(t);
     	}
+    	session.flush();
     	
     	return o;
     }
@@ -211,26 +225,28 @@ public class HibernateDB implements DatabaseInterface{
     @SuppressWarnings("unchecked")
 	public List<DatabaseObject> getAll(String source){
     	if(!isConnected()) return null;
-    	Session session = sessionFactory.getCurrentSession();
+    	Session session = sessionFactory.openSession();
     	Transaction t = session.beginTransaction();
     	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery("from "+source).list();
     	commit(t);
+    	session.flush();
     	return l;
     }
 
 	public DatabaseObject get(String source, int id) {
 		if(!isConnected()) return null;
-		Session session = sessionFactory.getCurrentSession();
+		Session session = sessionFactory.openSession();
     	Transaction t = session.beginTransaction();
     	DatabaseObject o = (DatabaseObject)session.createQuery("from "+source+" where id="+id).uniqueResult();
     	commit(t);
+    	session.flush();
     	return o;
 	}
 	
 	@SuppressWarnings("unchecked")
 	public List<DatabaseObject> getBetween(String source, String field, String from, String to){
 		if(!isConnected()) return null;
-		Session session = sessionFactory.getCurrentSession();
+		Session session = sessionFactory.openSession();
     	Transaction t = session.beginTransaction();
     	StringBuffer sb = new StringBuffer();
     	sb.append("from ");
@@ -244,6 +260,7 @@ public class HibernateDB implements DatabaseInterface{
     	sb.append("'");    	
     	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery(sb.toString()).list();
     	commit(t);
+    	session.flush();
     	return l;
 	}
 
@@ -252,7 +269,7 @@ public class HibernateDB implements DatabaseInterface{
 		//if no values specified, bounce to default getAll
 		if(null==values||0==values.keySet().size()) return getAll(source);
 		if(!isConnected()) return null;
-    	Session session = sessionFactory.getCurrentSession();
+    	Session session = sessionFactory.openSession();
     	Transaction t = session.beginTransaction();
     	StringBuffer sb = new StringBuffer();
     	sb.append("from ");
@@ -271,13 +288,14 @@ public class HibernateDB implements DatabaseInterface{
     	}
     	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery(sb.toString()).list();
     	commit(t);
+    	session.flush();
     	return l;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<DatabaseObject> getAll(String source, String column) {
 		if(!isConnected()) return null;
-		Session session = sessionFactory.getCurrentSession();
+		Session session = sessionFactory.openSession();
     	Transaction t = session.beginTransaction();
     	StringBuffer sb = new StringBuffer();
     	sb.append("from ");
@@ -286,6 +304,7 @@ public class HibernateDB implements DatabaseInterface{
     	sb.append(column);
     	List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery(sb.toString()).list();
     	commit(t);
+    	session.flush();
     	return l;
 	}
 
@@ -308,7 +327,7 @@ public class HibernateDB implements DatabaseInterface{
 		//if no values specified, bounce to default getAll
 		if(null==values||0==values.length||
 				null==columns||0==columns.length) return getAll(source);
-    	Session session = sessionFactory.getCurrentSession();
+    	Session session = sessionFactory.openSession();
     	Transaction t = session.beginTransaction();
     	if(!session.isConnected()){
     		return null;
@@ -350,6 +369,7 @@ public class HibernateDB implements DatabaseInterface{
     	@SuppressWarnings("unchecked")
 		List<DatabaseObject> l = (List<DatabaseObject>)session.createQuery(sb.toString()).list();
     	commit(t);
+    	session.flush();
     	return l;
 	}
 

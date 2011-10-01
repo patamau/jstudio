@@ -28,7 +28,11 @@ public class Invoice implements DatabaseObject {
 	}
 	
 	public Invoice(){
-		this.id=0l;
+		this(0l);
+	}
+	
+	public Invoice(Long id){
+		this.id=id;
 		this.date=new Date();
 		this.name="";
 		this.lastname="";

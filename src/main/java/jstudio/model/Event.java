@@ -17,7 +17,11 @@ public class Event implements DatabaseObject {
 	private String description;
 	
 	public Event(){
+		
+	}
 	
+	public Event(Long id){
+		this.id = id;
 	}
 	
 	public Event(Date date, String name, String lastname, String phone, String description){

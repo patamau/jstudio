@@ -5,9 +5,7 @@
         
 <hibernate-mapping package="jstudio.model">
     <class name="Product" table="products">
-        <id name="id" type="long" column="id">
-        	<generator class="increment"/>
-        </id>
+        <id name="id" type="long" column="id" />
         <many-to-one name="invoice" lazy="proxy" 
         	class="jstudio.model.Invoice" cascade="none"/>
         <property name="description" type="string"/>

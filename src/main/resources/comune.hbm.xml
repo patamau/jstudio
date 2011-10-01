@@ -5,9 +5,7 @@
         
 <hibernate-mapping package="jstudio.model">
     <class name="Comune" table="comuni">
-        <id name="id" column="id" type="long">
-        	<generator class="increment"/>
-        </id>
+        <id name="id" column="id" type="long" />
         <property column="id_nazionale" name="idNazionale" type="string"/>
         <property column="id_catastale" name="idCatastale" type="string"/>
         <property name="provincia" type="string"/>

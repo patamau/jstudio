@@ -46,7 +46,7 @@ public class ProductPopup extends ContextualMenu<Product> {
 				accounting.refresh();
 			}
 		}else if(o==newItem){
-			JDialog dialog = new ProductPanel(new Product(invoice), parent, invoice, accounting).createDialog(parent.getTopLevelAncestor());
+			JDialog dialog = new ProductPanel(new Product(parent.getController().getNextId(),invoice), parent, invoice, accounting).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
 		}
 	}

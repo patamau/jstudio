@@ -39,7 +39,7 @@ public class ReportGenerator {
 	public static void main(String args[]){
 		ReportGenerator rg = new ReportGenerator();
 		rg.setReport("/report1.jasper");
-		Invoice i = new Invoice();
+		Invoice i = new Invoice(1l);
 		i.setId(23l);
 		i.setDate(new Date());
 		i.setName("Matteo");
@@ -49,13 +49,13 @@ public class ReportGenerator {
 		i.setCap("38123");
 		i.setProvince("TN");
 		Set<Product> set = new HashSet<Product>();
-		Product p = new Product();
+		Product p = new Product(1l);
 		p.setId(0l);
 		p.setDescription("Estrazione dente del giudizio");
 		p.setCost(150f);
 		p.setQuantity(1);
 		set.add(p);
-		Product p2 = new Product();
+		Product p2 = new Product(2l);
 		p2.setId(1l);
 		p2.setDescription("Pulizia dentale e sbiancamento");
 		p.setCost(200f);

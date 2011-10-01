@@ -13,6 +13,7 @@ import jstudio.db.DatabaseObject;
  */
 public class Controller<E extends DatabaseObject> {
 	
+	private long maxid = -1;
 	private String source;
 	private JStudio app;
 	
@@ -27,6 +28,16 @@ public class Controller<E extends DatabaseObject> {
 	
 	public final String getSource(){
 		return this.source;
+	}
+	
+	public Long getNextId(){
+		String query = "SELECT MAX(id) FROM "+source;
+		Object o = app.getDatabase().execute(query);
+		if(o!=null){
+			return ((Long)o)+1;
+		}else{
+			return 1l;
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -35,7 +35,7 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 				parent.refresh();
 			}
 		}else if(o==newItem){
-			JDialog dialog = new InvoicePanel(new Invoice(), parent, true).createDialog(parent.getTopLevelAncestor());
+			JDialog dialog = new InvoicePanel(new Invoice(parent.getController().getNextId()), parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
 		}
 	}
