@@ -1,8 +1,6 @@
 package jstudio;
 
-import java.awt.HeadlessException;
 import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Date;
 
