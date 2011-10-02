@@ -13,7 +13,6 @@ import jstudio.db.DatabaseObject;
  */
 public class Controller<E extends DatabaseObject> {
 	
-	private long maxid = -1;
 	private String source;
 	private JStudio app;
 	

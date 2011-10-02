@@ -12,6 +12,7 @@ import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -32,6 +33,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	private DefaultTableModel htable, dtable;
 	private JTextField fileField;
 	private JButton browseButton, okButton, cancelButton;
+	private JCheckBox pdfCheck, docCheck, xlsCheck;
 	
 	/**
 	 * Creates a new window to configure output for the report.
@@ -48,6 +50,28 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		//TODO: tables
 	}
 	
+	private Component getFormatsPanel(){
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Language.string("Select output format")));
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx=0;
+		gc.gridy=0;
+		gc.anchor=GridBagConstraints.LINE_START;
+		gc.weightx=GridBagConstraints.HORIZONTAL;
+		//gc.insets = new Insets(5,5,5,5);
+		//get selected status out of configuration
+		pdfCheck = new JCheckBox(Language.string("Pdf (Portable Document Format)"));
+		panel.add(pdfCheck, gc);
+		docCheck = new JCheckBox(Language.string("Doc (Rich Text Format)"));
+		gc.gridy++;
+		panel.add(docCheck, gc);
+		xlsCheck = new JCheckBox(Language.string("Xls (Excel Style Sheet Format)"));
+		gc.gridy++;
+		panel.add(xlsCheck, gc);
+		return panel;
+	}
+	
 	private Component getButtonsPanel(){
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
@@ -55,6 +79,11 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		gc.gridx=0;
 		gc.gridy=0;
 		gc.insets = new Insets(5,5,5,5);
+
+		gc.gridwidth=2;
+		panel.add(getFormatsPanel(), gc);
+		gc.gridy++;
+		gc.gridwidth=1;
 		okButton = new JButton(Language.string("Ok"));
 		okButton.addActionListener(this);
 		panel.add(okButton,gc);
