@@ -23,11 +23,16 @@ import jstudio.model.Person;
 import jstudio.model.Product;
 import jstudio.report.ReportGenerator;
 import jstudio.report.ReportGeneratorGUI;
+import jstudio.util.Configuration;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
 public class InvoicePanel extends EntityPanel<Invoice> {
+	
+	public static final String 
+		INVOICE_REPORT = "report.invoice",
+		INVOICE_REPORT_DEF = "/reports/invoice.jasper";
 	
 	private JTextField 
 		//idField,
@@ -156,7 +161,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			getDialog().dispose();
 		}else if(o==printButton){
 			ReportGenerator rg = new ReportGenerator();
-			rg.setReport("/report1.jasper");
+			rg.setReport(Configuration.getGlobal(INVOICE_REPORT, INVOICE_REPORT_DEF));
 			rg.setHead(entity);
 			rg.setData(entity.getProducts());
 			rg.setHeadValue("totalcost", Float.toString(productTable.getTotal()));
