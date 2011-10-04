@@ -36,9 +36,9 @@ import net.sf.jasperreports.engine.export.JRTextExporter;
  */
 public class ReportGenerator {
 	
-	public static void main(String args[]){
+	public static void main(String args[]){		
 		ReportGenerator rg = new ReportGenerator();
-		rg.setReport("/report1.jasper");
+		rg.setReport("/reports/report1.jasper");
 		Invoice i = new Invoice(1l);
 		i.setId(23l);
 		i.setDate(new Date());
@@ -174,32 +174,44 @@ public class ReportGenerator {
  
     public void generatePdf(String outputDir, String outputFile) throws Exception {
         InputStream is = getClass().getResourceAsStream(reportName);
+        if(is==null){
+        	throw new Exception("No such report "+reportName);
+        }
         File outDir = new File(outputDir);
         outDir.mkdirs();
         OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
-        JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
+        JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data);
         JasperRunManager.runReportToPdfStream(is, os, null, dataSource);
         os.close();
+        is.close();
     }
     
     public void generateRtf(String outputDir, String outputFile) throws Exception {
         InputStream is = getClass().getResourceAsStream(reportName);
+        if(is==null){
+        	throw new Exception("No such report "+reportName);
+        }
         File outDir = new File(outputDir);
         outDir.mkdirs();
         OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
         JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
         runReportToRtfStream(is, os, null, dataSource);
         os.close();
+        is.close();
     }
     
     public void generateText(String outputDir, String outputFile) throws Exception {
         InputStream is = getClass().getResourceAsStream(reportName);
+        if(is==null){
+        	throw new Exception("No such report "+reportName);
+        }
         File outDir = new File(outputDir);
         outDir.mkdirs();
         OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
         JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
         runReportToRtfStream(is, os, null, dataSource);
         os.close();
+        is.close();
     }
     
     public static void runReportToRtfStream(InputStream inputStream, 

@@ -2,6 +2,7 @@ package jstudio.report;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -15,11 +16,13 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.table.DefaultTableModel;
+
+import org.apache.log4j.Logger;
 
 import jstudio.util.Configuration;
 import jstudio.util.Language;
@@ -27,13 +30,19 @@ import jstudio.util.Language;
 @SuppressWarnings("serial")
 public class ReportGeneratorGUI extends JPanel implements ActionListener {
 
-	public static final String PRINT_PATH_LAST_KEY = "print.path.last";
+	public static final String PRINTPATH_KEY = "print.path";
+	
+	private static final Logger logger = Logger.getLogger(ReportGeneratorGUI.class);
 	
 	private ReportGenerator rg;
-	private DefaultTableModel htable, dtable;
+	//private DefaultTableModel htable, dtable;
 	private JTextField fileField;
 	private JButton browseButton, okButton, cancelButton;
 	private JCheckBox pdfCheck, docCheck, xlsCheck;
+	
+	public enum PrintMode {
+		PdfMode, DocMode, XlsMode
+	}
 	
 	/**
 	 * Creates a new window to configure output for the report.
@@ -69,6 +78,10 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		xlsCheck = new JCheckBox(Language.string("Xls (Excel Style Sheet Format)"));
 		gc.gridy++;
 		panel.add(xlsCheck, gc);
+		JLabel note = new JLabel(Language.string("Extension added automatically"));
+		note.setFont(note.getFont().deriveFont(Font.PLAIN));
+		gc.gridy++;
+		panel.add(note, gc);
 		return panel;
 	}
 	
@@ -99,8 +112,8 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		panel.setLayout(new GridBagLayout());
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		GridBagConstraints gc = new GridBagConstraints();
-		String defaultPath = Configuration.getGlobal(PRINT_PATH_LAST_KEY, ".");
-		fileField = new JTextField(defaultPath+File.separator+filename);
+		String defaultPath = Configuration.getGlobal(PRINTPATH_KEY, ".");
+		fileField = new JTextField();
 		fileField.setText(defaultPath+File.separator+filename);
 		gc.gridx=0;
 		gc.gridy=0;
@@ -120,6 +133,66 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		//TODO: set head in htable
 		//htable.addRow(rowData);
 		//TODO: set data in dtable
+	}
+	
+	private boolean checkOverwrite(File destination){
+		if(!destination.exists()) return true;
+		int ch = JOptionPane.showConfirmDialog(this,
+				Language.string("A file with the same name already exists ({0}): confirm overwrite?",destination.getName()),
+				Language.string("Overwrite?"),
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE);
+		if(ch!=JOptionPane.YES_OPTION){
+			return false;
+		}else{
+			return true;
+		}
+	}
+	
+	private String checkExtension(String src, String ext){
+		int last = src.lastIndexOf(File.separator);
+		if(last<0) last=0;
+		int pos = src.lastIndexOf('.');
+		if(pos<=last) pos=-1;
+		if(pos<0) src += '.'+ext;
+		else src = src.substring(0, pos)+'.'+ext;
+		return src;
+	}
+	
+	public void doPrint(String destination, final PrintMode mode){
+		File f;
+		try{
+		switch(mode){
+		case PdfMode:
+			f = new File(checkExtension(destination, "pdf"));		
+			if(checkOverwrite(f)){
+				rg.generatePdf(f.getParent(), f.getName());
+			}
+			break;
+		case DocMode:
+			f = new File(checkExtension(destination, "doc"));
+			if(checkOverwrite(f)){
+				rg.generateRtf(f.getParent(), f.getName());
+			}
+			break;
+		case XlsMode:
+			f = new File(checkExtension(destination, "xls"));
+			if(checkOverwrite(f)){
+				//rg.generateRtf(f.getParent(), f.getName());
+				JOptionPane.showMessageDialog(this,"INTERNAL: XLS NOT IMPLEMENTED");
+			}
+			break;
+		default:
+			logger.error("Unrecognized print mode "+mode);
+			break;
+		}
+		}catch(Exception e){
+			logger.error("Cannot print ("+mode+") "+destination,e);
+			JOptionPane.showMessageDialog(this, 
+					Language.string("While printing {0}: {1}",destination,e.getMessage()), 
+					Language.string("Print error"),
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	public void showGUI(Window parent){
@@ -148,25 +221,19 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		}else if(src==cancelButton){
 			((Window)SwingUtilities.getRoot(this)).dispose();
 		}else if(src==okButton){
-			Configuration.getGlobalConfiguration().setProperty(PRINT_PATH_LAST_KEY, fileField.getText());
-			File f = new File(fileField.getText());
-			if(f.exists()){
-				int ch = JOptionPane.showConfirmDialog(this,
-						Language.string("A file with the same name already exists: confirm overwrite?"),
-						Language.string("Overwrite?"),
-						JOptionPane.YES_NO_OPTION,
-						JOptionPane.WARNING_MESSAGE);
-				if(ch!=JOptionPane.YES_OPTION){
-					return;
-				}
-			}else if(!f.getParentFile().exists()){
-				JOptionPane.showMessageDialog(this, Language.string("Wrong destination path",Language.string("Print error"), JOptionPane.ERROR_MESSAGE));
-				return;
+			String lastPath;
+			int pos = fileField.getText().lastIndexOf(File.separator);
+			if(pos<0) lastPath = ".";
+			else lastPath = fileField.getText().substring(0, pos);
+			Configuration.getGlobalConfiguration().setProperty(PRINTPATH_KEY, lastPath);
+			if(pdfCheck.isSelected()){
+				doPrint(fileField.getText(), PrintMode.PdfMode);
 			}
-			try {
-				rg.generatePdf(f.getParent(), f.getName());
-			} catch (Exception e1) {
-				e1.printStackTrace();
+			if(docCheck.isSelected()){
+				doPrint(fileField.getText(), PrintMode.DocMode);
+			}
+			if(xlsCheck.isSelected()){
+				doPrint(fileField.getText(), PrintMode.XlsMode);
 			}
 		}
 	}

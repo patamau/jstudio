@@ -31,6 +31,7 @@ import jstudio.gui.generic.PopupListener;
 import jstudio.model.Event;
 import jstudio.report.ReportGenerator;
 import jstudio.report.ReportGeneratorGUI;
+import jstudio.util.Configuration;
 import jstudio.util.DatePicker;
 import jstudio.util.Language;
 import jstudio.util.Resources;
@@ -50,7 +51,8 @@ public class AgendaPanel
 	
 	public static final String 
 		PIC_AGENDA="eventicon.png",
-		DAY_EVENTS_REPORT="/day.jasper";
+		AGENDA_REPORT = "report.agenda",
+		AGENDA_REPORT_DEF = "/reports/day.jasper";
 	
 	private JButton dateButton, refreshButton, printButton;
 
@@ -147,7 +149,7 @@ public class AgendaPanel
 			refresh();
 		}else if(o==printButton){
 			ReportGenerator rg = new ReportGenerator();
-			rg.setReport(DAY_EVENTS_REPORT);
+			rg.setReport(Configuration.getGlobal(AGENDA_REPORT,AGENDA_REPORT_DEF));
 			rg.setHeadValue("day", dateFormat.format(getDate()));
 			Set<Event> events = new HashSet<Event>();
 			for(int i=0; i<model.getRowCount(); i++){
