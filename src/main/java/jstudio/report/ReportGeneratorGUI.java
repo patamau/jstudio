@@ -235,6 +235,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 			if(xlsCheck.isSelected()){
 				doPrint(fileField.getText(), PrintMode.XlsMode);
 			}
+			((Window)SwingUtilities.getRoot(this)).dispose();
 		}
 	}
 }
