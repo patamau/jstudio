@@ -163,6 +163,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			ReportGenerator rg = new ReportGenerator();
 			rg.setReport(Configuration.getGlobal(INVOICE_REPORT, INVOICE_REPORT_DEF));
 			rg.setHead(entity);
+			rg.setHeadValue("date", Person.birthdateFormat.format(entity.getDate()));
 			rg.setData(entity.getProducts());
 			rg.setHeadValue("totalcost", Float.toString(productTable.getTotal()));
 			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice"+entity.getId());

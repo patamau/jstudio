@@ -126,6 +126,10 @@ public class ReportGenerator {
 	 * @param entry
 	 */
 	public void addData(Map<String, String> entry){
+		if(this.head.size()>0){
+			entry.putAll(this.head);
+			this.head.clear();
+		}
 		this.data.add(entry);
 	}
 	

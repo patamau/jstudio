@@ -151,11 +151,16 @@ public class AgendaPanel
 			ReportGenerator rg = new ReportGenerator();
 			rg.setReport(Configuration.getGlobal(AGENDA_REPORT,AGENDA_REPORT_DEF));
 			rg.setHeadValue("day", dateFormat.format(getDate()));
-			Set<Event> events = new HashSet<Event>();
 			for(int i=0; i<model.getRowCount(); i++){
-				events.add((Event)model.getValueAt(i, 0));
+				Map<String,String> map = new HashMap<String,String>();
+				Event ev = (Event)model.getValueAt(i, 0);
+				map.put("date",Event.timeFormat.format(ev.getDate()));
+				map.put("name",ev.getName());
+				map.put("lastname",ev.getLastname());
+				map.put("phone", ev.getPhone());
+				map.put("description",ev.getDescription());
+				rg.addData(map);
 			}
-			rg.setData(events);
 			ReportGeneratorGUI rggui = new ReportGeneratorGUI(rg,"day_"+timestampFormat.format(getDate()));
 			rggui.showGUI((Window)SwingUtilities.getRoot(this));
 		}else{
