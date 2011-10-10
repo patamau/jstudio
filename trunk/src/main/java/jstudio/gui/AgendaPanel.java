@@ -8,9 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -131,6 +129,7 @@ public class AgendaPanel
 		model.addRow(new Object[]{
 				e,
 				e.getLastname()+" "+e.getName(),
+				e.getPhone(),
 				e.getDescription()
 		});
 	}

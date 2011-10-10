@@ -103,6 +103,7 @@ public class EventPanel extends EntityPanel<Event> {
 			cd.set(Calendar.HOUR_OF_DAY, ct.get(Calendar.HOUR_OF_DAY));
 			cd.set(Calendar.MINUTE, ct.get(Calendar.MINUTE));
 			cd.set(Calendar.SECOND, 0);
+			if(entity.getId()==0) entity.setId(controller.getNextId());
 			entity.setDate(cd.getTime());
 			entity.setName(nameField.getText());
 			entity.setLastname(lastnameField.getText());

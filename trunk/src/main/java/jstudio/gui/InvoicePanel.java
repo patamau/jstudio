@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+import jstudio.control.Accounting;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
 import jstudio.model.Invoice;
@@ -150,8 +151,11 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			entity.setProvince(provinceField.getText());
 			entity.setCap(capField.getText());
 			entity.setCode(codeField.getText());
-			controller.store(entity);
+			if(entity.getId()==0) entity.setId(controller.getNextId());
+			//controller.store(entity);
+			long pid = ((Accounting)controller).getProducts().getNextId();
 			for(Product p: entity.getProducts()){
+				if(p.getId()==0) p.setId(++pid);
 				p.setInvoice(entity);
 			}
 			controller.store(entity);

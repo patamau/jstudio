@@ -12,7 +12,8 @@ public class AgendaTableModel extends DefaultTableModel {
 	
 	private static final Object[] cols = new Object[]{
 			Language.string("Time"), 
-			Language.string("Contact"), 
+			Language.string("Contact"),
+			Language.string("Phone"),
 			Language.string("Description")
 			};
 	

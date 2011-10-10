@@ -36,7 +36,7 @@ public class PersonPopup extends ContextualMenu<Person> {
 				parent.refresh();
 			}
 		}else if(o==newItem){
-			JDialog dialog = new PersonPanel(new Person(parent.getController().getNextId()), parent, true).createDialog(parent.getTopLevelAncestor());
+			JDialog dialog = new PersonPanel(new Person(0l), parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
 		}
 	}
