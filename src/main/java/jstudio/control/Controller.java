@@ -13,8 +13,8 @@ import jstudio.db.DatabaseObject;
  */
 public class Controller<E extends DatabaseObject> {
 	
-	private String source;
-	private JStudio app;
+	protected String source;
+	protected JStudio app;
 	
 	public Controller(JStudio app, String source){
 		this.app = app;

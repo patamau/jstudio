@@ -117,6 +117,7 @@ public class PersonPanel extends EntityPanel<Person> {
 				JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			if(entity.getId()==0) entity.setId(controller.getNextId());
 			entity.setName(nameField.getText());
 			entity.setLastname(lastnameField.getText());
 			entity.setAddress(addressField.getText());

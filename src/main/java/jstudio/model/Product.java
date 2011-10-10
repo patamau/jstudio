@@ -75,7 +75,7 @@ public class Product implements DatabaseObject, Comparable<Product> {
 	}
 
 	public int compareTo(Product o) {
-		if(o.id==0||this.id==0) return -1;
+		if(o.id==0||this.id==0) return -1;		
 		return id.compareTo(o.id);
 	}
 }
