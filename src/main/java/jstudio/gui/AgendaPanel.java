@@ -5,6 +5,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -52,7 +53,9 @@ public class AgendaPanel
 		AGENDA_REPORT = "report.agenda",
 		AGENDA_REPORT_DEF = "/reports/day.jasper";
 	
-	private JButton dateButton, refreshButton, printButton;
+	private JButton[] weekButtons = new JButton[7];
+	private JButton refreshButton, printButton;
+	private Calendar calendar = Calendar.getInstance();
 
 	public AgendaPanel(Controller<Event> controller){
 		super(controller);
@@ -70,9 +73,12 @@ public class AgendaPanel
 		
 		JToolBar datePanel = new JToolBar(Language.string("Actions"));
 		datePanel.setFloatable(false);
-		dateButton = new JButton("");
-		dateButton.addActionListener(this);
-		datePanel.add(dateButton);
+		for(int i=0; i<weekButtons.length; ++i){
+			weekButtons[i] = new JButton("");
+			weekButtons[i].addActionListener(this);
+			weekButtons[i].setActionCommand(Integer.toString(i));
+			datePanel.add(weekButtons[i]);
+		}
 		setDate(new Date());
 		topPanel.add(datePanel, BorderLayout.NORTH);
 		//TODO: add other days of the week
@@ -108,16 +114,20 @@ public class AgendaPanel
 	}
 	
 	public void setDate(Date date){
-		if(date==null) date = new Date();
-		dateButton.setText(dateFormat.format(date));
+		//if(date==null) date = new Date();
+		calendar.set(2011, Calendar.JANUARY, 31);
+		date = calendar.getTime();
+		calendar.setTime(date);
+		//int d = calendar.get(Calendar.DAY_OF_WEEK);
+		for(int i=0; i<weekButtons.length; ++i){
+			calendar.set(Calendar.DAY_OF_WEEK,i+2);
+			weekButtons[i].setText(dateFormat.format(calendar.getTime()));
+		}
+		//dateButton.setText(dateFormat.format(date));
 	}
 	
 	public Date getDate(){
-		try {
-			return dateFormat.parse(dateButton.getText());
-		} catch (ParseException e) {
-			return new Date();
-		}
+		return calendar.getTime();
 	}
 	
 	public void showEntity(Event e){
@@ -136,15 +146,8 @@ public class AgendaPanel
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
+		String ac = e.getActionCommand();
 		if(o==refreshButton){
-			refresh();
-		}else if(o==dateButton){
-			DatePicker dp = new DatePicker(this);
-			dp.setDate(this.getDate());
-			Date d = dp.getDate();
-			if(d!=null){
-				this.setDate(d);
-			}
 			refresh();
 		}else if(o==printButton){
 			ReportGenerator rg = new ReportGenerator();
@@ -163,6 +166,9 @@ public class AgendaPanel
 			ReportGeneratorGUI rggui = new ReportGeneratorGUI(rg,"day_"+timestampFormat.format(getDate()));
 			rggui.showGUI((Window)SwingUtilities.getRoot(this));
 		}else{
+			if(ac.equals("0")){
+				logger.debug("Lunedì");
+			}
 			logger.warn("Event source not mapped: "+o);
 		}
 	}
