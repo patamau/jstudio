@@ -1,9 +1,11 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -45,7 +47,8 @@ public class AgendaPanel
 	//time format for event entries
 	public static final SimpleDateFormat 
 		timestampFormat = new SimpleDateFormat("yyyyMMdd"),
-		dateFormat = new SimpleDateFormat("EEEE dd MMMM yyyy");
+		dawFormat = new SimpleDateFormat("EEE"),
+		dayFormat = new SimpleDateFormat("dd/MM/yy");
 	private static final Logger logger = LoggerFactory.getLogger(AgendaPanel.class);
 	
 	public static final String 
@@ -54,7 +57,8 @@ public class AgendaPanel
 		AGENDA_REPORT_DEF = "/reports/day.jasper";
 	
 	private JButton[] weekButtons = new JButton[7];
-	private JButton refreshButton, printButton;
+	private JButton refreshButton, printButton, 
+		nextWeekButton, prevWeekButton;
 	private Calendar calendar = Calendar.getInstance();
 
 	public AgendaPanel(Controller<Event> controller){
@@ -66,22 +70,33 @@ public class AgendaPanel
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane scrollpane = new JScrollPane(table);
+		scrollpane.addMouseListener(this);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 		this.add(scrollpane, BorderLayout.CENTER);
 		
 		JPanel topPanel = new JPanel(new BorderLayout());
-		
-		JToolBar datePanel = new JToolBar(Language.string("Actions"));
-		datePanel.setFloatable(false);
+		JPanel weekPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx=0;
+		gc.gridy=0;
+		prevWeekButton = new JButton("<<");
+		prevWeekButton.addActionListener(this);
+		weekPanel.add(prevWeekButton);
+		gc.gridx++;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=1.0f;
 		for(int i=0; i<weekButtons.length; ++i){
 			weekButtons[i] = new JButton("");
 			weekButtons[i].addActionListener(this);
-			weekButtons[i].setActionCommand(Integer.toString(i));
-			datePanel.add(weekButtons[i]);
+			weekPanel.add(weekButtons[i],gc);
+			gc.gridx++;
 		}
+		gc.fill=GridBagConstraints.NONE;
+		nextWeekButton = new JButton(">>");
+		nextWeekButton.addActionListener(this);
+		weekPanel.add(nextWeekButton);
 		setDate(new Date());
-		topPanel.add(datePanel, BorderLayout.NORTH);
-		//TODO: add other days of the week
+		topPanel.add(weekPanel,BorderLayout.NORTH);
 
 		JToolBar actionPanel = new JToolBar(Language.string("Actions"));
 		actionPanel.setFloatable(false);
@@ -93,14 +108,11 @@ public class AgendaPanel
 		actionPanel.add(printButton);
 		filterField = new JTextField();
 		filterField.addKeyListener(this);
-		//filterField.addActionListener(this);
 		actionPanel.add(filterField);
 		topPanel.add(actionPanel, BorderLayout.CENTER);
-		
 		this.add(topPanel, BorderLayout.NORTH);
 		
 		this.popup = new EventPopup(this);
-		scrollpane.addMouseListener(this);
 		table.addMouseListener(this);
 		table.addMouseListener(new PopupListener<Event>(table, popup));
 	}
@@ -114,16 +126,35 @@ public class AgendaPanel
 	}
 	
 	public void setDate(Date date){
-		//if(date==null) date = new Date();
-		calendar.set(2011, Calendar.JANUARY, 31);
-		date = calendar.getTime();
+		if(date==null) {
+			date = new Date();
+		}
+		logger.debug("Setting date to "+date);
 		calendar.setTime(date);
-		//int d = calendar.get(Calendar.DAY_OF_WEEK);
+		int d = calendar.get(Calendar.DAY_OF_WEEK)%7;
+		logger.debug("Dow is "+d);
 		for(int i=0; i<weekButtons.length; ++i){
 			calendar.set(Calendar.DAY_OF_WEEK,i+2);
-			weekButtons[i].setText(dateFormat.format(calendar.getTime()));
+			weekButtons[i].setText(dayFormat.format(calendar.getTime()));
+			int _d = (i+2)%7;
+			logger.debug("_Dow is "+_d);
+			if(_d==d){
+				weekButtons[i].setBackground(Color.BLACK);
+				weekButtons[i].setForeground(Color.WHITE);
+				//weekButtons[i].setEnabled(false);
+			}else{
+				weekButtons[i].setBackground(Color.WHITE);
+				weekButtons[i].setForeground(Color.BLACK);
+				//weekButtons[i].setEnabled(true);
+			}
+			weekButtons[i].setActionCommand(timestampFormat.format(calendar.getTime()));
 		}
-		//dateButton.setText(dateFormat.format(date));
+		calendar.setTime(date);
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		this.refresh();
 	}
 	
 	public Date getDate(){
@@ -149,10 +180,16 @@ public class AgendaPanel
 		String ac = e.getActionCommand();
 		if(o==refreshButton){
 			refresh();
+		}else if(o==prevWeekButton){
+			calendar.set(Calendar.WEEK_OF_YEAR, calendar.get(Calendar.WEEK_OF_YEAR)-1);
+			setDate(getDate());
+		}else if(o==nextWeekButton){
+			calendar.set(Calendar.WEEK_OF_YEAR, calendar.get(Calendar.WEEK_OF_YEAR)+1);
+			setDate(getDate());
 		}else if(o==printButton){
 			ReportGenerator rg = new ReportGenerator();
 			rg.setReport(Configuration.getGlobal(AGENDA_REPORT,AGENDA_REPORT_DEF));
-			rg.setHeadValue("day", dateFormat.format(getDate()));
+			rg.setHeadValue("day", dawFormat.format(getDate())+" "+dayFormat.format(getDate()));
 			for(int i=0; i<model.getRowCount(); i++){
 				Map<String,String> map = new HashMap<String,String>();
 				Event ev = (Event)model.getValueAt(i, 0);
@@ -166,10 +203,18 @@ public class AgendaPanel
 			ReportGeneratorGUI rggui = new ReportGeneratorGUI(rg,"day_"+timestampFormat.format(getDate()));
 			rggui.showGUI((Window)SwingUtilities.getRoot(this));
 		}else{
-			if(ac.equals("0")){
-				logger.debug("Lunedì");
+			try{
+				final Date d = timestampFormat.parse(ac);
+				if(d.equals(getDate())){
+					DatePicker dp = new DatePicker(this);
+					dp.setDate(d);
+					setDate(dp.getDate());
+				}else{
+					setDate(d);
+				}
+			}catch(Exception ex){
+				logger.debug("Action command "+ac+" not a valid date!");
 			}
-			logger.warn("Event source not mapped: "+o);
 		}
 	}
 
