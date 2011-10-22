@@ -4,9 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
@@ -25,6 +27,7 @@ public class ProductTable
 	private DefaultTableModel totalsModel;
 	private Invoice invoice;
 	private EntityManagerPanel<Invoice> accounting;
+	private JButton newButton, removeButton;
 	
 	private float total;
 	
@@ -34,6 +37,19 @@ public class ProductTable
 		this.accounting = accounting;
 		
 		this.setLayout(new BorderLayout());
+		
+		if(editable){
+			JToolBar toolBar = new JToolBar();
+			toolBar.setPreferredSize(new Dimension(0,20));
+			toolBar.setFloatable(false);
+			newButton = new JButton("+");
+			newButton.addActionListener(this);
+			removeButton = new JButton("-");
+			removeButton.addActionListener(this);
+			toolBar.add(newButton);
+			toolBar.add(removeButton);
+			this.add(toolBar, BorderLayout.NORTH);
+		}
 
 		table = new JTable(){
 			public Dimension getPreferredScrollableViewportSize() {

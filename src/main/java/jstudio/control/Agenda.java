@@ -23,11 +23,8 @@ public class Agenda extends Controller<Event> {
 	
 	@SuppressWarnings("unchecked")
 	public List<Event> getByDate(Date date){
-		Calendar c = Calendar.getInstance();
-		c.setTime(date);
-		c.add(Calendar.DAY_OF_YEAR, 1);
 		String from = dayDateFormat.format(date);
-		String to = dayDateFormat.format(c.getTime());
+		String to = dayDateFormat.format(date);
 		return (List<Event>)getApplication().getDatabase().getBetween(getSource(), "date", from, to);
 	}
 }
