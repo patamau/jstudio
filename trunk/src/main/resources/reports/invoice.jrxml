@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="19"/>
-	<property name="ireport.y" value="279"/>
+	<property name="ireport.y" value="580"/>
 	<subDataset name="dataset1"/>
 	<field name="id" class="java.lang.String"/>
 	<field name="date" class="java.lang.String"/>
@@ -17,11 +17,12 @@
 	<field name="address" class="java.lang.String"/>
 	<field name="cap" class="java.lang.String"/>
 	<field name="city" class="java.lang.String"/>
+	<field name="note" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="295" splitType="Stretch">
+		<band height="335" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="0" width="281" height="24"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -48,7 +49,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="10"/>
 				</textElement>
-				<text><![CDATA[specialista in chirurgia maxill - facciale]]></text>
+				<text><![CDATA[specialista in chirurgia maxillo - facciale]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="63" width="281" height="13"/>
@@ -86,81 +87,86 @@
 				<text><![CDATA[Partita I.V.A. 00848280228]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="155" y="134" width="126" height="20"/>
-				<textElement/>
+				<reportElement x="155" y="155" width="126" height="20"/>
+				<textElement verticalAlignment="Bottom"/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{id}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="134" width="112" height="24"/>
+				<reportElement x="0" y="155" width="112" height="24"/>
 				<textElement verticalAlignment="Middle">
 					<font size="18" isBold="true"/>
 				</textElement>
 				<text><![CDATA[FATTURA]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="112" y="134" width="43" height="20"/>
-				<textElement verticalAlignment="Middle">
+				<reportElement x="112" y="155" width="43" height="20"/>
+				<textElement verticalAlignment="Bottom">
 					<font size="14" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Nr.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="112" y="154" width="43" height="20"/>
-				<textElement verticalAlignment="Middle">
+				<reportElement x="112" y="175" width="43" height="20"/>
+				<textElement verticalAlignment="Bottom">
 					<font size="14" isBold="false"/>
 				</textElement>
 				<text><![CDATA[del]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="155" y="154" width="126" height="20"/>
-				<textElement/>
+				<reportElement x="155" y="175" width="126" height="20"/>
+				<textElement verticalAlignment="Bottom"/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{date}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="313" y="134" width="242" height="24"/>
+				<reportElement x="313" y="155" width="242" height="24"/>
 				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true"/>
+					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Egr. Sig.]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="313" y="158" width="242" height="23"/>
+				<reportElement x="313" y="179" width="242" height="23"/>
 				<textElement>
-					<font size="18" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="313" y="181" width="242" height="23"/>
+				<reportElement x="313" y="202" width="242" height="23"/>
 				<textElement>
-					<font size="18" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{lastname}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="313" y="204" width="242" height="22"/>
-				<textElement>
-					<font size="16"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{code}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="313" y="226" width="242" height="20"/>
+				<reportElement x="313" y="251" width="242" height="16"/>
 				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{address}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="313" y="246" width="81" height="20"/>
+				<reportElement x="313" y="267" width="81" height="15"/>
 				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{cap}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="394" y="246" width="161" height="20"/>
+				<reportElement x="394" y="267" width="161" height="15"/>
 				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{city}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="313" y="227" width="242" height="15"/>
+				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="294" width="555" height="31"/>
+				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{note}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -190,59 +196,59 @@
 	<lastPageFooter>
 		<band height="150">
 			<textField>
-				<reportElement x="455" y="49" width="100" height="20"/>
+				<reportElement x="455" y="31" width="100" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{totalcost}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="313" y="49" width="100" height="20"/>
+				<reportElement x="313" y="31" width="100" height="20"/>
 				<textElement>
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[TOTALE FATTURA]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="313" y="29" width="100" height="20"/>
+				<reportElement x="313" y="11" width="100" height="20"/>
 				<textElement>
 					<font isBold="false"/>
 				</textElement>
 				<text><![CDATA[Bollo]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="455" y="29" width="100" height="20"/>
+				<reportElement x="455" y="11" width="100" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{stamp}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="0" y="0" width="32" height="14"/>
+				<reportElement x="0" y="11" width="32" height="14"/>
 				<textElement>
 					<font isBold="false"/>
 				</textElement>
 				<text><![CDATA[Bollo]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="32" y="0" width="51" height="14"/>
+				<reportElement x="32" y="11" width="51" height="14"/>
 				<textElement>
 					<font isBold="false"/>
 				</textElement>
 				<text><![CDATA[$F{stamp}]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="83" y="0" width="83" height="14"/>
+				<reportElement x="83" y="11" width="83" height="14"/>
 				<textElement>
 					<font isBold="false"/>
 				</textElement>
 				<text><![CDATA[solo su originale]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="15" width="166" height="14"/>
+				<reportElement x="0" y="26" width="166" height="14"/>
 				<textElement>
 					<font isBold="false"/>
 				</textElement>
 				<text><![CDATA[Esente IVA Art.10 N.18]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="0" y="29" width="166" height="14"/>
+				<reportElement x="0" y="40" width="166" height="14"/>
 				<textElement>
 					<font isBold="false"/>
 				</textElement>
