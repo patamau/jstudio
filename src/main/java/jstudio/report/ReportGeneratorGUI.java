@@ -14,6 +14,7 @@ import java.io.File;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -38,7 +39,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	//private DefaultTableModel htable, dtable;
 	private JTextField fileField;
 	private JButton browseButton, okButton, cancelButton;
-	private JCheckBox pdfCheck, docCheck, xlsCheck;
+	private JComboBox formatBox;
 	
 	public enum PrintMode {
 		PdfMode, DocMode, XlsMode
@@ -53,10 +54,9 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	public ReportGeneratorGUI(ReportGenerator rg, final String filename){
 		this.rg = rg;
 		this.setLayout(new BorderLayout());
+		this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 		this.add(getFilePanel(filename),BorderLayout.CENTER);
 		this.add(getButtonsPanel(), BorderLayout.SOUTH);
-		//TODO: add output formats
-		//TODO: tables
 	}
 	
 	private Component getFormatsPanel(){
@@ -67,17 +67,15 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		gc.gridx=0;
 		gc.gridy=0;
 		gc.anchor=GridBagConstraints.LINE_START;
-		gc.weightx=GridBagConstraints.HORIZONTAL;
-		//gc.insets = new Insets(5,5,5,5);
-		//get selected status out of configuration
-		pdfCheck = new JCheckBox(Language.string("Pdf (Portable Document Format)"));
-		panel.add(pdfCheck, gc);
-		docCheck = new JCheckBox(Language.string("Doc (Rich Text Format)"));
-		gc.gridy++;
-		panel.add(docCheck, gc);
-		xlsCheck = new JCheckBox(Language.string("Xls (Excel Style Sheet Format)"));
-		gc.gridy++;
-		panel.add(xlsCheck, gc);
+		gc.weightx=1.0f;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		String[] formats = {
+				Language.string("Pdf (Portable Document Format)"),
+				Language.string("Doc (Rich Text Format)")
+		};
+		formatBox = new JComboBox(formats);
+		panel.add(formatBox, gc);
+
 		JLabel note = new JLabel(Language.string("Extension added automatically"));
 		note.setFont(note.getFont().deriveFont(Font.PLAIN));
 		gc.gridy++;
@@ -91,10 +89,12 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.gridx=0;
 		gc.gridy=0;
-		gc.insets = new Insets(5,5,5,5);
 
 		gc.gridwidth=2;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=1.0f;
 		panel.add(getFormatsPanel(), gc);
+		gc.fill=GridBagConstraints.NONE;
 		gc.gridy++;
 		gc.gridwidth=1;
 		okButton = new JButton(Language.string("Ok"));
@@ -110,11 +110,12 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	private Component getFilePanel(final String filename){
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
-		panel.setBorder(BorderFactory.createEtchedBorder());
+		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Language.string("Destination")));
 		GridBagConstraints gc = new GridBagConstraints();
 		String defaultPath = Configuration.getGlobal(PRINTPATH_KEY, ".");
 		fileField = new JTextField();
 		fileField.setText(defaultPath+File.separator+filename);
+		fileField.setColumns(30);
 		gc.gridx=0;
 		gc.gridy=0;
 		gc.insets = new Insets(5,5,5,5);
@@ -226,14 +227,16 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 			if(pos<0) lastPath = ".";
 			else lastPath = fileField.getText().substring(0, pos);
 			Configuration.getGlobalConfiguration().setProperty(PRINTPATH_KEY, lastPath);
-			if(pdfCheck.isSelected()){
+			int idx = formatBox.getSelectedIndex();
+			switch(idx){
+			case 0:
 				doPrint(fileField.getText(), PrintMode.PdfMode);
-			}
-			if(docCheck.isSelected()){
+				break;
+			case 1:
 				doPrint(fileField.getText(), PrintMode.DocMode);
-			}
-			if(xlsCheck.isSelected()){
-				doPrint(fileField.getText(), PrintMode.XlsMode);
+				break;
+			default:
+				logger.error("Unmapped print mode "+idx);
 			}
 			((Window)SwingUtilities.getRoot(this)).dispose();
 		}
