@@ -1,5 +1,10 @@
 package jstudio.report;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -17,14 +22,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
 import jstudio.db.DatabaseObject;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
 import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperPrintManager;
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRRtfExporter;
@@ -38,7 +49,7 @@ public class ReportGenerator {
 	
 	public static void main(String args[]){		
 		ReportGenerator rg = new ReportGenerator();
-		rg.setReport("/reports/report1.jasper");
+		rg.setReport("/reports/invoice.jasper");
 		Invoice i = new Invoice(1l);
 		i.setId(23l);
 		i.setDate(new Date());
@@ -70,7 +81,33 @@ public class ReportGenerator {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.exit(0);
+		
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setSize(250,400);
+		frame.setLocationRelativeTo(null);
+		
+		Image img;
+		try {
+			img = rg.getImage();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+		BufferedImage resizedImage = new BufferedImage(210, 297, BufferedImage.TYPE_INT_RGB);
+		Graphics2D g = resizedImage.createGraphics();
+		g.setComposite(AlphaComposite.Src);
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		g.drawImage(img, 0, 0, 210, 297, null);
+		g.dispose();
+		
+		ImageIcon icon = new ImageIcon(resizedImage);
+		frame.getContentPane().add(new JLabel(icon));
+		frame.setVisible(true);
+		//System.exit(0);
 	}
 	
 	private String reportName;
@@ -174,6 +211,15 @@ public class ReportGenerator {
     		this.data.add(row);
     		row = new HashMap<String,String>();
 		}
+	}
+	
+	public Image getImage() throws Exception {
+		InputStream is = getClass().getResourceAsStream(reportName);
+        if(is==null){
+        	throw new Exception("No such report "+reportName);
+        }
+		JasperPrint print = JasperFillManager.fillReport(is, null, new JREmptyDataSource()); 
+		return JasperPrintManager.printPageToImage(print, 0, 1.0f);
 	}
  
     public void generatePdf(String outputDir, String outputFile) throws Exception {
