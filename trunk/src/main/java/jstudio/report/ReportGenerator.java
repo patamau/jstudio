@@ -89,7 +89,7 @@ public class ReportGenerator {
 		
 		Image img;
 		try {
-			img = rg.getImage();
+			img = rg.getPreviewImage();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -213,7 +213,7 @@ public class ReportGenerator {
 		}
 	}
 	
-	public Image getImage() throws Exception {
+	public Image getPreviewImage() throws Exception {
 		InputStream is = getClass().getResourceAsStream(reportName);
         if(is==null){
         	throw new Exception("No such report "+reportName);
