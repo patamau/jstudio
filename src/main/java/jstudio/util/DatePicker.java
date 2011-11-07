@@ -106,6 +106,7 @@ public class DatePicker {
 		p2.add(nextButton);
 		
 		dialog = new JDialog();
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setTitle(Language.string("Date Picker"));
 		dialog.setModal(true);
 		dialog.add(p1, BorderLayout.CENTER);
@@ -175,7 +176,7 @@ public class DatePicker {
 		p.add(text);
 		p.add(b);
 		final JFrame f = new JFrame();
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		f.getContentPane().add(p);
 		f.pack();
 		f.setVisible(true);

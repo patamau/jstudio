@@ -95,16 +95,8 @@ public class ReportGenerator {
 			e.printStackTrace();
 			return;
 		}
-		BufferedImage resizedImage = new BufferedImage(210, 297, BufferedImage.TYPE_INT_RGB);
-		Graphics2D g = resizedImage.createGraphics();
-		g.setComposite(AlphaComposite.Src);
-		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-		g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-		g.drawImage(img, 0, 0, 210, 297, null);
-		g.dispose();
 		
-		ImageIcon icon = new ImageIcon(resizedImage);
+		ImageIcon icon = rg.doResizeImage(img, 210, 297);
 		frame.getContentPane().add(new JLabel(icon));
 		frame.setVisible(true);
 		//System.exit(0);
@@ -211,6 +203,19 @@ public class ReportGenerator {
     		this.data.add(row);
     		row = new HashMap<String,String>();
 		}
+	}
+	
+	public ImageIcon doResizeImage(final Image image, final int width, final int height){
+		BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
+		Graphics2D g = resizedImage.createGraphics();
+		g.setComposite(AlphaComposite.Src);
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		g.drawImage(image, 0, 0, width, height, null);
+		g.dispose();
+		
+		return new ImageIcon(resizedImage);
 	}
 	
 	public Image getPreviewImage() throws Exception {

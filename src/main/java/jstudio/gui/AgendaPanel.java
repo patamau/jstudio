@@ -47,7 +47,7 @@ public class AgendaPanel
 	//time format for event entries
 	public static final SimpleDateFormat 
 		timestampFormat = new SimpleDateFormat("yyyyMMdd"),
-		dawFormat = new SimpleDateFormat("EEE"),
+		dawFormat = new SimpleDateFormat("EEEE"),
 		dayFormat = new SimpleDateFormat("dd/MM/yy");
 	private static final Logger logger = LoggerFactory.getLogger(AgendaPanel.class);
 	
@@ -79,22 +79,23 @@ public class AgendaPanel
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.gridx=0;
 		gc.gridy=0;
+		gc.weightx=1.0f;
+		gc.weighty=1.0f;
+		gc.fill=GridBagConstraints.BOTH;
 		prevWeekButton = new JButton("<<");
 		prevWeekButton.addActionListener(this);
-		weekPanel.add(prevWeekButton);
+		weekPanel.add(prevWeekButton,gc);
 		gc.gridx++;
-		gc.fill=GridBagConstraints.HORIZONTAL;
-		gc.weightx=1.0f;
 		for(int i=0; i<weekButtons.length; ++i){
 			weekButtons[i] = new JButton("");
 			weekButtons[i].addActionListener(this);
 			weekPanel.add(weekButtons[i],gc);
 			gc.gridx++;
 		}
-		gc.fill=GridBagConstraints.NONE;
 		nextWeekButton = new JButton(">>");
 		nextWeekButton.addActionListener(this);
-		weekPanel.add(nextWeekButton);
+		weekPanel.add(nextWeekButton,gc);
+		gc.fill=GridBagConstraints.NONE;
 		setDate(new Date());
 		topPanel.add(weekPanel,BorderLayout.NORTH);
 
@@ -129,21 +130,39 @@ public class AgendaPanel
 		if(date==null) {
 			date = new Date();
 		}
+		Date today = new Date();
+		calendar.setTime(today);
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH);
+		int day = calendar.get(Calendar.DAY_OF_MONTH);
+		calendar.clear();
+		calendar.set(year, month, day);
+		today = calendar.getTime();
 		logger.debug("Setting date to "+date);
 		calendar.setTime(date);
 		int d = calendar.get(Calendar.DAY_OF_WEEK)%7;
-		logger.debug("Dow is "+d);
+		//logger.debug("Dow is "+d);
 		for(int i=0; i<weekButtons.length; ++i){
 			calendar.set(Calendar.DAY_OF_WEEK,i+2);
-			weekButtons[i].setText(dayFormat.format(calendar.getTime()));
+			String daylabel = "<html>"+dawFormat.format(calendar.getTime())+
+				"<br/>"+dayFormat.format(calendar.getTime())+"</html>";
+			weekButtons[i].setText(daylabel);
 			int _d = (i+2)%7;
-			logger.debug("_Dow is "+_d);
+			//logger.debug("_Dow is "+_d);
 			if(_d==d){
-				weekButtons[i].setBackground(Color.BLACK);
+				if(calendar.getTime().equals(today)){
+					weekButtons[i].setBackground(Color.BLACK);
+				}else{
+					weekButtons[i].setBackground(Color.DARK_GRAY);
+				}
 				weekButtons[i].setForeground(Color.WHITE);
 				//weekButtons[i].setEnabled(false);
 			}else{
-				weekButtons[i].setBackground(Color.WHITE);
+				if(calendar.getTime().equals(today)){
+					weekButtons[i].setBackground(Color.GRAY);
+				}else{
+					weekButtons[i].setBackground(Color.WHITE);
+				}
 				weekButtons[i].setForeground(Color.BLACK);
 				//weekButtons[i].setEnabled(true);
 			}
