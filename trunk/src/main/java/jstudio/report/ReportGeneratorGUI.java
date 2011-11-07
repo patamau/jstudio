@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -22,6 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
 
 import org.apache.log4j.Logger;
 
@@ -55,14 +57,31 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		this.rg = rg;
 		this.setLayout(new BorderLayout());
 		this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-		this.add(getFilePanel(filename),BorderLayout.CENTER);
-		this.add(getButtonsPanel(), BorderLayout.SOUTH);
+		JPanel body = new JPanel(new BorderLayout());
+		body.add(getFilePanel(filename),BorderLayout.CENTER);
+		body.add(getButtonsPanel(), BorderLayout.SOUTH);
+		this.add(body, BorderLayout.CENTER);
+		this.add(getPreviewPanel(), BorderLayout.EAST);
+	}
+	
+	private Component getPreviewPanel(){
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+		JLabel preview;
+		try {
+			Image img = rg.getPreviewImage();
+			preview = new JLabel(rg.doResizeImage(img, 210, 297));
+		} catch (Exception e) {
+			preview = new JLabel("N/A");
+		}
+		panel.add(preview, BorderLayout.CENTER);
+		return panel;
 	}
 	
 	private Component getFormatsPanel(){
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
-		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Language.string("Select output format")));
+		//panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Language.string("Select output format")));
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.gridx=0;
 		gc.gridy=0;
@@ -71,7 +90,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		String[] formats = {
 				Language.string("Pdf (Portable Document Format)"),
-				Language.string("Doc (Rich Text Format)")
+				Language.string("Rtf (Rich Text Format)")
 		};
 		formatBox = new JComboBox(formats);
 		panel.add(formatBox, gc);
@@ -89,14 +108,15 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.gridx=0;
 		gc.gridy=0;
-
+		/*
 		gc.gridwidth=2;
 		gc.fill=GridBagConstraints.HORIZONTAL;
-		gc.weightx=1.0f;
 		panel.add(getFormatsPanel(), gc);
+		*/
 		gc.fill=GridBagConstraints.NONE;
-		gc.gridy++;
-		gc.gridwidth=1;
+		gc.weightx=1.0f;
+		//gc.gridy++;
+		//gc.gridwidth=1;
 		okButton = new JButton(Language.string("Ok"));
 		okButton.addActionListener(this);
 		panel.add(okButton,gc);
@@ -127,6 +147,12 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		browseButton = new JButton("...");
 		browseButton.addActionListener(this);
 		panel.add(browseButton,gc);
+		gc.gridx=0;
+		gc.gridy++;
+		gc.gridwidth=2;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=1.0f;
+		panel.add(getFormatsPanel(), gc);
 		return panel;
 	}
 	
@@ -171,7 +197,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 			}
 			break;
 		case DocMode:
-			f = new File(checkExtension(destination, "doc"));
+			f = new File(checkExtension(destination, "rtf"));
 			if(checkOverwrite(f)){
 				rg.generateRtf(f.getParent(), f.getName());
 			}
