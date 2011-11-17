@@ -17,6 +17,7 @@ import jstudio.db.HibernateDB;
 import jstudio.gui.AccountingPanel;
 import jstudio.gui.AddressBookPanel;
 import jstudio.gui.AgendaPanel;
+import jstudio.gui.DBDialog;
 import jstudio.gui.JStudioGUI;
 import jstudio.util.Configuration;
 import jstudio.util.DatePicker;
@@ -76,31 +77,35 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		gui.addPanel(new AddressBookPanel(addressBook));
 		gui.addPanel(new AgendaPanel(agenda));
 		gui.addPanel(new AccountingPanel(accounting));
-	}
+	}	
 	
-	private void initializeData(){
-		//initialize database manager
-		String protocol = Configuration.getGlobal(DatabaseInterface.KEY_PROTOCOL,DatabaseInterface.DEF_PROTOCOL);
-		String driver = Configuration.getGlobal(DatabaseInterface.KEY_DRIVER,DatabaseInterface.DEF_DRIVER);
-		database = new HibernateDB(protocol, driver);
-		String hostname = Configuration.getGlobal(DatabaseInterface.KEY_HOST, DatabaseInterface.DEF_HOST);
-		String dbname = Configuration.getGlobal(DatabaseInterface.KEY_NAME, DatabaseInterface.DEF_NAME);
-		String user = Configuration.getGlobal(DatabaseInterface.KEY_USER, DatabaseInterface.DEF_USER);
-		String password = Configuration.getGlobal(DatabaseInterface.KEY_PASS, DatabaseInterface.DEF_PASS);
-		try {
-			database.connect(hostname, dbname, user, password);
-			//database.dump(new File("db.dump"));
-			//database.clear();
-			//database.restore(new File("db.dump"));
-		} catch (Throwable e) {
-			logger.error("Database connection error",e);
-			JOptionPane.showMessageDialog(null, Language.string("Database connection error")+": "+e.getLocalizedMessage(), Language.string("Data initialization"), JOptionPane.ERROR_MESSAGE);
-		}
+	private boolean initializeData(){
+		do{
+			//initialize database manager
+			String protocol = Configuration.getGlobal(DatabaseInterface.KEY_PROTOCOL,DatabaseInterface.DEF_PROTOCOL);
+			String driver = Configuration.getGlobal(DatabaseInterface.KEY_DRIVER,DatabaseInterface.DEF_DRIVER);
+			database = new HibernateDB(protocol, driver);
+			String hostname = Configuration.getGlobal(DatabaseInterface.KEY_HOST, DatabaseInterface.DEF_HOST);
+			String dbname = Configuration.getGlobal(DatabaseInterface.KEY_NAME, DatabaseInterface.DEF_NAME);
+			String user = Configuration.getGlobal(DatabaseInterface.KEY_USER, DatabaseInterface.DEF_USER);
+			String password = Configuration.getGlobal(DatabaseInterface.KEY_PASS, DatabaseInterface.DEF_PASS);
+			try {
+				database.connect(hostname, dbname, user, password);
+			} catch (Throwable e) {
+				logger.error("Database connection error",e);
+				JOptionPane.showMessageDialog(null, Language.string("Database connection error")+": "+e.getLocalizedMessage(), Language.string("Data initialization"), JOptionPane.ERROR_MESSAGE);
+				DBDialog dbdialog = new DBDialog(gui, database);
+				if(!dbdialog.showDialog(configuration)){
+					return false;
+				}
+			}
+		}while(!database.isConnected());
 		//initialize data handlers
 		agenda = new Agenda(this);
 		addressBook = new AddressBook(this);
 		accounting = new Accounting(this);
 		comuni = new Comuni(this);
+		return true;
 	}
 	
 	private void initializeConfiguration(){
@@ -130,7 +135,9 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		panel.setText(Language.string("Loading configuration..."));
 		initializeConfiguration();
 		panel.setText(Language.string("Initializing data..."));
-		initializeData();
+		if(!initializeData()){
+			throw new RuntimeException(Language.string("Connection to database aborted"));
+		}
 		panel.setText(Language.string("Generating graphic interface..."));
 		initializeGUI();
 		panel.setText(Language.string("Ready!"));
@@ -154,9 +161,9 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 	 */
 	public void finalize(){
 		//kill all gui listeners
-		gui.finalize();
+		if(gui!=null) gui.finalize();
 		//async call, dont care
-		database.close();
+		if(database!=null) database.close();
 		// I dont care if overwrite
 		Configuration.getGlobalConfiguration().save(new File(this.getClass().getSimpleName()+Configuration.FILE_SUFFIX));		
 	}

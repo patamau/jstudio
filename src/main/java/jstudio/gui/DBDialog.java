@@ -97,7 +97,7 @@ public class DBDialog extends JDialog implements ActionListener {
 		this.setLocationRelativeTo(parent);
 	}
 	
-	public void showDialog(Configuration c){
+	public boolean showDialog(Configuration c){
 		accept=false;
 		setHost(c.getProperty(DatabaseInterface.KEY_HOST, DatabaseInterface.DEF_HOST));
 		setDBName(c.getProperty(DatabaseInterface.KEY_NAME, DatabaseInterface.DEF_NAME));
@@ -110,6 +110,7 @@ public class DBDialog extends JDialog implements ActionListener {
 			c.setProperty(DatabaseInterface.KEY_USER, getUser());
 			c.setProperty(DatabaseInterface.KEY_PASS, getPassword());
 		}
+		return accept;
 	}
 	
 	public String getHost(){

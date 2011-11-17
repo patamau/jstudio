@@ -159,7 +159,7 @@ public class AgendaPanel
 				//weekButtons[i].setEnabled(false);
 			}else{
 				if(calendar.getTime().equals(today)){
-					weekButtons[i].setBackground(Color.GRAY);
+					weekButtons[i].setBackground(Color.LIGHT_GRAY);
 				}else{
 					weekButtons[i].setBackground(Color.WHITE);
 				}
@@ -212,7 +212,9 @@ public class AgendaPanel
 			for(int i=0; i<model.getRowCount(); i++){
 				Map<String,String> map = new HashMap<String,String>();
 				Event ev = (Event)model.getValueAt(i, 0);
-				map.put("date",Event.timeFormat.format(ev.getDate()));
+				String date_s = Event.timeFormat.format(ev.getDate());
+				logger.debug("Printing event at "+date_s+" was "+ev.getDate());
+				map.put("date",date_s);
 				map.put("name",ev.getName());
 				map.put("lastname",ev.getLastname());
 				map.put("phone", ev.getPhone());
@@ -223,11 +225,14 @@ public class AgendaPanel
 			rggui.showGUI((Window)SwingUtilities.getRoot(this));
 		}else{
 			try{
-				final Date d = timestampFormat.parse(ac);
+				Date d = timestampFormat.parse(ac);
 				if(d.equals(getDate())){
 					DatePicker dp = new DatePicker(this);
 					dp.setDate(d);
-					setDate(dp.getDate());
+					d = dp.getDate();
+					if(d!=null){
+						setDate(d);
+					}
 				}else{
 					setDate(d);
 				}
