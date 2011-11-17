@@ -14,7 +14,6 @@ import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -154,12 +153,6 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		gc.weightx=1.0f;
 		panel.add(getFormatsPanel(), gc);
 		return panel;
-	}
-	
-	public void update(){
-		//TODO: set head in htable
-		//htable.addRow(rowData);
-		//TODO: set data in dtable
 	}
 	
 	private boolean checkOverwrite(File destination){

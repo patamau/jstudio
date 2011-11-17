@@ -150,6 +150,10 @@ public class HibernateDB implements DatabaseInterface{
         }catch (Throwable ex) {
             logger.error("Initial SessionFactory creation failed.", ex);
         }
+        
+        if(!isConnected()){
+        	throw new RuntimeException("Database connection failed");
+        }
     }
     
     public void close(){
@@ -169,6 +173,7 @@ public class HibernateDB implements DatabaseInterface{
 	    		try{
 	    			t.commit();
 	    		}catch(Exception ex){
+	    			logger.error("Transaction exception",ex);
 	    			return false;
 	    		}
 	    		return true;
