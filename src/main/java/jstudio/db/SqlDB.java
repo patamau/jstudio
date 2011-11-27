@@ -9,10 +9,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jstudio.model.Comune;
+import jstudio.model.Event;
 import jstudio.model.Invoice;
+import jstudio.model.Person;
+import jstudio.model.Product;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -26,12 +31,27 @@ public class SqlDB implements DatabaseInterface {
 		for(String t: db.getTables()){
 			logger.debug(t);
 		}
+		db.initialize(new Person());
+		db.initialize(new Event());
+		db.initialize(new Product());
+		db.initialize(new Invoice());
 		db.close();
+	}
+	
+	public enum EntryType{
+		Integer,
+		Long,
+		Float,
+		Date,
+		String,
+		Set,
 	}
 	
 	private static final Logger logger = Logger.getLogger(SqlDB.class);
 	private String protocol, driver;
 	private Connection connection;
+	
+	private Map<Class,Boolean> initCache;
 	
 	public SqlDB(String databasefile){
 		this("jdbc:sqlite:"+databasefile, "org.sqlite.JDBC");
@@ -40,6 +60,7 @@ public class SqlDB implements DatabaseInterface {
 	protected SqlDB(String protocol, String driver){
 		this.protocol = protocol;
 		this.driver = driver;
+		initCache = new HashMap<Class,Boolean>();
 	}
 
 	/**
@@ -52,7 +73,6 @@ public class SqlDB implements DatabaseInterface {
 			Class.forName(driver);
 			connection = DriverManager.getConnection(protocol);
 			logger.debug("Connection established, initializing...");
-			initialize(new Invoice());
 		} catch (SQLException e) {
 			logger.error("Protocol "+protocol+" error",e);
 		} catch (ClassNotFoundException e) {
@@ -76,22 +96,91 @@ public class SqlDB implements DatabaseInterface {
 		return tables.toArray(new String[0]);
 	}
 	
+	private Class getGenericType(Field f){
+		String tname = f.getGenericType().getClass().getSimpleName();
+		return f.getGenericType().getClass();
+	}
+	
+	private void initialize(DatabaseObject o){
+		initialize(o.getClass());
+	}
+	
 	/**
 	 * This method will look for suitable tables in the db
 	 * If they do not exist they will be created anew.
 	 * If they exist but are different, errors will be eventually thrown later
 	 */
-	private void initialize(DatabaseObject o){
-		Class<?> c = o.getClass();
-		logger.debug(c.getSimpleName());
-		for(Field f: c.getDeclaredFields()){
-			if(Modifier.isStatic(f.getModifiers())){
-				
+	private void initialize(Class<? extends DatabaseObject> c){
+		if(initCache.get(c)!=null){
+			logger.warn("Class "+c+" already initialized");
+			return;
+		}else{
+			initCache.put(c,true);
+		}
+		String classname = c.getSimpleName().toLowerCase();
+		String sql = "CREATE TABLE IF NOT EXISTS "+classname+"(";
+		Field[] fields = c.getDeclaredFields();
+		int fieldsn = fields.length;
+		int factual = 0;
+		for(int i=0; i<fieldsn; ++i){
+			Field f = fields[i];
+			if(Modifier.isStatic(f.getModifiers())||
+				Modifier.isVolatile(f.getModifiers())){
+				//do not serialize
 			}else{
 				Class<?> tc = f.getType();
-				logger.debug(f.getName()+": "+tc.getSimpleName());
+				String fname = f.getName();
+				logger.debug(fname+" "+f.getType().getName()+" "+getGenericType(f));
+				String ftype = f.getType().getSimpleName();
+				String fdef = (factual>0?", ":"")+fname;
+				try{
+					switch(EntryType.valueOf(ftype)){
+						case Integer:
+							fdef+=" INTEGER (5)";
+							if(fname.equals("id")){
+								fdef += " PRIMARY KEY"; 
+							}
+							break;
+						case Long:
+							fdef+=" INTEGER (11)";
+							if(fname.equals("id")){
+								fdef += " PRIMARY KEY"; 
+							}
+							break;
+						case Float:
+							fdef+= " FLOAT";
+							break;
+						case String:
+							fdef += " VARCHAR (255)";		
+							break;
+						case Date:
+							fdef += " DATETIME";
+							break;
+						case Set:
+							//the set requires another table referring to this entities
+							break;
+						default:
+							logger.error("EntryType "+ftype+" not implemented");
+							continue;
+					}
+				}catch(IllegalArgumentException e){
+					//custom object type
+					String clazz = f.getType().getName();
+					try {
+						Class refc = Class.forName(clazz);
+						initialize(refc);
+					} catch (ClassNotFoundException e1) {
+						logger.error("Custom class not found "+clazz);
+					}
+					
+				}
+				++factual;
+				sql += fdef;
 			}
 		}
+		
+		sql +=");";
+		logger.debug(sql);
 		/*
 		String sql = "CREATE TABLE IF NOT EXISTS test(";
 		sql += "id INTEGER PRIMARY KEY, ";

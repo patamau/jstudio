@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping package="jstudio.model">
-	<class name="Invoice" table="invoices">
+	<class name="Invoice" table="invoice">
 		<id name="id" type="long" column="id" />
 		<property name="date" />
 		<set name="products" lazy="false" cascade="all" inverse="true">
