@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
         
 <hibernate-mapping package="jstudio.model">
-    <class name="Product" table="products">
+    <class name="Product" table="product">
         <id name="id" type="long" column="id" />
         <many-to-one name="invoice" lazy="proxy" 
         	class="jstudio.model.Invoice" cascade="none"/>

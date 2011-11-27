@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
         
 <hibernate-mapping package="jstudio.model">
-    <class name="Event" table="events">
+    <class name="Event" table="event">
         <id name="id" type="long" column="id" />
         <property name="date"/>
         <property name="name" type="string"/>

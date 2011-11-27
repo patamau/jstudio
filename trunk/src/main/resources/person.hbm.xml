@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
         
 <hibernate-mapping package="jstudio.model">
-    <class name="Person" table="contacts">
+    <class name="Person" table="person">
         <id name="id" column="id" type="long" />
         <property name="name" type="string"/>
         <property name="lastname" type="string"/>

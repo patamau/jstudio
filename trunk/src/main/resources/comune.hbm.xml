@@ -4,7 +4,7 @@
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
         
 <hibernate-mapping package="jstudio.model">
-    <class name="Comune" table="comuni">
+    <class name="Comune" table="comune">
         <id name="id" column="id" type="long" />
         <property column="id_nazionale" name="idNazionale" type="string"/>
         <property column="id_catastale" name="idCatastale" type="string"/>
