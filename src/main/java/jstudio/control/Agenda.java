@@ -19,7 +19,7 @@ public class Agenda extends Controller<Event> {
 	public static final Calendar calendar = Calendar.getInstance();
 
 	public Agenda(JStudio app){
-		super(app, Event.class.getName());
+		super(app, Event.class);
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -4,10 +4,13 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,12 +34,18 @@ public class SqlDB implements DatabaseInterface {
 		for(String t: db.getTables()){
 			logger.debug(t);
 		}
-		db.initialize(new Person());
-		db.initialize(new Event());
-		db.initialize(new Product());
-		db.initialize(new Invoice());
-		db.store(null, new Invoice());
+		db.initialize(null, Person.class);
+		db.initialize(null, Event.class);
+		db.initialize(null, Product.class);
+		db.initialize(null, Invoice.class);
+		db.store(null, new Invoice(1l));
+		db.store(null, new Invoice(2l));
+		db.store(null, new Invoice(3l));
 		db.execute("SELECT MAX(id) FROM invoice");
+		List<? extends DatabaseObject> list = db.getAll("invoice");
+		for(DatabaseObject o: list){
+			logger.debug(o.toString());
+		}
 		db.close();
 	}
 	
@@ -50,16 +59,23 @@ public class SqlDB implements DatabaseInterface {
 	}
 	
 	private static final Logger logger = Logger.getLogger(SqlDB.class);
+	public static final DateFormat SQLDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	private String protocol, driver;
+	private File dbfile;
 	private Connection connection;
 	
 	private Map<String, Class> initCache;
 	
-	public SqlDB(String databasefile){
-		this("jdbc:sqlite:"+databasefile, "org.sqlite.JDBC");
+	public SqlDB(final File dbfile){
+		this(dbfile.getName());
+		this.dbfile = dbfile;
 	}
 	
-	protected SqlDB(String protocol, String driver){
+	private SqlDB(final String dbfilename){
+		this("jdbc:sqlite:"+dbfilename, "org.sqlite.JDBC");
+	}
+	
+	private SqlDB(String protocol, String driver){
 		this.protocol = protocol;
 		this.driver = driver;
 		initCache = new HashMap<String,Class>();
@@ -98,13 +114,8 @@ public class SqlDB implements DatabaseInterface {
 		return tables.toArray(new String[0]);
 	}
 	
-	private Class getGenericType(Field f){
-		String tname = f.getGenericType().getClass().getSimpleName();
-		return f.getGenericType().getClass();
-	}
-	
-	private void initialize(DatabaseObject o){
-		initialize(o.getClass());
+	public void initialize(String table, Class c){
+		initialize(c);
 	}
 	
 	private String getClassTable(Class<?> c){
@@ -132,12 +143,11 @@ public class SqlDB implements DatabaseInterface {
 	 * If they exist but are different, errors will be eventually thrown later
 	 */
 	private void initialize(Class<? extends DatabaseObject> c){
-		String classname;
-		if(initCache.get(c)!=null){
-			logger.warn("Class "+c+" already initialized");
+		String classname = getClassTable(c);
+		if(initCache.get(classname)!=null){
+			logger.warn("Table "+classname+" already initialized");
 			return;
 		}else{
-			classname = getClassTable(c);
 			initCache.put(classname, c);
 		}
 		String sql = "CREATE TABLE IF NOT EXISTS "+classname+"(";
@@ -145,13 +155,13 @@ public class SqlDB implements DatabaseInterface {
 		for(Field f: getFields(c)){
 			Class<?> tc = f.getType();
 			String fname = f.getName();
-			logger.debug(fname+" "+f.getType().getName()+" "+getGenericType(f));
+			//logger.debug(fname+" "+f.getType().getName()+" "+getGenericType(f));
 			String ftype = f.getType().getSimpleName();
 			String fdef = (factual>0?", ":"")+fname;
 			try{
 				switch(EntryType.valueOf(ftype)){
 					case Integer:
-						fdef+=" INTEGER (5)";
+						fdef+=" INTEGER (6)";
 						if(fname.equals("id")){
 							fdef += " PRIMARY KEY"; 
 						}
@@ -173,10 +183,12 @@ public class SqlDB implements DatabaseInterface {
 						break;
 					case Set:
 						//the set requires another table referring to this entities
-						break;
+						continue;
+						//break;
 					default:
 						logger.error("EntryType "+ftype+" not implemented");
 						continue;
+						//break;
 				}
 			}catch(IllegalArgumentException e){
 				//custom object type
@@ -184,10 +196,10 @@ public class SqlDB implements DatabaseInterface {
 				try {
 					Class refc = Class.forName(clazz);
 					initialize(refc);
+					fdef+=" INTEGER (11)";
 				} catch (ClassNotFoundException e1) {
 					logger.error("Custom class not found "+clazz);
 				}
-				
 			}
 			++factual;
 			sql += fdef;
@@ -203,46 +215,6 @@ public class SqlDB implements DatabaseInterface {
 			e.printStackTrace();
 		}
 	}
-	
-/**
-public void run() throws Exception {
- 
-//sq lite driver
-Class.forName("org.sqlite.JDBC");
-//database path, if it's new data base it will be created in project folder
-con = DriverManager.getConnection("jdbc:sqlite:mydb.db");
-Statement stat = con.createStatement();
- 
-stat.executeUpdate("drop table if exists weights");
- 
-//creating table
-stat.executeUpdate("create table weights(id integer,"
-+ "firstName varchar(30)," + "age INT," + "sex varchar(15),"
-+ "weight INT," + "height INT,"
-+ "idealweight INT, primary key (id));");
- 
-PreparedStatement prep = con
-.prepareStatement("insert into weights values(?,?,?,?,?,?,?);");
-prep.setString(2, "vasea");
-prep.setString(3, "21");
-prep.setString(4, "male");
-prep.setString(5, "77");
-prep.setString(6, "185");
-prep.setString(7, "76");
-prep.execute();
- 
-//getting data
-ResultSet res = stat.executeQuery("select * from weights");
-while (res.next()) {
-System.out.println(res.getString("id") + " " + res.getString("age")
-+ " " + res.getString("firstName") + " "
-+ res.getString("sex") + " " + res.getString("weight")
-+ " " + res.getString("height") + " "
-+ res.getString("idealweight"));
-}
- 
-}
- */
 
 	@Override
 	public void close() {
@@ -269,8 +241,9 @@ System.out.println(res.getString("id") + " " + res.getString("age")
 		try {
 			s = connection.createStatement();
 			ResultSet rs = s.executeQuery(query);
-			rs.next();
-			o = rs.getObject(1);
+			if(rs.next()){
+				o = rs.getObject(1);
+			}
 		} catch (SQLException e) {
 			logger.debug(e);
 		}
@@ -297,21 +270,45 @@ System.out.println(res.getString("id") + " " + res.getString("age")
 	}
 
 	@Override
+	/**
+	 * Table is ignored here
+	 */
 	public DatabaseObject store(String table, DatabaseObject o) {
-		initialize(o);
+		initialize(table, o.getClass());
 		int factual = 0;
 		try {
 			Statement s = connection.createStatement();
-			String sql = "INSERT INTO "+getClassTable(o.getClass())+" VALUES(";
+			String sql = "REPLACE INTO "+getClassTable(o.getClass())+" VALUES(";
+			String ftype;
+			String fdef = "";
 			for(Field f: getFields(o.getClass())){
 				if(factual>0){
-					sql += ", ";
+					fdef = ", ";
 				}
-				sql+= "'"+f.get(o).toString()+"'";
+				ftype = f.getType().getSimpleName();
+				switch(EntryType.valueOf(ftype)){
+					case Integer:
+					case Float:
+					case String:
+					case Long:
+						fdef+= "'"+f.get(o).toString()+"'";
+						break;
+					case Date:
+						fdef+= "'"+SQLDateFormat.format(f.get(o))+"'";
+						break;
+					case Set:
+						//the set requires another table referring to this entities
+						continue;
+					default:
+						logger.error("EntryType "+ftype+" not implemented");
+						continue;
+				}				
 				++factual;
+				sql+=fdef;
 			}
 			sql += ");";
 			logger.debug(sql);
+			s.executeUpdate(sql);
 		} catch (Exception e) {
 			logger.error("store("+o+")",e);
 		} 
@@ -321,12 +318,69 @@ System.out.println(res.getString("id") + " " + res.getString("age")
 	@Override
 	public void delete(String table, DatabaseObject o) {
 		// TODO Auto-generated method stub
-		
+		throw new RuntimeException("NOT IMPLEMENTED");
+	}
+	
+	private List<DatabaseObject> execute(String table, String sql) throws Exception{
+		Class<?> c = this.initCache.get(table);
+		if(c==null){
+			throw new RuntimeException("Class "+table+" not initialized properly");
+		}
+		List<DatabaseObject> l = new ArrayList<DatabaseObject>();
+		try {
+			Statement s = connection.createStatement();
+			ResultSet rs = s.executeQuery(sql);
+			l = getMapped(rs, c);
+		} catch (Exception e) {
+			logger.debug("executing "+sql,e);
+		} 
+		logger.debug("execute >"+sql+"< returns "+l.size()+" elements");
+		return l;
+	}
+	
+	private List<DatabaseObject> getMapped(ResultSet rs, Class<?> c) throws Exception{
+		Field[] fs = this.getFields(c);
+		List<DatabaseObject> l = new ArrayList<DatabaseObject>();
+		while(rs.next()){
+			DatabaseObject o = (DatabaseObject)c.newInstance();
+			String ftype;
+			for(Field f: fs){
+				ftype = f.getType().getSimpleName();
+				switch(EntryType.valueOf(ftype)){
+					case Integer:
+					case Float:
+					case String:
+						f.set(o, rs.getObject(f.getName()));
+						break;
+					case Long:
+						f.set(o, ((Integer)rs.getObject(f.getName())).longValue());
+						break;
+					case Date:
+						String thedate = (String)rs.getObject(f.getName());
+						f.set(o, SQLDateFormat.parse(thedate));
+						break;
+					case Set:
+						//the set requires another table referring to this entities
+						break;
+					default:
+						logger.error("EntryType "+ftype+" not implemented");
+						continue;
+				}
+			}
+			l.add(o);
+		}
+		return l;
 	}
 
 	@Override
 	public List<? extends DatabaseObject> getAll(String table) {
-		// TODO Auto-generated method stub
+		table = table.toLowerCase();
+		String sql = new String("SELECT * FROM "+table+";");
+		try {
+			return execute(table, sql);
+		} catch (Exception e) {
+			logger.error(sql,e);
+		}
 		return null;
 	}
 
@@ -338,14 +392,27 @@ System.out.println(res.getString("id") + " " + res.getString("age")
 
 	@Override
 	public DatabaseObject get(String table, int id) {
-		// TODO Auto-generated method stub
+		table = table.toLowerCase();
+		String sql = new String("SELECT * FROM "+table+" WHERE id="+id+";");
+		try {
+			List<DatabaseObject> l = execute(table, sql);
+			if(l.size()>0) return l.get(0);
+		} catch (Exception e) {
+			logger.error(sql,e);
+		}
 		return null;
 	}
 
 	@Override
 	public List<? extends DatabaseObject> getBetween(String table,
 			String field, String from, String to) {
-		// TODO Auto-generated method stub
+		table = table.toLowerCase();
+		String sql = new String("SELECT * FROM "+table+" WHERE "+field+" BETWEEN '"+from+"' AND '"+to+"';");
+		try {
+			return execute(table, sql);
+		} catch (Exception e) {
+			logger.error(sql,e);
+		}
 		return null;
 	}
 

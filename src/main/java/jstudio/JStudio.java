@@ -14,6 +14,7 @@ import jstudio.control.AddressBook;
 import jstudio.control.Comuni;
 import jstudio.db.DatabaseInterface;
 import jstudio.db.HibernateDB;
+import jstudio.db.SqlDB;
 import jstudio.gui.AccountingPanel;
 import jstudio.gui.AddressBookPanel;
 import jstudio.gui.AgendaPanel;
@@ -84,7 +85,8 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 			//initialize database manager
 			String protocol = Configuration.getGlobal(DatabaseInterface.KEY_PROTOCOL,DatabaseInterface.DEF_PROTOCOL);
 			String driver = Configuration.getGlobal(DatabaseInterface.KEY_DRIVER,DatabaseInterface.DEF_DRIVER);
-			database = new HibernateDB(protocol, driver);
+			//database = new HibernateDB(protocol, driver);
+			database = new SqlDB(new File("test.db"));
 			String hostname = Configuration.getGlobal(DatabaseInterface.KEY_HOST, DatabaseInterface.DEF_HOST);
 			String dbname = Configuration.getGlobal(DatabaseInterface.KEY_NAME, DatabaseInterface.DEF_NAME);
 			String user = Configuration.getGlobal(DatabaseInterface.KEY_USER, DatabaseInterface.DEF_USER);
