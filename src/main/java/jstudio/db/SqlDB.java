@@ -35,6 +35,8 @@ public class SqlDB implements DatabaseInterface {
 		db.initialize(new Event());
 		db.initialize(new Product());
 		db.initialize(new Invoice());
+		db.store(null, new Invoice());
+		db.execute("SELECT MAX(id) FROM invoice");
 		db.close();
 	}
 	
@@ -51,7 +53,7 @@ public class SqlDB implements DatabaseInterface {
 	private String protocol, driver;
 	private Connection connection;
 	
-	private Map<Class,Boolean> initCache;
+	private Map<String, Class> initCache;
 	
 	public SqlDB(String databasefile){
 		this("jdbc:sqlite:"+databasefile, "org.sqlite.JDBC");
@@ -60,7 +62,7 @@ public class SqlDB implements DatabaseInterface {
 	protected SqlDB(String protocol, String driver){
 		this.protocol = protocol;
 		this.driver = driver;
-		initCache = new HashMap<Class,Boolean>();
+		initCache = new HashMap<String,Class>();
 	}
 
 	/**
@@ -105,95 +107,101 @@ public class SqlDB implements DatabaseInterface {
 		initialize(o.getClass());
 	}
 	
+	private String getClassTable(Class<?> c){
+		return c.getSimpleName().toLowerCase();
+	}
+	
+	private Field[] getFields(Class<?> c){
+		ArrayList<Field> rf = new ArrayList<Field>();
+		Field[] fields = c.getDeclaredFields();
+		int fieldsn = fields.length;
+		for(int i=0; i<fieldsn; ++i){
+			Field f = fields[i];
+			if(!Modifier.isStatic(f.getModifiers())&&
+					!Modifier.isVolatile(f.getModifiers())){
+				f.setAccessible(true);
+				rf.add(f);
+			}
+		}
+		return rf.toArray(new Field[rf.size()]);
+	}
+	
 	/**
 	 * This method will look for suitable tables in the db
 	 * If they do not exist they will be created anew.
 	 * If they exist but are different, errors will be eventually thrown later
 	 */
 	private void initialize(Class<? extends DatabaseObject> c){
+		String classname;
 		if(initCache.get(c)!=null){
 			logger.warn("Class "+c+" already initialized");
 			return;
 		}else{
-			initCache.put(c,true);
+			classname = getClassTable(c);
+			initCache.put(classname, c);
 		}
-		String classname = c.getSimpleName().toLowerCase();
 		String sql = "CREATE TABLE IF NOT EXISTS "+classname+"(";
-		Field[] fields = c.getDeclaredFields();
-		int fieldsn = fields.length;
 		int factual = 0;
-		for(int i=0; i<fieldsn; ++i){
-			Field f = fields[i];
-			if(Modifier.isStatic(f.getModifiers())||
-				Modifier.isVolatile(f.getModifiers())){
-				//do not serialize
-			}else{
-				Class<?> tc = f.getType();
-				String fname = f.getName();
-				logger.debug(fname+" "+f.getType().getName()+" "+getGenericType(f));
-				String ftype = f.getType().getSimpleName();
-				String fdef = (factual>0?", ":"")+fname;
-				try{
-					switch(EntryType.valueOf(ftype)){
-						case Integer:
-							fdef+=" INTEGER (5)";
-							if(fname.equals("id")){
-								fdef += " PRIMARY KEY"; 
-							}
-							break;
-						case Long:
-							fdef+=" INTEGER (11)";
-							if(fname.equals("id")){
-								fdef += " PRIMARY KEY"; 
-							}
-							break;
-						case Float:
-							fdef+= " FLOAT";
-							break;
-						case String:
-							fdef += " VARCHAR (255)";		
-							break;
-						case Date:
-							fdef += " DATETIME";
-							break;
-						case Set:
-							//the set requires another table referring to this entities
-							break;
-						default:
-							logger.error("EntryType "+ftype+" not implemented");
-							continue;
-					}
-				}catch(IllegalArgumentException e){
-					//custom object type
-					String clazz = f.getType().getName();
-					try {
-						Class refc = Class.forName(clazz);
-						initialize(refc);
-					} catch (ClassNotFoundException e1) {
-						logger.error("Custom class not found "+clazz);
-					}
-					
+		for(Field f: getFields(c)){
+			Class<?> tc = f.getType();
+			String fname = f.getName();
+			logger.debug(fname+" "+f.getType().getName()+" "+getGenericType(f));
+			String ftype = f.getType().getSimpleName();
+			String fdef = (factual>0?", ":"")+fname;
+			try{
+				switch(EntryType.valueOf(ftype)){
+					case Integer:
+						fdef+=" INTEGER (5)";
+						if(fname.equals("id")){
+							fdef += " PRIMARY KEY"; 
+						}
+						break;
+					case Long:
+						fdef+=" INTEGER (11)";
+						if(fname.equals("id")){
+							fdef += " PRIMARY KEY"; 
+						}
+						break;
+					case Float:
+						fdef+= " FLOAT";
+						break;
+					case String:
+						fdef += " VARCHAR (255)";		
+						break;
+					case Date:
+						fdef += " DATETIME";
+						break;
+					case Set:
+						//the set requires another table referring to this entities
+						break;
+					default:
+						logger.error("EntryType "+ftype+" not implemented");
+						continue;
 				}
-				++factual;
-				sql += fdef;
+			}catch(IllegalArgumentException e){
+				//custom object type
+				String clazz = f.getType().getName();
+				try {
+					Class refc = Class.forName(clazz);
+					initialize(refc);
+				} catch (ClassNotFoundException e1) {
+					logger.error("Custom class not found "+clazz);
+				}
+				
 			}
+			++factual;
+			sql += fdef;
 		}
 		
 		sql +=");";
 		logger.debug(sql);
-		/*
-		String sql = "CREATE TABLE IF NOT EXISTS test(";
-		sql += "id INTEGER PRIMARY KEY, ";
-		sql += "name VARCHAR(45), ";
-		sql += "lastname VARCHAR(55)";
-		sql += ");";
+		Statement s;
 		try {
-			Statement s = connection.createStatement();
-			int res = s.executeUpdate(sql);
+			s = connection.createStatement();
+			s.execute(sql);
 		} catch (SQLException e) {
-			logger.error(sql,e);
+			e.printStackTrace();
 		}
-		*/
 	}
 	
 /**
@@ -256,8 +264,18 @@ System.out.println(res.getString("id") + " " + res.getString("age")
 
 	@Override
 	public Object execute(String query) {
-		// TODO Auto-generated method stub
-		return null;
+		Statement s;
+		Object o = null;
+		try {
+			s = connection.createStatement();
+			ResultSet rs = s.executeQuery(query);
+			rs.next();
+			o = rs.getObject(1);
+		} catch (SQLException e) {
+			logger.debug(e);
+		}
+		logger.debug("execute >"+query+"< returns "+o);
+		return o;
 	}
 
 	@Override
@@ -280,8 +298,24 @@ System.out.println(res.getString("id") + " " + res.getString("age")
 
 	@Override
 	public DatabaseObject store(String table, DatabaseObject o) {
-		// TODO Auto-generated method stub
-		return null;
+		initialize(o);
+		int factual = 0;
+		try {
+			Statement s = connection.createStatement();
+			String sql = "INSERT INTO "+getClassTable(o.getClass())+" VALUES(";
+			for(Field f: getFields(o.getClass())){
+				if(factual>0){
+					sql += ", ";
+				}
+				sql+= "'"+f.get(o).toString()+"'";
+				++factual;
+			}
+			sql += ");";
+			logger.debug(sql);
+		} catch (Exception e) {
+			logger.error("store("+o+")",e);
+		} 
+		return o;
 	}
 
 	@Override
