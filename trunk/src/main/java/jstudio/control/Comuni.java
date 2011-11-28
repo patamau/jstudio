@@ -10,7 +10,7 @@ import jstudio.model.Comune;
 public class Comuni extends Controller<Comune>{
 	
 	public Comuni(JStudio app){
-		super(app, Comune.class.getName());
+		super(app, Comune.class);
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -5,6 +5,7 @@ import java.util.Map;
 
 import jstudio.JStudio;
 import jstudio.db.DatabaseObject;
+import jstudio.model.Invoice;
 
 /**
  * Agenda holds events on a daily basis.
@@ -16,9 +17,10 @@ public class Controller<E extends DatabaseObject> {
 	protected String source;
 	protected JStudio app;
 	
-	public Controller(JStudio app, String source){
+	public Controller(JStudio app, Class<?> c){
 		this.app = app;
-		this.source = source;
+		this.source = c.getSimpleName();
+		app.getDatabase().initialize(source, c);
 	}
 	
 	public final JStudio getApplication(){
@@ -33,7 +35,7 @@ public class Controller<E extends DatabaseObject> {
 		String query = "SELECT MAX(id) FROM "+source;
 		Object o = app.getDatabase().execute(query);
 		if(o!=null){
-			return ((Long)o)+1;
+			return ((Integer)o).longValue()+1l;
 		}else{
 			return 1l;
 		}

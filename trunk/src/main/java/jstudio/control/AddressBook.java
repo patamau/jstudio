@@ -6,6 +6,6 @@ import jstudio.model.Person;
 public class AddressBook extends Controller<Person>{
 	
 	public AddressBook(JStudio app){
-		super(app,Person.class.getName());
+		super(app,Person.class);
 	}
 }

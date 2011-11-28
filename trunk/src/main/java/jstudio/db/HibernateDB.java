@@ -38,6 +38,10 @@ public class HibernateDB implements DatabaseInterface{
     	this.driver = driver;
     }
     
+	public void initialize(String table, Class c){
+		//do nothing here
+	}
+    
     public Object execute(String sql){
     	if(!isConnected()) return null;
     	Session session = sessionFactory.openSession();
