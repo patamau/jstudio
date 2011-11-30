@@ -3,9 +3,10 @@ package jstudio.control;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import jstudio.JStudio;
 import jstudio.db.DatabaseObject;
-import jstudio.model.Invoice;
 
 /**
  * Agenda holds events on a daily basis.
@@ -13,6 +14,8 @@ import jstudio.model.Invoice;
  *
  */
 public class Controller<E extends DatabaseObject> {
+	
+	private static final Logger logger = Logger.getLogger(Controller.class);
 	
 	protected String source;
 	protected JStudio app;
@@ -34,11 +37,14 @@ public class Controller<E extends DatabaseObject> {
 	public Long getNextId(){
 		String query = "SELECT MAX(id) FROM "+source;
 		Object o = app.getDatabase().execute(query);
+		long id;
 		if(o!=null){
-			return ((Integer)o).longValue()+1l;
+			id = ((Integer)o).longValue()+1l;
 		}else{
-			return 1l;
+			id = 1l;
 		}
+		logger.debug("Next id is "+id);
+		return id;
 	}
 	
 	@SuppressWarnings("unchecked")

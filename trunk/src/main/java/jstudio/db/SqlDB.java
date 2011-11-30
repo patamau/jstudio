@@ -6,6 +6,7 @@ import java.lang.reflect.Modifier;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -13,8 +14,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jstudio.model.Comune;
 import jstudio.model.Event;
@@ -46,6 +49,7 @@ public class SqlDB implements DatabaseInterface {
 		for(DatabaseObject o: list){
 			logger.debug(o.toString());
 		}
+		db.clear();
 		db.close();
 	}
 	
@@ -116,6 +120,15 @@ public class SqlDB implements DatabaseInterface {
 	
 	public void initialize(String table, Class c){
 		initialize(c);
+	}
+	
+	private String getSetTable(Field f){
+		String t = f.getName().toLowerCase();
+		if(t.endsWith("s")){
+			return t.substring(0,t.length()-1);
+		}else{
+			return t;
+		}
 	}
 	
 	private String getClassTable(Class<?> c){
@@ -254,19 +267,29 @@ public class SqlDB implements DatabaseInterface {
 	@Override
 	public void dump(File dest) throws Exception {
 		// TODO Auto-generated method stub
-		
+		throw new RuntimeException("NOT IMPLEMENTED!");
 	}
 
 	@Override
 	public void restore(File src) throws Exception {
 		// TODO Auto-generated method stub
-		
+		throw new RuntimeException("NOT IMPLEMENTED!");
 	}
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-		
+		try {
+			Statement s = connection.createStatement();
+			String sql;
+			for(String t: getTables()){
+				sql = "DROP TABLE "+t+";";
+				//TODO!
+				s.execute(sql);
+				logger.debug("clear: "+sql);
+			}
+		}catch(Exception e){
+			logger.error("on clear",e);
+		}
 	}
 
 	@Override
@@ -286,25 +309,40 @@ public class SqlDB implements DatabaseInterface {
 					fdef = ", ";
 				}
 				ftype = f.getType().getSimpleName();
-				switch(EntryType.valueOf(ftype)){
-					case Integer:
-					case Float:
-					case String:
-					case Long:
-						fdef+= "'"+f.get(o).toString()+"'";
-						break;
-					case Date:
-						fdef+= "'"+SQLDateFormat.format(f.get(o))+"'";
-						break;
-					case Set:
-						//the set requires another table referring to this entities
-						continue;
-					default:
-						logger.error("EntryType "+ftype+" not implemented");
-						continue;
-				}				
+				try{
+					switch(EntryType.valueOf(ftype)){
+						case Integer:
+						case Float:
+						case String:
+						case Long:
+							Object _o = f.get(o);
+							if(_o==null) fdef += "''";
+							else fdef += "'"+_o.toString()+"' ";
+							break;
+						case Date:
+							fdef+= "'"+SQLDateFormat.format(f.get(o))+"'";
+							break;
+						case Set:
+							//the set requires another table referring to this entities
+							Set<DatabaseObject> _s = (Set<DatabaseObject>)f.get(o);
+							String _t = getSetTable(f);
+							for(DatabaseObject dob: _s){
+								store(_t, dob);
+							}
+							continue;
+						default:
+							logger.error("EntryType "+ftype+" not implemented");
+							continue;
+					}			
+				}catch(IllegalArgumentException e){
+					//custom external class
+					Object _o = f.get(o);
+					if(_o==null || !(_o instanceof DatabaseObject)) fdef += "''";
+					else fdef += ((DatabaseObject)_o).getId();
+				}
 				++factual;
 				sql+=fdef;
+				logger.debug("sql: "+sql);
 			}
 			sql += ");";
 			logger.debug(sql);
@@ -317,11 +355,17 @@ public class SqlDB implements DatabaseInterface {
 
 	@Override
 	public void delete(String table, DatabaseObject o) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("NOT IMPLEMENTED");
+		table = table.toLowerCase();
+		String sql = new String("DELETE FROM "+table+" WHERE id="+o.getId()+";");
+		try {
+			Statement s = connection.createStatement();
+			s.execute(sql);
+		} catch (Exception e) {
+			logger.debug("executing "+sql,e);
+		} 
 	}
 	
-	private List<DatabaseObject> execute(String table, String sql) throws Exception{
+	private List<DatabaseObject> execute(String table, String sql, DatabaseObject parent) throws Exception{
 		Class<?> c = this.initCache.get(table);
 		if(c==null){
 			throw new RuntimeException("Class "+table+" not initialized properly");
@@ -330,7 +374,7 @@ public class SqlDB implements DatabaseInterface {
 		try {
 			Statement s = connection.createStatement();
 			ResultSet rs = s.executeQuery(sql);
-			l = getMapped(rs, c);
+			l = getMapped(rs, c, parent);
 		} catch (Exception e) {
 			logger.debug("executing "+sql,e);
 		} 
@@ -338,7 +382,7 @@ public class SqlDB implements DatabaseInterface {
 		return l;
 	}
 	
-	private List<DatabaseObject> getMapped(ResultSet rs, Class<?> c) throws Exception{
+	private List<DatabaseObject> getMapped(ResultSet rs, Class<?> c, DatabaseObject parent) throws Exception{
 		Field[] fs = this.getFields(c);
 		List<DatabaseObject> l = new ArrayList<DatabaseObject>();
 		while(rs.next()){
@@ -346,25 +390,53 @@ public class SqlDB implements DatabaseInterface {
 			String ftype;
 			for(Field f: fs){
 				ftype = f.getType().getSimpleName();
-				switch(EntryType.valueOf(ftype)){
-					case Integer:
-					case Float:
-					case String:
-						f.set(o, rs.getObject(f.getName()));
-						break;
-					case Long:
-						f.set(o, ((Integer)rs.getObject(f.getName())).longValue());
-						break;
-					case Date:
-						String thedate = (String)rs.getObject(f.getName());
-						f.set(o, SQLDateFormat.parse(thedate));
-						break;
-					case Set:
-						//the set requires another table referring to this entities
-						break;
-					default:
-						logger.error("EntryType "+ftype+" not implemented");
-						continue;
+				try{
+					switch(EntryType.valueOf(ftype)){
+						case Float:
+							f.set(o, ((Double)rs.getObject(f.getName())).floatValue());
+							break;
+						case Integer:
+						case String:
+							f.set(o, rs.getObject(f.getName()));
+							break;
+						case Long:
+							f.set(o, ((Integer)rs.getObject(f.getName())).longValue());
+							break;
+						case Date:
+							String thedate = (String)rs.getObject(f.getName());
+							f.set(o, SQLDateFormat.parse(thedate));
+							break;
+						case Set:
+							//the set requires another table referring to this entities
+							String table = getSetTable(f);
+							List<DatabaseObject> _li = execute(table,"SELECT * FROM "+table+" WHERE "+c.getSimpleName().toLowerCase()+"="+o.getId(), o);
+							Set<DatabaseObject> s = new HashSet<DatabaseObject>(_li);
+							f.set(o, s);
+							logger.debug("Set list of "+f.getName()+" "+ftype+" for "+o.getId()+" where parent is "+parent);
+							break;
+						default:
+							logger.error("EntryType "+ftype+" not implemented");
+							continue;
+					}
+				}catch(IllegalArgumentException e){
+					//custom datatype
+					Long id = 0l;
+					try{
+						id = ((Integer)rs.getObject(f.getName())).longValue();
+					}catch(ClassCastException cce){
+						logger.error("Unable to retrieve id for "+f.getName()+" object is "+rs.getObject(f.getName()));
+					}
+					String tab = ftype.toLowerCase();
+					if(parent!=null && parent.getId()==id &&
+							parent.getClass().getSimpleName().toLowerCase().equals(tab)){
+						f.set(o, parent);
+					}else{
+						//loading the connected entity
+						List<DatabaseObject> res = execute(tab, "SELECT * FROM "+tab+" WHERE id="+id+" LIMIT 1;", o);
+						if(res.size()>0){
+							f.set(o, res.get(0));
+						}
+					}
 				}
 			}
 			l.add(o);
@@ -377,7 +449,7 @@ public class SqlDB implements DatabaseInterface {
 		table = table.toLowerCase();
 		String sql = new String("SELECT * FROM "+table+";");
 		try {
-			return execute(table, sql);
+			return execute(table, sql, null);
 		} catch (Exception e) {
 			logger.error(sql,e);
 		}
@@ -386,7 +458,13 @@ public class SqlDB implements DatabaseInterface {
 
 	@Override
 	public List<? extends DatabaseObject> getAll(String table, String column) {
-		// TODO Auto-generated method stub
+		table = table.toLowerCase();
+		String sql = new String("SELECT * FROM "+table+" GROUP BY "+column+";");
+		try {
+			return execute(table, sql, null);
+		} catch (Exception e) {
+			logger.error(sql,e);
+		}
 		return null;
 	}
 
@@ -395,7 +473,7 @@ public class SqlDB implements DatabaseInterface {
 		table = table.toLowerCase();
 		String sql = new String("SELECT * FROM "+table+" WHERE id="+id+";");
 		try {
-			List<DatabaseObject> l = execute(table, sql);
+			List<DatabaseObject> l = execute(table, sql, null);
 			if(l.size()>0) return l.get(0);
 		} catch (Exception e) {
 			logger.error(sql,e);
@@ -404,12 +482,11 @@ public class SqlDB implements DatabaseInterface {
 	}
 
 	@Override
-	public List<? extends DatabaseObject> getBetween(String table,
-			String field, String from, String to) {
+	public List<? extends DatabaseObject> getBetween(String table, String field, String from, String to) {
 		table = table.toLowerCase();
 		String sql = new String("SELECT * FROM "+table+" WHERE "+field+" BETWEEN '"+from+"' AND '"+to+"';");
 		try {
-			return execute(table, sql);
+			return execute(table, sql, null);
 		} catch (Exception e) {
 			logger.error(sql,e);
 		}
@@ -420,20 +497,59 @@ public class SqlDB implements DatabaseInterface {
 	public List<? extends DatabaseObject> getAll(String table,
 			Map<String, String> values) {
 		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("NOT IMPLEMENTED!");
 	}
 
 	@Override
 	public List<? extends DatabaseObject> findAll(String table,
 			String[] values, String[] columns) {
-		// TODO Auto-generated method stub
-		return null;
+		return findAll(table, values, columns, new HashMap<String,String>());
 	}
 
 	@Override
 	public List<? extends DatabaseObject> findAll(String source,
 			String[] values, String[] columns, Map<String, String> constraints) {
-		// TODO Auto-generated method stub
+		
+		//building query
+		StringBuffer sb = new StringBuffer();
+    	sb.append("SELECT * FROM ");
+    	sb.append(source.toLowerCase());
+    	sb.append(" WHERE ");
+    	int vsiz = values.length;
+    	for(String v: values){
+	    	int csiz = columns.length;
+    		sb.append("(");
+	    	for(String k: columns){
+	    		sb.append(k);
+	    		sb.append(" LIKE '%");
+	    		sb.append(v);
+	    		sb.append("%'");
+	    		csiz--;
+	    		if(csiz>0){
+	    			sb.append(" OR ");
+	    		}
+	    	}
+	    	sb.append(")");
+	    	vsiz--;
+	    	if(vsiz>0){
+	    		sb.append(" AND ");
+	    	}
+    	}
+    	int ksiz = constraints.keySet().size();
+    	for(String k: constraints.keySet()){
+        	if(ksiz>0) sb.append(" AND ");
+    		sb.append(k);
+    		sb.append(" LIKE '%");
+    		sb.append(constraints.get(k));
+    		sb.append("%'");
+    		ksiz--;
+    	}
+    	
+    	try {
+			return execute(source.toLowerCase(), sb.toString(), null);
+		} catch (Exception e) {
+			logger.error(sb.toString(),e);
+		}
 		return null;
 	}
 
