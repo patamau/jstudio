@@ -232,7 +232,9 @@ public class SqlDB implements DatabaseInterface {
 	@Override
 	public void close() {
 		try {
-			if(connection!=null) connection.close();
+			if(connection!=null){
+				connection.close();
+			}
 		} catch (SQLException e) {
 			logger.error("Closing connection",e);
 		}

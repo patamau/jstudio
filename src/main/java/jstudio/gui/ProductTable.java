@@ -32,7 +32,7 @@ public class ProductTable
 	private float total;
 	
 	public ProductTable(Invoice invoice, EntityManagerPanel<Invoice> accounting, boolean editable){
-		super(((Accounting)accounting.getController()).getProducts());
+		super(((Accounting)accounting.getController()).getProducts(), false);
 		this.invoice = invoice;
 		this.accounting = accounting;
 		
