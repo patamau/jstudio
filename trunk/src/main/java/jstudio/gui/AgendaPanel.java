@@ -257,6 +257,7 @@ public class AgendaPanel
 	
 	public void filter(String text){
 		text = text.trim();
+		if(text.length()==0) return;
 		this.clear();
 		String[] vals = text.split(" ");
 		String[] cols = new String[]{

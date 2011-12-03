@@ -69,27 +69,37 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	public void keyPressed(KeyEvent e){}
 	public void keyReleased(KeyEvent e){}
 	public void keyTyped(KeyEvent e){
-		logger.debug("Key typed "+e.getKeyChar());
 		synchronized(filterThread){
 			filterThread.notify();
 		}
 	}
 	
+	/*
+	 * Default controller constructor
+	 * assumes filter is true
+	 */
 	public EntityManagerPanel(Controller<T> controller){
+		this(controller, true);
+	}
+	
+	public EntityManagerPanel(Controller<T> controller, boolean filter){
 		this.controller=controller;
-		filterThread = new FilterThread();
-		filterThread.start();
+		if(filter){
+			filterThread = new FilterThread();
+			filterThread.start();
+		}
 	}
 	
 	public void filter(String text){
 		text = text.trim();
+		if(text.length()==0) return;
+		else logger.debug("Filtering text ["+text+"]");
 		this.clear();
 		String[] vals = text.split(" ");
 		String[] cols = new String[]{
 				"name",
 				"lastname" };
 		Collection<T> ts = controller.findAll(vals, cols);
-		logger.debug("Filtering by "+text+" returned "+ts);
 		if(ts!=null){
 			for(T t: ts){
 				this.addEntity(t);
