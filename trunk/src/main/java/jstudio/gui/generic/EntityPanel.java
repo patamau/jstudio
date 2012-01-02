@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 
 import jstudio.control.Controller;
 import jstudio.db.DatabaseObject;
+import jstudio.util.Configuration;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
@@ -47,6 +48,10 @@ public abstract class EntityPanel<T extends DatabaseObject>
 		dialog.getContentPane().removeAll();
 		dialog.getContentPane().add(this,BorderLayout.CENTER);
 		dialog.pack();
+		int minwidth = Configuration.getGlobal("panel.width.min", 400);
+		if(dialog.getWidth()<minwidth){
+			dialog.setSize(minwidth, dialog.getHeight());
+		}
 	}
 	
 	public JDialog getDialog(){
