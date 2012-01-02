@@ -27,6 +27,8 @@ import jstudio.model.Product;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public class SqlDB implements DatabaseInterface {
 		
@@ -498,8 +500,30 @@ public class SqlDB implements DatabaseInterface {
 	@Override
 	public List<? extends DatabaseObject> getAll(String table,
 			Map<String, String> values) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("NOT IMPLEMENTED!");
+		//if no values specified, bounce to default getAll
+		if(null==values||0==values.keySet().size()) return getAll(table);
+		if(!isConnected()) return null;
+    	StringBuffer sb = new StringBuffer();
+    	sb.append("SELECT * FROM ");
+    	sb.append(table.toLowerCase());
+    	sb.append(" WHERE ");
+    	int siz = values.size();
+    	for(String k: values.keySet()){
+    		sb.append(k);
+    		sb.append("='");
+    		sb.append(values.get(k));
+    		sb.append("'");
+    		siz--;
+    		if(siz>0){
+    			sb.append(" AND ");
+    		}
+    	}
+    	try {
+			return execute(table.toLowerCase(), sb.toString(), null);
+		} catch (Exception e) {
+			logger.error(sb.toString(),e);
+		}
+		return null;
 	}
 
 	@Override
