@@ -2,6 +2,7 @@ package jstudio.util;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -111,10 +112,13 @@ public class GUITool {
 		int px = gc.gridx;
 		gc.gridx++;
 		if(!editable){
-			if(values.length>0&&values[selected]!=null)
-				c.add(new JLabel(values[selected].toString(), JLabel.LEFT),gc);
-			else
+			if(values.length>0&&values[selected]!=null){
+				JLabel l = new JLabel(values[selected].toString(), JLabel.LEFT);
+				l.setFont(l.getFont().deriveFont(Font.PLAIN));
+				c.add(l,gc);
+			}else{
 				c.add(new JLabel(), gc);
+			}
 		}else{
 			c.add(f,gc);
 		}
