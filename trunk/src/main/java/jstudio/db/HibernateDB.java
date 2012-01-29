@@ -124,7 +124,7 @@ public class HibernateDB implements DatabaseInterface{
     /**
      * Host also accepts port option as a suffix like localhost:3306
      */
-    public void connect(String host, String dbname, String user, String password){
+    public void connect(String host, String dbname, String user, String password) throws Exception{
        	//override default configuration property
        	String url = protocol+"://"+host+"/"+dbname;
     	// load the standard configuration
@@ -156,7 +156,7 @@ public class HibernateDB implements DatabaseInterface{
         }
         
         if(!isConnected()){
-        	throw new RuntimeException("Database connection failed");
+        	throw new Exception("Database connection failed");
         }
     }
     

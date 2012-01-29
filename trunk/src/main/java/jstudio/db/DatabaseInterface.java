@@ -7,6 +7,7 @@ import java.util.Map;
 public interface DatabaseInterface {
 	
 	public static final String
+		KEY_JDBC = "db.jdbc",
 		KEY_DRIVER = "db.driver",
 		KEY_PROTOCOL = "db.protocol",
 		KEY_HOST = "db.host",
@@ -15,14 +16,21 @@ public interface DatabaseInterface {
 		KEY_PASS = "db.password";
 	
 	public static final String
+		/* sqlite default configuration */
+		DEF_JDBC = "jstudio.db.SqlDB",
+		DEF_DRIVER = "org.sqlite.JDBC",
+		DEF_PROTOCOL = "jdbc:sqlite",
+		/* hibernate with mysql default configuration
+		DEF_JDBC = "jstudio.db.HibernateDB"
 		DEF_DRIVER = "com.mysql.jdbc.Driver",
 		DEF_PROTOCOL = "jdbc:mysql",
+		*/
 		DEF_HOST = "localhost",
 		DEF_NAME = "none",
 		DEF_USER = "",
 		DEF_PASS = "";
 
-	public void connect(String host, String table, String user, String pass);
+	public void connect(String host, String table, String user, String pass) throws Exception;
 	public void close();
 	public boolean isConnected();
 	public Object execute(String query);

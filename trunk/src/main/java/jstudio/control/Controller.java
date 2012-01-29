@@ -39,7 +39,11 @@ public class Controller<E extends DatabaseObject> {
 		Object o = app.getDatabase().execute(query);
 		long id;
 		if(o!=null){
-			id = ((Integer)o).longValue()+1l;
+			if(o instanceof Integer){
+				id = ((Integer)o).longValue()+1l;
+			} else {
+				id = ((Long)o)+1l;
+			}
 		}else{
 			id = 1l;
 		}
