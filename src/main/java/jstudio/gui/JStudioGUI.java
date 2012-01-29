@@ -154,7 +154,9 @@ public class JStudioGUI extends JFrame implements ActionListener {
 			Configuration.setGlobalConfiguration(c);
 		}else if(src==connectionItem){
 			DBDialog dbdialog = new DBDialog(this,app.getDatabase());
-			dbdialog.showDialog(Configuration.getGlobalConfiguration());			
+			if(dbdialog.showDialog(Configuration.getGlobalConfiguration())){
+				app.setDatabase(dbdialog.getDatabase());
+			}
 		}else if(src==exitItem){
 			app.finalize();
 			this.dispose();

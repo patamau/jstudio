@@ -17,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
+import jstudio.JStudio;
 import jstudio.db.DatabaseInterface;
 import jstudio.db.HibernateDB;
 import jstudio.util.Configuration;
@@ -39,7 +40,11 @@ public class DBDialog extends JDialog implements ActionListener {
 	}
 	
 	private boolean accept;
-	private JTextField hostField, 
+	private JTextField
+		jdbcField,
+		driverField,
+		protocolField,
+		hostField, 
 		nameField, 
 		userField, 
 		passwordField;
@@ -61,6 +66,9 @@ public class DBDialog extends JDialog implements ActionListener {
 						TitledBorder.LEFT, 
 						TitledBorder.CENTER)
 					);
+		jdbcField = createField(16);
+		driverField = createField(16);
+		protocolField = createField(16);
 		hostField = createField(16);
 		nameField = createField(16);
 		userField = createField(16);
@@ -68,7 +76,10 @@ public class DBDialog extends JDialog implements ActionListener {
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.gridy=0;
 		gc.insets = new Insets(4,4,4,4);
-		addInput(panel, gc, "Server:", hostField);
+		addInput(panel, gc, "JDBC:", jdbcField);
+		addInput(panel, gc, "Driver:", driverField);
+		addInput(panel, gc, "Protocol:", protocolField);
+		addInput(panel, gc, "Source:", hostField);
 		addInput(panel, gc, "Database name:", nameField);
 		addInput(panel, gc, "Username:", userField);
 		addInput(panel, gc, "Password:", passwordField);
@@ -99,18 +110,45 @@ public class DBDialog extends JDialog implements ActionListener {
 	
 	public boolean showDialog(Configuration c){
 		accept=false;
+		setJDBC(c.getProperty(DatabaseInterface.KEY_JDBC, DatabaseInterface.DEF_JDBC));
+		setDriver(c.getProperty(DatabaseInterface.KEY_DRIVER, DatabaseInterface.DEF_DRIVER));
+		setProtocol(c.getProperty(DatabaseInterface.KEY_PROTOCOL, DatabaseInterface.DEF_PROTOCOL));
 		setHost(c.getProperty(DatabaseInterface.KEY_HOST, DatabaseInterface.DEF_HOST));
 		setDBName(c.getProperty(DatabaseInterface.KEY_NAME, DatabaseInterface.DEF_NAME));
 		setUser(c.getProperty(DatabaseInterface.KEY_USER, DatabaseInterface.DEF_USER));
 		setPassword(c.getProperty(DatabaseInterface.KEY_PASS, DatabaseInterface.DEF_PASS));
 		setVisible(true); //wait for dialog to be disposed
 		if(accept){
+			c.setProperty(DatabaseInterface.KEY_JDBC, getJDBC());
+			c.setProperty(DatabaseInterface.KEY_DRIVER, getDriver());
+			c.setProperty(DatabaseInterface.KEY_PROTOCOL, getProtocol());
 			c.setProperty(DatabaseInterface.KEY_HOST, getHost());
 			c.setProperty(DatabaseInterface.KEY_NAME, getDBName());
 			c.setProperty(DatabaseInterface.KEY_USER, getUser());
 			c.setProperty(DatabaseInterface.KEY_PASS, getPassword());
 		}
 		return accept;
+	}
+	
+	/**
+	 * Retrieve the database interface currently used within the dialog
+	 * Database can be invalid or null
+	 * @return
+	 */
+	public DatabaseInterface getDatabase(){
+		return database;
+	}
+	
+	public String getJDBC(){
+		return jdbcField.getText();
+	}
+	
+	public String getDriver(){
+		return driverField.getText();
+	}
+	
+	public String getProtocol(){
+		return protocolField.getText();
 	}
 	
 	public String getHost(){
@@ -127,6 +165,18 @@ public class DBDialog extends JDialog implements ActionListener {
 	
 	public String getPassword(){
 		return passwordField.getText();
+	}
+	
+	public void setJDBC(String t){
+		jdbcField.setText(t);
+	}
+	
+	public void setDriver(String t){
+		driverField.setText(t);
+	}
+	
+	public void setProtocol(String t){
+		protocolField.setText(t);
 	}
 	
 	public void setHost(String t){
@@ -162,7 +212,7 @@ public class DBDialog extends JDialog implements ActionListener {
 		gc.gridx=0;
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		gc.weightx=0f;
-		JLabel label = new JLabel(title);
+		JLabel label = new JLabel(Language.string(title));
 		label.setAlignmentX(JLabel.RIGHT_ALIGNMENT);
 		label.setHorizontalAlignment(JLabel.RIGHT);
 		panel.add(label, gc);
@@ -188,6 +238,7 @@ public class DBDialog extends JDialog implements ActionListener {
 			}
 		}else if(src==testButton){
 			try {
+				database = JStudio.getDatabaseInterface(getJDBC(), getProtocol(), getDriver());
 				database.connect(getHost(), getDBName(), getUser(), getPassword());
 				if(database.isConnected()){
 					JOptionPane.showMessageDialog(this, 

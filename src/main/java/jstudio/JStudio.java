@@ -1,6 +1,8 @@
 package jstudio;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Date;
 
@@ -80,25 +82,56 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		gui.addPanel(new AccountingPanel(accounting));
 	}	
 	
+	/**
+	 * Using currently set configuration parameters
+	 * creates a new DatabaseInterface object
+	 * @return
+	 * @throws Exception
+	 */
+	public static DatabaseInterface getDatabaseInterface(
+			final String jdbc,
+			final String protocol,
+			final String driver) 
+	throws Exception {
+		//initialize database manager
+		//TODO: load jdbc class dynamically
+		//database = new HibernateDB(protocol, driver);
+		//XXX: use sqlite prefix and standard driver
+		@SuppressWarnings("unchecked")
+		Class<DatabaseInterface> d = (Class<DatabaseInterface>) Class.forName(jdbc);
+        Class<?> partypes[] = new Class[]{ String.class, String.class };
+        Constructor<DatabaseInterface> dc = d.getConstructor(partypes);
+        Object arglist[] = new String[]{ protocol, driver };
+        return dc.newInstance(arglist);
+	}
+	
 	private boolean initializeData(){
+		//keep tring to connect to a db
+		//every loop asks for credentatials
 		do{
-			//initialize database manager
-			String protocol = Configuration.getGlobal(DatabaseInterface.KEY_PROTOCOL,DatabaseInterface.DEF_PROTOCOL);
-			String driver = Configuration.getGlobal(DatabaseInterface.KEY_DRIVER,DatabaseInterface.DEF_DRIVER);
-			//database = new HibernateDB(protocol, driver);
-			database = new SqlDB(new File("test.db"));
-			String hostname = Configuration.getGlobal(DatabaseInterface.KEY_HOST, DatabaseInterface.DEF_HOST);
-			String dbname = Configuration.getGlobal(DatabaseInterface.KEY_NAME, DatabaseInterface.DEF_NAME);
-			String user = Configuration.getGlobal(DatabaseInterface.KEY_USER, DatabaseInterface.DEF_USER);
-			String password = Configuration.getGlobal(DatabaseInterface.KEY_PASS, DatabaseInterface.DEF_PASS);
 			try {
+				String jdbc = Configuration.getGlobal(DatabaseInterface.KEY_JDBC,DatabaseInterface.DEF_JDBC);
+				String protocol = Configuration.getGlobal(DatabaseInterface.KEY_PROTOCOL,DatabaseInterface.DEF_PROTOCOL);
+				String driver = Configuration.getGlobal(DatabaseInterface.KEY_DRIVER,DatabaseInterface.DEF_DRIVER);
+				database = getDatabaseInterface(jdbc, protocol, driver);
+				String hostname = Configuration.getGlobal(DatabaseInterface.KEY_HOST, DatabaseInterface.DEF_HOST);
+				String dbname = Configuration.getGlobal(DatabaseInterface.KEY_NAME, DatabaseInterface.DEF_NAME);
+				String user = Configuration.getGlobal(DatabaseInterface.KEY_USER, DatabaseInterface.DEF_USER);
+				String password = Configuration.getGlobal(DatabaseInterface.KEY_PASS, DatabaseInterface.DEF_PASS);
 				database.connect(hostname, dbname, user, password);
-			} catch (Throwable e) {
+			} catch (Exception e) {
 				logger.error("Database connection error",e);
-				JOptionPane.showMessageDialog(null, Language.string("Database connection error")+": "+e.getLocalizedMessage(), Language.string("Data initialization"), JOptionPane.ERROR_MESSAGE);
+				String msg = Language.string("Database connection error");
+				msg += ": "+e.getLocalizedMessage();
+				JOptionPane.showMessageDialog(null, 
+						msg, 
+						Language.string("Data initialization"), 
+						JOptionPane.ERROR_MESSAGE);
 				DBDialog dbdialog = new DBDialog(gui, database);
 				if(!dbdialog.showDialog(configuration)){
 					return false;
+				}else{
+					database = dbdialog.getDatabase();
 				}
 			}
 		}while(!database.isConnected());
@@ -168,6 +201,20 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		if(database!=null) database.close();
 		// I dont care if overwrite
 		Configuration.getGlobalConfiguration().save(new File(this.getClass().getSimpleName()+Configuration.FILE_SUFFIX));		
+	}
+	
+	/**
+	 * Force the app to use the database specified.
+	 * This happens when a new driver has been loaded from a dialog
+	 * @param database
+	 */
+	public void setDatabase(final DatabaseInterface database){
+		this.database = database;
+		//initialize data handlers
+		agenda = new Agenda(this);
+		addressBook = new AddressBook(this);
+		accounting = new Accounting(this);
+		comuni = new Comuni(this);
 	}
 	
 	public DatabaseInterface getDatabase(){

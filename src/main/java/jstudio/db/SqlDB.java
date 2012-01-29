@@ -1,12 +1,15 @@
 package jstudio.db;
 
+import java.io.EOFException;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -15,27 +18,34 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jstudio.model.Comune;
 import jstudio.model.Event;
 import jstudio.model.Invoice;
 import jstudio.model.Person;
 import jstudio.model.Product;
+import jstudio.util.Language;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.mapping.PersistentClass;
+import org.sqlite.SQLite;
 
 public class SqlDB implements DatabaseInterface {
 		
 	public static void main(String[] args){
 		BasicConfigurator.configure();
 		SqlDB db = new SqlDB("test.db");
-		db.connect(null,null,null,null);
+		try {
+			db.connect("data.db",null,null,null);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		for(String t: db.getTables()){
 			logger.debug(t);
 		}
@@ -64,43 +74,52 @@ public class SqlDB implements DatabaseInterface {
 		Set,
 	}
 	
+	public static final String 
+		SQLITE_PROTOCOL_PREFIX = "jdbc:sqlite:",
+		SQLITE_DRIVER = "org.sqlite.JDBC";
+	
 	private static final Logger logger = Logger.getLogger(SqlDB.class);
 	public static final DateFormat SQLDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 	private String protocol, driver;
 	private File dbfile;
 	private Connection connection;
 	
-	private Map<String, Class> initCache;
+	private Map<String, Class<?>> initCache;
 	
 	public SqlDB(final File dbfile){
 		this(dbfile.getName());
 		this.dbfile = dbfile;
 	}
 	
-	private SqlDB(final String dbfilename){
+	public SqlDB(final String dbfilename){
 		this("jdbc:sqlite:"+dbfilename, "org.sqlite.JDBC");
 	}
 	
-	private SqlDB(String protocol, String driver){
+	public SqlDB(final String protocol, final String driver){
 		this.protocol = protocol;
 		this.driver = driver;
-		initCache = new HashMap<String,Class>();
+		initCache = new HashMap<String,Class<?>>();
 	}
-
+	
 	/**
-	 * Arguments are unusued now.
-	 * Protocol and driver will be used
+	 * Arguments are unused now.
+	 * Protocol and driver set at initialization will be used
+	 * File is the file used as db sources.
+	 * table, user and password won't be used.
 	 */
 	@Override
-	public void connect(String host, String table, String user, String pass) {
+	public void connect(String file, String table, String user, String pass) throws Exception {
+		String p = protocol+":"+file;
 		try {
 			Class.forName(driver);
-			connection = DriverManager.getConnection(protocol);
+			connection = DriverManager.getConnection(p);
 			logger.debug("Connection established, initializing...");
 		} catch (SQLException e) {
-			logger.error("Protocol "+protocol+" error",e);
+			logger.error("Protocol "+p+" error",e);
+			throw e;
 		} catch (ClassNotFoundException e) {
 			logger.error("Driver "+driver+" error",e);
+			throw e;
 		}
 	}
 	
@@ -270,14 +289,43 @@ public class SqlDB implements DatabaseInterface {
 
 	@Override
 	public void dump(File dest) throws Exception {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("NOT IMPLEMENTED!");
+    	if(!isConnected()) throw new RuntimeException(Language.string("Not connected"));
+    	if(dest==null) throw new NullPointerException(Language.string("No destination selected"));
+
+		FileOutputStream fos = new FileOutputStream(dest);
+		ObjectOutputStream oos = new ObjectOutputStream(fos);
+    	for (String source: getTables()) {
+    		logger.info("Starting to dump "+source);
+    		List<DatabaseObject> data = getAll(source);
+    		for(DatabaseObject d : data){
+    			oos.writeObject(d);
+    		}
+    		logger.info(source+" dump finished ("+data.size()+" objects)");
+    	}
+		oos.close();
 	}
 
 	@Override
 	public void restore(File src) throws Exception {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("NOT IMPLEMENTED!");
+    	if(!isConnected()) throw new RuntimeException(Language.string("Not connected"));
+    	if(src==null) throw new NullPointerException(Language.string("No source selected"));
+    	FileInputStream fis = new FileInputStream(src);
+    	ObjectInputStream ios = new ObjectInputStream(fis);
+    	DatabaseObject o;
+    	int nobjs = 0;
+    	String t = null;
+    	try{
+	    	while((o = (DatabaseObject)ios.readObject())!=null){
+	    		initialize(o.getClass());
+	    		store(t , o);
+	    		nobjs++;
+	    		logger.debug("Loaded "+o.getClass().getName()+" "+o);
+	    	}
+    	}catch(EOFException eof){
+    		//end of file reached!
+    	}
+    	logger.info("Loaded "+nobjs+" objects");
+    	ios.close();
 	}
 
 	@Override
@@ -286,10 +334,10 @@ public class SqlDB implements DatabaseInterface {
 			Statement s = connection.createStatement();
 			String sql;
 			for(String t: getTables()){
-				sql = "DROP TABLE "+t+";";
-				//TODO!
+				sql = "DROP TABLE "+t+";";	
 				s.execute(sql);
 				logger.debug("clear: "+sql);
+				initCache.remove(t);
 			}
 		}catch(Exception e){
 			logger.error("on clear",e);
@@ -304,6 +352,10 @@ public class SqlDB implements DatabaseInterface {
 		initialize(table, o.getClass());
 		int factual = 0;
 		try {
+			String args = new String();
+			final int fsize = getFields(o.getClass()).length;
+			//TODO: inject parameters into prepared statement
+			connection.prepareStatement("REPLACE INTO "+getClassTable(o.getClass())+" VALUES("+args);
 			Statement s = connection.createStatement();
 			String sql = "REPLACE INTO "+getClassTable(o.getClass())+" VALUES(";
 			String ftype;
@@ -449,7 +501,7 @@ public class SqlDB implements DatabaseInterface {
 	}
 
 	@Override
-	public List<? extends DatabaseObject> getAll(String table) {
+	public List<DatabaseObject> getAll(String table) {
 		table = table.toLowerCase();
 		String sql = new String("SELECT * FROM "+table+";");
 		try {
