@@ -9,7 +9,9 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
+import java.util.Date;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -127,14 +129,23 @@ public class SqlDB implements DatabaseInterface {
 		String sql = "SELECT name FROM sqlite_master WHERE type = \"table\";";
 		ArrayList<String> tables = new ArrayList<String>();
 		Statement s;
+		ResultSet rs = null;
 		try{
 			s = connection.createStatement();
-			ResultSet rs = s.executeQuery(sql);
+			rs = s.executeQuery(sql);
 			while(rs.next()){
 				tables.add(rs.getString("name"));
 			}
 		}catch(SQLException e){
 			logger.error(sql,e);
+		}finally{
+			if(rs!=null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return tables.toArray(new String[0]);
 	}
@@ -274,14 +285,23 @@ public class SqlDB implements DatabaseInterface {
 	public Object execute(String query) {
 		Statement s;
 		Object o = null;
+		ResultSet rs = null;
 		try {
 			s = connection.createStatement();
-			ResultSet rs = s.executeQuery(query);
+			rs = s.executeQuery(query);
 			if(rs.next()){
 				o = rs.getObject(1);
 			}
 		} catch (SQLException e) {
-			logger.debug(e);
+			logger.debug("executing "+query, e);
+		} finally {
+			if(rs!=null){
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		logger.debug("execute >"+query+"< returns "+o);
 		return o;
@@ -334,10 +354,10 @@ public class SqlDB implements DatabaseInterface {
 			Statement s = connection.createStatement();
 			String sql;
 			for(String t: getTables()){
-				sql = "DROP TABLE "+t+";";	
+				sql = "DELETE FROM "+t+";";	
 				s.execute(sql);
 				logger.debug("clear: "+sql);
-				initCache.remove(t);
+				//initCache.remove(t);
 			}
 		}catch(Exception e){
 			logger.error("on clear",e);
@@ -350,34 +370,33 @@ public class SqlDB implements DatabaseInterface {
 	 */
 	public DatabaseObject store(String table, DatabaseObject o) {
 		initialize(table, o.getClass());
-		int factual = 0;
 		try {
 			String args = new String();
-			final int fsize = getFields(o.getClass()).length;
-			//TODO: inject parameters into prepared statement
-			connection.prepareStatement("REPLACE INTO "+getClassTable(o.getClass())+" VALUES("+args);
-			Statement s = connection.createStatement();
-			String sql = "REPLACE INTO "+getClassTable(o.getClass())+" VALUES(";
 			String ftype;
-			String fdef = "";
+			int fsize = 0;
 			for(Field f: getFields(o.getClass())){
-				if(factual>0){
-					fdef = ", ";
-				}
 				ftype = f.getType().getSimpleName();
 				try{
+					if(EntryType.valueOf(ftype)==EntryType.Set) continue;
+				}catch(IllegalArgumentException ex){
+					//when no object is mapped in the entrytype enum
+				}
+				if(args.length()>0){
+					args+=", ?";
+				}else{
+					args+="?";
+				}
+				++fsize;
+			}
+			String sql = "REPLACE INTO "+getClassTable(o.getClass())+" VALUES ("+args+")";
+			logger.debug("PreparedStatement "+sql);
+			PreparedStatement ps = connection.prepareStatement(sql);	
+			int factual = 0;
+			for(Field f: getFields(o.getClass())){
+				ftype = f.getType().getSimpleName();
+				logger.debug("factual is "+factual+"/"+fsize);
+				try{
 					switch(EntryType.valueOf(ftype)){
-						case Integer:
-						case Float:
-						case String:
-						case Long:
-							Object _o = f.get(o);
-							if(_o==null) fdef += "''";
-							else fdef += "'"+_o.toString()+"' ";
-							break;
-						case Date:
-							fdef+= "'"+SQLDateFormat.format(f.get(o))+"'";
-							break;
 						case Set:
 							//the set requires another table referring to this entities
 							Set<DatabaseObject> _s = (Set<DatabaseObject>)f.get(o);
@@ -385,24 +404,47 @@ public class SqlDB implements DatabaseInterface {
 							for(DatabaseObject dob: _s){
 								store(_t, dob);
 							}
-							continue;
+							break;
+						case Integer:
+							ps.setInt(++factual, (Integer)f.get(o));
+							break;
+						case Float:
+							ps.setFloat(++factual, (Float)f.get(o));
+							break;
+						case String:
+							ps.setString(++factual, (String)f.get(o));
+							break;
+						case Long:
+							ps.setLong(++factual, (Long)f.get(o));
+							break;
+						case Date:			
+							java.util.Date d = (java.util.Date)f.get(o);
+							ps.setString(++factual, SQLDateFormat.format(d));
+							break;
 						default:
-							logger.error("EntryType "+ftype+" not implemented");
-							continue;
-					}			
+							Object _o = f.get(o);
+							if(_o==null){
+								ps.setObject(++factual, "");
+							}else{
+								ps.setObject(++factual, _o);
+							}
+							break;
+					}
 				}catch(IllegalArgumentException e){
 					//custom external class
 					Object _o = f.get(o);
-					if(_o==null || !(_o instanceof DatabaseObject)) fdef += "''";
-					else fdef += ((DatabaseObject)_o).getId();
+					if(_o==null || !(_o instanceof DatabaseObject)){
+						ps.setObject(++factual, "");
+					}else{
+						ps.setObject(++factual,((DatabaseObject)_o).getId());
+					}
+				}catch(Exception e){
+					logger.error("Generic exception on "+f.get(o)+" as "+f.get(o).getClass().getSimpleName(),e);
 				}
-				++factual;
-				sql+=fdef;
-				logger.debug("sql: "+sql);
 			}
-			sql += ");";
-			logger.debug(sql);
-			s.executeUpdate(sql);
+			logger.debug("Executing update on prepared statement");
+			ps.executeUpdate();
+			ps.close();
 		} catch (Exception e) {
 			logger.error("store("+o+")",e);
 		} 
@@ -427,13 +469,16 @@ public class SqlDB implements DatabaseInterface {
 			throw new RuntimeException("Class "+table+" not initialized properly");
 		}
 		List<DatabaseObject> l = new ArrayList<DatabaseObject>();
+		ResultSet rs = null;
 		try {
 			Statement s = connection.createStatement();
-			ResultSet rs = s.executeQuery(sql);
+			rs = s.executeQuery(sql);
 			l = getMapped(rs, c, parent);
 		} catch (Exception e) {
 			logger.debug("executing "+sql,e);
-		} 
+		} finally {
+			if(rs!=null) rs.close();
+		}
 		logger.debug("execute >"+sql+"< returns "+l.size()+" elements");
 		return l;
 	}
@@ -447,6 +492,7 @@ public class SqlDB implements DatabaseInterface {
 			for(Field f: fs){
 				ftype = f.getType().getSimpleName();
 				try{
+					logger.debug("Trying to get field "+f.getName()+" as "+ftype);
 					switch(EntryType.valueOf(ftype)){
 						case Float:
 							f.set(o, ((Double)rs.getObject(f.getName())).floatValue());
@@ -456,7 +502,12 @@ public class SqlDB implements DatabaseInterface {
 							f.set(o, rs.getObject(f.getName()));
 							break;
 						case Long:
-							f.set(o, ((Integer)rs.getObject(f.getName())).longValue());
+							Object rso = rs.getObject(f.getName());
+							if(rso instanceof Integer){
+								f.set(o, ((Integer)rso).longValue());
+							}else{
+								f.set(o, ((Long)rso).longValue());
+							}
 							break;
 						case Date:
 							String thedate = (String)rs.getObject(f.getName());
