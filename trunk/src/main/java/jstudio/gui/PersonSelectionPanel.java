@@ -142,7 +142,9 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 		dialog.pack();
 		dialog.setLocationRelativeTo(parent);
 		dialog.setVisible(true);
+		logger.debug("Finalizing selection panel");
 		this.finalize();
+		dialog.dispose();
 	}
 	
 	public void mouseClicked(MouseEvent e){ 

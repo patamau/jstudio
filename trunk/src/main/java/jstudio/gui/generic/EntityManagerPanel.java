@@ -54,6 +54,7 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 			} catch (InterruptedException e) {
 				logger.error("Filter thread interrupted");
 			}
+			logger.debug("FilterThread finished");
 		}
 	}
 	

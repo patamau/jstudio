@@ -61,12 +61,14 @@ public class Main {
 		
 		final JStudio jstudio = new JStudio();
 		//redirect exceptions to jstudio
+		/*
 		Thread.setDefaultUncaughtExceptionHandler(jstudio);
 		Runtime.getRuntime().addShutdownHook(new Thread(){
 			public void run(){
-				jstudio.finalize();
+				//jstudio.finalize();
 			}
 		});
+		*/
 		
 		//start up
 		try{
