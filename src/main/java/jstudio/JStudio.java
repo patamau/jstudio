@@ -2,7 +2,6 @@ package jstudio;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Date;
 
@@ -10,13 +9,11 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JWindow;
 
-import jstudio.control.Agenda;
 import jstudio.control.Accounting;
 import jstudio.control.AddressBook;
+import jstudio.control.Agenda;
 import jstudio.control.Comuni;
 import jstudio.db.DatabaseInterface;
-import jstudio.db.HibernateDB;
-import jstudio.db.SqlDB;
 import jstudio.gui.AccountingPanel;
 import jstudio.gui.AddressBookPanel;
 import jstudio.gui.AgendaPanel;
@@ -195,12 +192,16 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 	 * BEWARE: After this call initialize() is required for the rest of the stuff to work properly again :)
 	 */
 	public void finalize(){
+		logger.debug("Starting finalization...");
 		//kill all gui listeners
 		if(gui!=null) gui.finalize();
+		logger.debug("GUI finalized");
 		//async call, dont care
 		if(database!=null) database.close();
+		logger.debug("DB closed");
 		// I dont care if overwrite
-		Configuration.getGlobalConfiguration().save(new File(this.getClass().getSimpleName()+Configuration.FILE_SUFFIX));		
+		Configuration.getGlobalConfiguration().save(new File(this.getClass().getSimpleName()+Configuration.FILE_SUFFIX));
+		logger.debug("Configuration saved");
 	}
 	
 	/**

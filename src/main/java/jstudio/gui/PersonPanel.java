@@ -12,6 +12,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
@@ -132,6 +133,21 @@ public class PersonPanel extends EntityPanel<Person> {
 		Object o = e.getSource();
 		if(o==closeButton){
 			getDialog().dispose();
+		}else if(o==editButton){
+			getDialog().dispose();
+			JDialog dialog = new PersonPanel(super.entity, super.manager, true).createDialog(super.manager.getTopLevelAncestor());
+			dialog.setVisible(true);
+		}else if(o==deleteButton){
+			int ch = JOptionPane.showConfirmDialog(super.manager, 
+					Language.string("Are you sure you want to remove {0} {1}?",
+							entity.getName(),entity.getLastname()),
+					Language.string("Romove person?"), 
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			if(ch==JOptionPane.YES_OPTION){
+				controller.delete(entity);
+				getDialog().dispose();
+				manager.refresh();
+			}
 		}else if(o==generateButton){
 			codeField.setText(getCode());
 		}else if(o==okButton){
