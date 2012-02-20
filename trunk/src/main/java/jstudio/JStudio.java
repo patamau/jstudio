@@ -1,6 +1,9 @@
 package jstudio;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -46,6 +49,8 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		DB_PASS = "jstudio137";
 	
 	public static final String
+		LOADFILE_KEY = "load.file",
+		LOADFILE_DEF = ".",
 		BACKUPFILE_KEY = "backup.file",
 		BACKUPFILE_DEF = ".";
 	
@@ -242,6 +247,43 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 		return gui;
 	}
 	
+	public void doLoad(){
+		JFileChooser fc = new JFileChooser();
+		File lastBackup = new File(Configuration.getGlobal(LOADFILE_KEY, LOADFILE_DEF));
+		fc.setSelectedFile(lastBackup);
+		fc.setCurrentDirectory(lastBackup.getParentFile());
+		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		int ch = fc.showOpenDialog(gui);
+		if(ch!=JFileChooser.APPROVE_OPTION){
+			logger.info("Load canceled by user");
+			return;
+		}
+		File f = fc.getSelectedFile();
+		if(!f.exists()||!f.canRead()){
+			JOptionPane.showMessageDialog(gui, 
+					Language.string("Unable to access file"),
+					Language.string("Load error"),
+					JOptionPane.ERROR_MESSAGE);
+		}else{
+			Configuration.getGlobalConfiguration().setProperty(LOADFILE_KEY, f.getAbsolutePath());
+			askClear();
+			String str;
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(f));
+				while((str = reader.readLine())!=null){
+					str = str.trim();
+					//logger.debug("Read: "+str);
+					if(str.length()==0) continue;
+					if(str.startsWith("-")) continue;
+					database.execute(str);
+					//break; //FIXME: remove this break to continue loading stuff
+				}
+			} catch (Exception e) {
+				logger.error("Loading "+f,e);
+			}
+		}
+	}
+	
 	public void doRestore(){
 		JFileChooser fc = new JFileChooser();
 		File lastBackup = new File(Configuration.getGlobal(BACKUPFILE_KEY, BACKUPFILE_DEF));
@@ -267,6 +309,20 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 					e.printStackTrace();
 				}
 			}
+		}
+	}
+	
+	public boolean askClear(){
+		int ch = JOptionPane.showConfirmDialog(gui, 
+				Language.string("Do you want to remove all the data from the database?"),
+				Language.string("Clear database?"),
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE);
+		if(ch==JOptionPane.YES_OPTION){
+			database.clear();
+			return true;
+		}else{
+			return false;
 		}
 	}
 	

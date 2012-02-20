@@ -48,13 +48,13 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 						if(stop) break;
 						wait(100);
 					}		
-					logger.debug("going to filter! "+filterField.getText());
+					//logger.debug("going to filter! "+filterField.getText());
 					filter(filterField.getText());
 				}
 			} catch (InterruptedException e) {
 				logger.error("Filter thread interrupted");
 			}
-			logger.debug("FilterThread finished");
+			//logger.debug("FilterThread finished");
 		}
 	}
 	
@@ -94,7 +94,6 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	public void filter(String text){
 		text = text.trim();
 		if(text.length()==0) return;
-		else logger.debug("Filtering text ["+text+"]");
 		this.clear();
 		String[] vals = text.split(" ");
 		String[] cols = new String[]{

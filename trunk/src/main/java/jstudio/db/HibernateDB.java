@@ -41,8 +41,17 @@ public class HibernateDB implements DatabaseInterface{
 	public void initialize(String table, Class c){
 		//do nothing here
 	}
+	
+
+	@Override
+	public void execute(String sql) throws Exception {
+		if(!isConnected()) return;
+    	Session session = sessionFactory.openSession();
+    	Query query = session.createQuery(sql);
+    	query.executeUpdate();
+	}
     
-    public Object execute(String sql){
+    public Object executeQuery(String sql){
     	if(!isConnected()) return null;
     	Session session = sessionFactory.openSession();
     	Query query = session.createQuery(sql);
@@ -381,5 +390,4 @@ public class HibernateDB implements DatabaseInterface{
     	session.flush();
     	return l;
 	}
-
 }

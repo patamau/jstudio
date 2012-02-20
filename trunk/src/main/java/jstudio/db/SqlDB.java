@@ -58,7 +58,7 @@ public class SqlDB implements DatabaseInterface {
 		db.store(null, new Invoice(1l));
 		db.store(null, new Invoice(2l));
 		db.store(null, new Invoice(3l));
-		db.execute("SELECT MAX(id) FROM invoice");
+		db.executeQuery("SELECT MAX(id) FROM invoice");
 		List<? extends DatabaseObject> list = db.getAll("invoice");
 		for(DatabaseObject o: list){
 			logger.debug(o.toString());
@@ -187,10 +187,10 @@ public class SqlDB implements DatabaseInterface {
 	 * If they do not exist they will be created anew.
 	 * If they exist but are different, errors will be eventually thrown later
 	 */
-	private void initialize(Class<? extends DatabaseObject> c){
+	private void initialize(Class<?> c){
 		String classname = getClassTable(c);
 		if(initCache.get(classname)!=null){
-			logger.warn("Table "+classname+" already initialized");
+			//logger.warn("Table "+classname+" already initialized");
 			return;
 		}else{
 			initCache.put(classname, c);
@@ -280,9 +280,15 @@ public class SqlDB implements DatabaseInterface {
 			return false;
 		}
 	}
+	
+	public void execute(final String query) throws SQLException {
+		Statement s = connection.createStatement();
+		s.execute(query);
+
+	}
 
 	@Override
-	public Object execute(String query) {
+	public Object executeQuery(final String query) {
 		Statement s;
 		Object o = null;
 		ResultSet rs = null;
@@ -334,16 +340,31 @@ public class SqlDB implements DatabaseInterface {
     	DatabaseObject o;
     	int nobjs = 0;
     	String t = null;
+		PreparedStatement ps = null;
     	try{
+    		Class<?> c=null;
 	    	while((o = (DatabaseObject)ios.readObject())!=null){
-	    		initialize(o.getClass());
-	    		store(t , o);
+	    		Class<?> _c = o.getClass();
+	    		if(_c!=c){
+	    			c = _c;
+	    			logger.info("Loading "+c.getSimpleName()+" objects...");
+	    			initialize(c);
+	    			if(ps!=null) ps.close();
+	    			ps = getReplaceStatement(c);
+	    		}
+	    		try {
+	    			fillPreparedStatement(o, ps);
+	    			ps.executeUpdate();
+	    		} catch (Exception e) {
+	    			logger.error("store("+o+")",e);
+	    		} 
 	    		nobjs++;
-	    		logger.debug("Loaded "+o.getClass().getName()+" "+o);
+	    		//logger.debug("Loaded "+o.getClass().getName()+" "+o);
 	    	}
     	}catch(EOFException eof){
     		//end of file reached!
     	}
+		if(ps!=null) ps.close();
     	logger.info("Loaded "+nobjs+" objects");
     	ios.close();
 	}
@@ -356,11 +377,90 @@ public class SqlDB implements DatabaseInterface {
 			for(String t: getTables()){
 				sql = "DELETE FROM "+t+";";	
 				s.execute(sql);
-				logger.debug("clear: "+sql);
+				sql = "DROP TABLE "+t+";";
+				s.execute(sql);
+				logger.debug("clear: "+t);
 				//initCache.remove(t);
 			}
 		}catch(Exception e){
 			logger.error("on clear",e);
+		}
+	}
+	
+	private PreparedStatement getReplaceStatement(final Class<?> c) throws SQLException{
+		String args = new String();
+		String ftype;
+		int fsize = 0;
+		for(Field f: getFields(c)){
+			ftype = f.getType().getSimpleName();
+			try{
+				if(EntryType.valueOf(ftype)==EntryType.Set) continue;
+			}catch(IllegalArgumentException ex){
+				//when no object is mapped in the entrytype enum
+			}
+			if(args.length()>0){
+				args+=", ?";
+			}else{
+				args+="?";
+			}
+			++fsize;
+		}
+		return connection.prepareStatement("REPLACE INTO "+getClassTable(c)+" VALUES ("+args+")");
+	}
+	
+	private void fillPreparedStatement(final DatabaseObject o, final PreparedStatement ps) 
+			throws Exception{
+		int factual = 0;
+		String ftype;
+		for(Field f: getFields(o.getClass())){
+			ftype = f.getType().getSimpleName();
+			//logger.debug("factual is "+factual+"/"+fsize);
+			try{
+				switch(EntryType.valueOf(ftype)){
+					case Set:
+						//the set requires another table referring to this entities
+						Set<DatabaseObject> _s = (Set<DatabaseObject>)f.get(o);
+						String _t = getSetTable(f);
+						for(DatabaseObject dob: _s){
+							store(_t, dob);
+						}
+						break;
+					case Integer:
+						ps.setInt(++factual, (Integer)f.get(o));
+						break;
+					case Float:
+						ps.setFloat(++factual, (Float)f.get(o));
+						break;
+					case String:
+						ps.setString(++factual, (String)f.get(o));
+						break;
+					case Long:
+						ps.setLong(++factual, (Long)f.get(o));
+						break;
+					case Date:			
+						java.util.Date d = (java.util.Date)f.get(o);
+						ps.setString(++factual, SQLDateFormat.format(d));
+						break;
+					default:
+						Object _o = f.get(o);
+						if(_o==null){
+							ps.setObject(++factual, "");
+						}else{
+							ps.setObject(++factual, _o);
+						}
+						break;
+				}
+			}catch(IllegalArgumentException e){
+				//custom external class
+				Object _o = f.get(o);
+				if(_o==null || !(_o instanceof DatabaseObject)){
+					ps.setObject(++factual, "");
+				}else{
+					ps.setObject(++factual,((DatabaseObject)_o).getId());
+				}
+			}catch(Exception e){
+				logger.error("Generic exception on "+f.get(o)+" as "+f.get(o).getClass().getSimpleName(),e);
+			}
 		}
 	}
 
@@ -369,80 +469,11 @@ public class SqlDB implements DatabaseInterface {
 	 * Table is ignored here
 	 */
 	public DatabaseObject store(String table, DatabaseObject o) {
-		initialize(table, o.getClass());
+		Class<?> c = o.getClass();
+		initialize(table, c);
 		try {
-			String args = new String();
-			String ftype;
-			int fsize = 0;
-			for(Field f: getFields(o.getClass())){
-				ftype = f.getType().getSimpleName();
-				try{
-					if(EntryType.valueOf(ftype)==EntryType.Set) continue;
-				}catch(IllegalArgumentException ex){
-					//when no object is mapped in the entrytype enum
-				}
-				if(args.length()>0){
-					args+=", ?";
-				}else{
-					args+="?";
-				}
-				++fsize;
-			}
-			String sql = "REPLACE INTO "+getClassTable(o.getClass())+" VALUES ("+args+")";
-			logger.debug("PreparedStatement "+sql);
-			PreparedStatement ps = connection.prepareStatement(sql);	
-			int factual = 0;
-			for(Field f: getFields(o.getClass())){
-				ftype = f.getType().getSimpleName();
-				logger.debug("factual is "+factual+"/"+fsize);
-				try{
-					switch(EntryType.valueOf(ftype)){
-						case Set:
-							//the set requires another table referring to this entities
-							Set<DatabaseObject> _s = (Set<DatabaseObject>)f.get(o);
-							String _t = getSetTable(f);
-							for(DatabaseObject dob: _s){
-								store(_t, dob);
-							}
-							break;
-						case Integer:
-							ps.setInt(++factual, (Integer)f.get(o));
-							break;
-						case Float:
-							ps.setFloat(++factual, (Float)f.get(o));
-							break;
-						case String:
-							ps.setString(++factual, (String)f.get(o));
-							break;
-						case Long:
-							ps.setLong(++factual, (Long)f.get(o));
-							break;
-						case Date:			
-							java.util.Date d = (java.util.Date)f.get(o);
-							ps.setString(++factual, SQLDateFormat.format(d));
-							break;
-						default:
-							Object _o = f.get(o);
-							if(_o==null){
-								ps.setObject(++factual, "");
-							}else{
-								ps.setObject(++factual, _o);
-							}
-							break;
-					}
-				}catch(IllegalArgumentException e){
-					//custom external class
-					Object _o = f.get(o);
-					if(_o==null || !(_o instanceof DatabaseObject)){
-						ps.setObject(++factual, "");
-					}else{
-						ps.setObject(++factual,((DatabaseObject)_o).getId());
-					}
-				}catch(Exception e){
-					logger.error("Generic exception on "+f.get(o)+" as "+f.get(o).getClass().getSimpleName(),e);
-				}
-			}
-			logger.debug("Executing update on prepared statement");
+			PreparedStatement ps = getReplaceStatement(c);
+			fillPreparedStatement(o, ps);
 			ps.executeUpdate();
 			ps.close();
 		} catch (Exception e) {

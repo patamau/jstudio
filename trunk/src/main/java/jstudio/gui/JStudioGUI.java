@@ -52,6 +52,7 @@ public class JStudioGUI extends JFrame implements ActionListener, WindowListener
 	private JMenuItem
 		backupItem,
 		restoreItem,
+		loadItem,
 		clearItem;
 		
 	private JMenu viewMenu;
@@ -117,15 +118,18 @@ public class JStudioGUI extends JFrame implements ActionListener, WindowListener
 		
 		//create tools menu		
 		JMenu toolsMenu = new JMenu(Language.string("Tools"));		
-		backupItem = new JMenuItem(Language.string("Backup"));
+		backupItem = new JMenuItem(Language.string("Backup..."));
 		backupItem.addActionListener(this);
 		toolsMenu.add(backupItem);
-		restoreItem = new JMenuItem(Language.string("Restore"));
+		restoreItem = new JMenuItem(Language.string("Restore..."));
 		restoreItem.addActionListener(this);
 		toolsMenu.add(restoreItem);
-		clearItem = new JMenuItem(Language.string("Clear"));
+		clearItem = new JMenuItem(Language.string("Reset"));
 		clearItem.addActionListener(this);
 		toolsMenu.add(clearItem);
+		loadItem = new JMenuItem(Language.string("Load..."));
+		loadItem.addActionListener(this);
+		toolsMenu.add(loadItem);
 		menuBar.add(toolsMenu);
 		
 		//create help menu		
@@ -153,6 +157,8 @@ public class JStudioGUI extends JFrame implements ActionListener, WindowListener
 			app.doRestore();
 		}else if(src==clearItem){
 			app.doClear();
+		}else if(src==loadItem){
+			app.doLoad();
 		}else if(src==optionsItem){
 			ConfigurationDialog cdialog = new ConfigurationDialog(this);
 			Configuration c = cdialog.showDialog(Configuration.getGlobalConfiguration());
