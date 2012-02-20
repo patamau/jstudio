@@ -33,7 +33,8 @@ public interface DatabaseInterface {
 	public void connect(String host, String table, String user, String pass) throws Exception;
 	public void close();
 	public boolean isConnected();
-	public Object execute(String query);
+	public Object executeQuery(String query);
+	public void execute(String sql) throws Exception;
 	public void dump(File dest) throws Exception;
 	public void restore(File src) throws Exception;
 	public void clear();

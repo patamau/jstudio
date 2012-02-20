@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -40,7 +41,7 @@ public class PersonPanel extends EntityPanel<Person> {
 		codeField,
 		phoneField;
 	private JButton okButton, cancelButton;
-	private JButton editButton, deleteButton;
+	private JButton viewButton, editButton, deleteButton;
 	private JButton closeButton;
 	private JButton generateButton;
 
@@ -87,6 +88,13 @@ public class PersonPanel extends EntityPanel<Person> {
 		phoneField = GUITool.createField(panel.getBody(), gc, Language.string("Phone"), this.entity.getPhone(), editable);
 		
 		if(editable){
+			deleteButton = new JButton(Language.string("Delete"));
+			deleteButton.addActionListener(this);
+			panel.addButton(deleteButton);
+			viewButton = new JButton(Language.string("View"));
+			viewButton.addActionListener(this);
+			panel.addButton(viewButton);
+			panel.addButtonsGlue();
 			okButton = new JButton(Language.string("Ok"));
 			okButton.addActionListener(this);
 			panel.addButton(okButton);
@@ -94,15 +102,16 @@ public class PersonPanel extends EntityPanel<Person> {
 			cancelButton.addActionListener(this);
 			panel.addButton(cancelButton);
 		}else{
-			closeButton = new JButton(Language.string("Close"));
-			closeButton.addActionListener(this);
-			panel.addButton(closeButton);
-			editButton = new JButton(Language.string("Edit"));
-			editButton.addActionListener(this);
-			panel.addButton(editButton);
 			deleteButton = new JButton(Language.string("Delete"));
 			deleteButton.addActionListener(this);
 			panel.addButton(deleteButton);
+			editButton = new JButton(Language.string("Edit"));
+			editButton.addActionListener(this);
+			panel.addButton(editButton);
+			panel.addButtonsGlue();
+			closeButton = new JButton(Language.string("Close"));
+			closeButton.addActionListener(this);
+			panel.addButton(closeButton);
 		}
 	}
 	

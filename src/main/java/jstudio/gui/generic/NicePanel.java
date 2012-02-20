@@ -9,7 +9,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -96,9 +98,19 @@ public class NicePanel extends JPanel {
 	 * and the last button is rightmost
 	 * @param button
 	 */
-	public void addButton(final JButton button){
+	public void addButton(final Component button){
 		footer.add(button, footerConstraints);
 		footerConstraints.gridx++;
+	}
+	
+	public void addButtonsGlue(){
+		footerConstraints.weightx=1.0f;
+		footerConstraints.fill=GridBagConstraints.HORIZONTAL;
+		footer.add(new JPanel(), footerConstraints);
+		//restore standard constraints
+		footerConstraints.weightx=0.0f;
+		footerConstraints.fill=GridBagConstraints.NONE;
+		++footerConstraints.gridx;
 	}
 	
 	protected JPanel getFooter(){
@@ -107,13 +119,9 @@ public class NicePanel extends JPanel {
 			
 			GridBagConstraints gc = new GridBagConstraints();
 			gc.gridx=gc.gridy=0;
-			gc.weightx=1.0;
-			gc.weighty=0.0;
-			gc.fill=GridBagConstraints.HORIZONTAL;
 			gc.insets=new Insets(5,5,5,5);
-			panel.add(new JPanel(), gc);
+			gc.weighty=0.0;
 			gc.weightx=0.0f;
-			++gc.gridx;
 			gc.fill=GridBagConstraints.NONE;
 			footerConstraints = gc;
 			

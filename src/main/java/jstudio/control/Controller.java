@@ -36,7 +36,7 @@ public class Controller<E extends DatabaseObject> {
 	
 	public Long getNextId(){
 		String query = "SELECT MAX(id) FROM "+source;
-		Object o = app.getDatabase().execute(query);
+		Object o = app.getDatabase().executeQuery(query);
 		long id;
 		if(o!=null){
 			if(o instanceof Integer){
