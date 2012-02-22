@@ -1,11 +1,17 @@
 package jstudio.util;
 
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,7 +23,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import org.apache.log4j.Logger;
+
 public class GUITool {
+	
+	private static final Logger logger = Logger.getLogger(GUITool.class);
+	
+	public static final DateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy");
 	
 	public static void appendContainer(Container c, GridBagConstraints gc, Container f){
 		int ow = gc.gridwidth; //store old weight
@@ -128,8 +140,80 @@ public class GUITool {
 		return f;
 	}
 	
-	public static JTextField createDateField(final Container c, GridBagConstraints gc, String label, String value, boolean editable, final SimpleDateFormat dateFormat){
-		final JTextField f = new JTextField(value);
+	private static class DateKeyListener implements KeyListener {
+		final JTextField field;
+		public DateKeyListener(final JTextField f){
+			field = f;
+		}
+		@Override
+		public void keyTyped(KeyEvent e) {
+			e.consume();
+			char ch = e.getKeyChar();
+			int pos = field.getCaretPosition();
+			if(KeyEvent.VK_BACK_SPACE==ch){
+				field.setText(field.getText().substring(0,pos));
+				return;
+			}
+			if(pos==2||pos==5){
+				if(Character.isDigit(ch)){
+					field.setText(field.getText().substring(0,pos)+'/'+ch);
+					pos+=2;
+				}else{
+					field.setText(field.getText().substring(0,pos)+'/');
+					pos++;
+				}
+				field.setCaretPosition(pos);
+			}else if(pos==8||pos==9){				
+				if(Character.isDigit(ch)){
+					field.setText(field.getText().substring(0,pos)+ch);
+				}
+			}else if(pos<8){
+				if(Character.isDigit(ch)){
+					field.setText(field.getText().substring(0,pos)+ch);
+				}else{
+					if(pos==1){
+						field.setText('0'+field.getText().substring(0,pos)+'/');
+						field.setCaretPosition(3);
+					}else if(pos==4){
+						field.setText(field.getText().substring(0,3)+'0'+field.getText().charAt(3)+'/');
+						field.setCaretPosition(7);
+					}
+				}
+			}
+		}
+		@Override
+		public void keyPressed(KeyEvent e) {
+			
+		}
+		@Override
+		public void keyReleased(KeyEvent e) {
+			
+		}
+	}
+	
+	public static JTextField createDateField(final Container c, GridBagConstraints gc, String label, Date value, boolean editable, final SimpleDateFormat dateFormat){
+		final JTextField f = new JTextField(dateFormat.format(value));
+		if(editable){
+			f.addKeyListener(new DateKeyListener(f));		
+			f.addFocusListener(new FocusListener(){
+				@Override
+				public void focusGained(FocusEvent e) {
+					f.setCaretPosition(0);
+					f.setBackground(Color.white);
+				}
+	
+				@Override
+				public void focusLost(FocusEvent e) {
+					try {
+						Date d = dateFormat.parse(f.getText());
+						f.setText(dateFormat.format(d));
+					} catch (ParseException e1) {
+						f.setBackground(Color.orange);
+					}
+				}
+			});
+		}
+		//final JFormattedTextField f = new JFormattedTextField(DateFormat.getDateInstance(DateFormat.MEDIUM));
 		f.setEditable(editable);
 		f.setColumns(0);
 		gc.gridy++;

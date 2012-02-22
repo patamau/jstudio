@@ -42,7 +42,7 @@ public class EventPanel extends EntityPanel<Event> {
 		gc.insets= new Insets(4,4,4,4);
 		dateField = GUITool.createDateField(this, gc, 
 				Language.string("Date"), 
-				Person.birthdateFormat.format(this.entity.getDate()), editable,
+				this.entity.getDate(), editable,
 				Person.birthdateFormat);
 		timeField = GUITool.createField(this, gc, 
 				Language.string("Time"), 

@@ -61,7 +61,7 @@ public class PersonPanel extends EntityPanel<Person> {
 		nameField = GUITool.createField(panel.getBody(), gc, Language.string("Name"), this.entity.getName(), editable);
 		lastnameField = GUITool.createField(panel.getBody(), gc, Language.string("Lastname"), this.entity.getLastname(), editable);
 		genderBox = GUITool.createCombo(panel.getBody(), gc, Language.string("Gender"), this.entity.getGender(), Person.Gender.values(), editable);
-		birthdateField = GUITool.createDateField(panel.getBody(), gc, Language.string("Birthdate"), Person.birthdateFormat.format(this.entity.getBirthdate()), editable, Person.birthdateFormat);
+		birthdateField = GUITool.createDateField(panel.getBody(), gc, Language.string("Birthdate"), this.entity.getBirthdate(), editable, Person.birthdateFormat);
 		addressField = GUITool.createField(panel.getBody(), gc, Language.string("Address"), this.entity.getAddress(), editable);
 		cityField = GUITool.createField(panel.getBody(), gc, Language.string("City"), this.entity.getCity(), editable);
 		if(controller!=null){
