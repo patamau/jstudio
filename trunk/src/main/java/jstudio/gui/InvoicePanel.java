@@ -48,7 +48,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		capField,
 		codeField;
 	private ProductTable productTable;
-	private JButton okButton, cancelButton, printButton;
+	private JButton okButton, cancelButton, printButton, closeButton;
 	private JButton pickPersonButton;
 
 	public InvoicePanel(Invoice invoice, EntityManagerPanel<Invoice> manager, boolean editable){
@@ -111,15 +111,23 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		panel.getBody().add(head, BorderLayout.NORTH);
 		panel.getBody().add(body, BorderLayout.CENTER);
 		
-		//TODO: include the Print button
-		/*
-		JPanel footer = new JPanel(new GridBagLayout());
+		printButton = new JButton(Language.string("Print"));
+		printButton.addActionListener(this);
+		panel.addButton(printButton);
+		panel.addButtonsGlue();
+		
 		if(editable){
-			okButton = GUITool.createButton(footer, gc, Language.string("Ok"), this);
-			cancelButton = GUITool.createButton(footer, gc, Language.string("Cancel"), this);
+			okButton = new JButton(Language.string("Ok"));
+			okButton.addActionListener(this);
+			panel.addButton(okButton);
+			cancelButton = new JButton(Language.string("Cancel"));
+			cancelButton.addActionListener(this);
+			panel.addButton(cancelButton);
+		}else{
+			closeButton = new JButton(Language.string("Close"));
+			closeButton.addActionListener(this);
+			panel.addButton(closeButton);
 		}
-		printButton = GUITool.createButton(footer, gc, Language.string("Print"), this);
-		*/
 		
 		//table.addMouseListener(new PopupListener<Product>(table, new TreatmentPopup(this.gui, this.gui.getApplication().getAccounting().getProductManager())));
 	}
@@ -170,7 +178,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			controller.store(entity);
 			getDialog().dispose();
 			manager.refresh();
-		}else if(o==cancelButton){
+		}else if(o==cancelButton||o==closeButton){
 			getDialog().dispose();
 		}else if(o==printButton){
 			ReportGenerator rg = new ReportGenerator();
