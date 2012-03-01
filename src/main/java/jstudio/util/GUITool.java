@@ -14,6 +14,7 @@ import java.awt.event.KeyListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.JButton;
@@ -64,8 +65,9 @@ public class GUITool {
 		return f;
 	}
 	
-	public static JTextArea createArea(Container c, GridBagConstraints gc, String label, String value){
+	public static JTextArea createArea(Container c, GridBagConstraints gc, String label, String value, boolean editable){
 		JTextArea f = new JTextArea(value);
+		f.setEditable(editable);
 		f.setColumns(0);
 		f.setRows(0);
 		gc.gridy++;
@@ -182,13 +184,127 @@ public class GUITool {
 			}
 		}
 		@Override
-		public void keyPressed(KeyEvent e) {
-			
+		public void keyPressed(KeyEvent e) {}
+		@Override
+		public void keyReleased(KeyEvent e) {}
+	}	
+	
+	private static class ProvinceKeyListener implements KeyListener {
+		final JTextField field;
+		public ProvinceKeyListener(final JTextField f){
+			field = f;
 		}
 		@Override
-		public void keyReleased(KeyEvent e) {
-			
+		public void keyTyped(KeyEvent e) {
+			e.consume();
+			char ch = e.getKeyChar();
+			int pos = field.getCaretPosition();
+			if(KeyEvent.VK_BACK_SPACE==ch){
+				field.setText(field.getText().substring(0,pos));
+				return;
+			}
+			if(pos<2){
+				if(Character.isLetter(ch)){
+					field.setText(field.getText().substring(0,pos)+Character.toUpperCase(ch));
+					++pos;
+				}
+			}
 		}
+		@Override
+		public void keyPressed(KeyEvent e) {}
+		@Override
+		public void keyReleased(KeyEvent e) {}
+	}
+	
+	private static class CAPKeyListener implements KeyListener {
+		final JTextField field;
+		public CAPKeyListener(final JTextField f){
+			field = f;
+		}
+		@Override
+		public void keyTyped(KeyEvent e) {
+			e.consume();
+			char ch = e.getKeyChar();
+			int pos = field.getCaretPosition();
+			if(KeyEvent.VK_BACK_SPACE==ch){
+				field.setText(field.getText().substring(0,pos));
+				return;
+			}
+			if(pos<5){
+				if(Character.isDigit(ch)){
+					field.setText(field.getText().substring(0,pos)+ch);
+					++pos;
+				}
+			}
+		}
+		@Override
+		public void keyPressed(KeyEvent e) {}
+		@Override
+		public void keyReleased(KeyEvent e) {}
+	}
+	
+	public static JTextField createCAPField(Container c, GridBagConstraints gc, String label, String value, boolean editable){
+		final JTextField f = new JTextField(value);
+		f.setEditable(editable);
+		f.setColumns(5);
+		if(editable){
+			f.addKeyListener(new CAPKeyListener(f));		
+			f.addFocusListener(new FocusListener(){
+				@Override
+				public void focusGained(FocusEvent e) {
+					f.setCaretPosition(0);
+				}
+	
+				@Override
+				public void focusLost(FocusEvent e) { }
+			});
+		}
+		gc.gridy++;
+		gc.anchor=GridBagConstraints.EAST;
+		JLabel l = new JLabel(label, JLabel.RIGHT);
+		c.add(l,gc);
+		gc.anchor=GridBagConstraints.WEST;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=1.0f;
+		int px = gc.gridx;
+		gc.gridx++;
+		c.add(f,gc);
+		gc.fill=GridBagConstraints.NONE;
+		gc.weightx=0.0f;
+		gc.gridx=px;
+		return f;
+	}
+	
+	public static JTextField createProvinceField(Container c, GridBagConstraints gc, String label, String value, boolean editable){
+		final JTextField f = new JTextField(value);
+		f.setEditable(editable);
+		f.setColumns(2);
+		if(editable){
+			f.addKeyListener(new ProvinceKeyListener(f));		
+			f.addFocusListener(new FocusListener(){
+				@Override
+				public void focusGained(FocusEvent e) {
+					f.setCaretPosition(0);
+				}
+	
+				@Override
+				public void focusLost(FocusEvent e) {}
+			});
+		}
+		gc.gridy++;
+		gc.anchor=GridBagConstraints.EAST;
+		JLabel l = new JLabel(label, JLabel.RIGHT);
+		c.add(l,gc);
+		gc.anchor=GridBagConstraints.WEST;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=1.0f;
+		int px = gc.gridx;
+		gc.gridx++;
+		c.add(f,gc);
+		gc.fill=GridBagConstraints.NONE;
+		gc.weightx=0.0f;
+		gc.gridx=px;
+		return f;
 	}
 	
 	public static JTextField createDateField(final Container c, GridBagConstraints gc, String label, Date value, boolean editable, final SimpleDateFormat dateFormat){
@@ -206,7 +322,15 @@ public class GUITool {
 				public void focusLost(FocusEvent e) {
 					try {
 						Date d = dateFormat.parse(f.getText());
-						f.setText(dateFormat.format(d));
+						Calendar c = Calendar.getInstance();
+						c.setTime(d);
+						int year = c.get(Calendar.YEAR);
+						if(year<100){
+							c.set(Calendar.YEAR, year+1900);
+						}else if(year<1000){
+							c.set(Calendar.YEAR, year+1000);
+						}
+						f.setText(dateFormat.format(c.getTime()));
 					} catch (ParseException e1) {
 						f.setBackground(Color.orange);
 					}
@@ -215,7 +339,7 @@ public class GUITool {
 		}
 		//final JFormattedTextField f = new JFormattedTextField(DateFormat.getDateInstance(DateFormat.MEDIUM));
 		f.setEditable(editable);
-		f.setColumns(0);
+		f.setColumns(10);
 		gc.gridy++;
 		gc.anchor=GridBagConstraints.EAST;
 		JLabel l = new JLabel(label, JLabel.RIGHT);

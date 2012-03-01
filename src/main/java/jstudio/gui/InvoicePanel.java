@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.JButton;
@@ -19,6 +20,7 @@ import javax.swing.SwingUtilities;
 import jstudio.control.Accounting;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
+import jstudio.gui.generic.NicePanel;
 import jstudio.model.Invoice;
 import jstudio.model.Person;
 import jstudio.model.Product;
@@ -52,7 +54,12 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 	public InvoicePanel(Invoice invoice, EntityManagerPanel<Invoice> manager, boolean editable){
 		super(invoice, manager);
 		
+		Calendar c = Calendar.getInstance();
+		c.setTime(invoice.getDate());
+		NicePanel panel = new NicePanel(invoice.getId()+"/"+c.get(Calendar.YEAR),editable?Language.string("Edit details"):Language.string("View details"));
+		panel.getBody().setLayout(new BorderLayout());
 		this.setLayout(new BorderLayout());
+		this.add(panel, BorderLayout.CENTER);
 		
 		JPanel head = new JPanel(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
@@ -84,10 +91,10 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		cityField = GUITool.createField(head, gc,
 				Language.string("City"),
 				this.entity.getCity(), editable);
-		provinceField = GUITool.createField(head, gc,
+		provinceField = GUITool.createProvinceField(head, gc,
 				Language.string("Province"),
 				this.entity.getProvince(), editable);
-		capField = GUITool.createField(head, gc, 
+		capField = GUITool.createCAPField(head, gc, 
 				Language.string("CAP"), 
 				this.entity.getCap(), editable);
 		codeField = GUITool.createField(head, gc,
@@ -101,16 +108,18 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		
 		body.add(productTable, BorderLayout.CENTER);
 		
-		this.add(head, BorderLayout.NORTH);
-		this.add(body, BorderLayout.CENTER);
+		panel.getBody().add(head, BorderLayout.NORTH);
+		panel.getBody().add(body, BorderLayout.CENTER);
 		
+		//TODO: include the Print button
+		/*
 		JPanel footer = new JPanel(new GridBagLayout());
 		if(editable){
 			okButton = GUITool.createButton(footer, gc, Language.string("Ok"), this);
 			cancelButton = GUITool.createButton(footer, gc, Language.string("Cancel"), this);
 		}
 		printButton = GUITool.createButton(footer, gc, Language.string("Print"), this);
-		this.add(footer, BorderLayout.SOUTH);
+		*/
 		
 		//table.addMouseListener(new PopupListener<Product>(table, new TreatmentPopup(this.gui, this.gui.getApplication().getAccounting().getProductManager())));
 	}

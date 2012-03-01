@@ -113,7 +113,7 @@ public class NicePanel extends JPanel {
 		++footerConstraints.gridx;
 	}
 	
-	protected JPanel getFooter(){
+	public JPanel getFooter(){
 		if(footer==null){
 			JPanel panel = new JPanel(new GridBagLayout());
 			
