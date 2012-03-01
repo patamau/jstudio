@@ -127,7 +127,8 @@ public class JStudioGUI extends JFrame implements ActionListener, WindowListener
 		clearItem = new JMenuItem(Language.string("Reset"));
 		clearItem.addActionListener(this);
 		toolsMenu.add(clearItem);
-		loadItem = new JMenuItem(Language.string("Load..."));
+		toolsMenu.add(new JSeparator());
+		loadItem = new JMenuItem(Language.string("Load SQL..."));
 		loadItem.addActionListener(this);
 		toolsMenu.add(loadItem);
 		menuBar.add(toolsMenu);

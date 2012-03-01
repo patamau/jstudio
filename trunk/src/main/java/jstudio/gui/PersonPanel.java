@@ -10,7 +10,6 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 
-import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -29,7 +28,6 @@ import jstudio.util.Language;
 public class PersonPanel extends EntityPanel<Person> {
 	
 	private JComboBox
-		provinceBox,
 		genderBox;
 	private JTextField 
 		nameField, 
@@ -37,6 +35,7 @@ public class PersonPanel extends EntityPanel<Person> {
 		birthdateField,
 		addressField,
 		cityField,
+		provinceField,
 		capField,
 		codeField,
 		phoneField;
@@ -48,7 +47,7 @@ public class PersonPanel extends EntityPanel<Person> {
 	public PersonPanel(Person person, EntityManagerPanel<Person> manager, boolean editable){
 		super(person, manager);
 		
-		NicePanel panel = new NicePanel(Language.string("Person"),editable?Language.string("Edit details"):Language.string("View details"));
+		NicePanel panel = new NicePanel(person.getName()+" "+person.getLastname(),editable?Language.string("Edit details"):Language.string("View details"));
 		panel.getBody().setLayout(new GridBagLayout());
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
@@ -64,6 +63,7 @@ public class PersonPanel extends EntityPanel<Person> {
 		birthdateField = GUITool.createDateField(panel.getBody(), gc, Language.string("Birthdate"), this.entity.getBirthdate(), editable, Person.birthdateFormat);
 		addressField = GUITool.createField(panel.getBody(), gc, Language.string("Address"), this.entity.getAddress(), editable);
 		cityField = GUITool.createField(panel.getBody(), gc, Language.string("City"), this.entity.getCity(), editable);
+		/*
 		if(controller!=null){
 			List<String> pvs = controller.getApplication().getComuni().getProvinces();
 			int sel = pvs==null?0:pvs.indexOf(this.entity.getProvince());
@@ -72,7 +72,9 @@ public class PersonPanel extends EntityPanel<Person> {
 		}else{
 			provinceBox = GUITool.createCombo(panel.getBody(), gc, Language.string("Province"), 0, new Object[]{this.entity.getProvince()}, editable);
 		}
-		capField = GUITool.createField(panel.getBody(), gc, Language.string("CAP"), this.entity.getCap(), editable);
+		*/
+		provinceField = GUITool.createProvinceField(panel.getBody(), gc, Language.string("Province"), this.entity.getProvince(), editable);
+		capField = GUITool.createCAPField(panel.getBody(), gc, Language.string("CAP"), this.entity.getCap(), editable);
 		codeField = GUITool.createField(panel.getBody(), gc, Language.string("Code"), this.entity.getCode(), editable);
 		if(editable){
 			String blabel = Language.string("Generate");
@@ -117,7 +119,8 @@ public class PersonPanel extends EntityPanel<Person> {
 	
 	public String getCode(){
 		boolean male = genderBox.getSelectedIndex()==Person.Gender.Male.getId();
-		String pv = (String)provinceBox.getSelectedItem();
+		//String pv = (String)provinceBox.getSelectedItem();
+		String pv = provinceField.getText();
 		String loc = controller.getApplication().getComuni().getCode(pv, cityField.getText());
 		Calendar c = Calendar.getInstance();
 		try{
@@ -172,7 +175,8 @@ public class PersonPanel extends EntityPanel<Person> {
 			entity.setLastname(lastnameField.getText());
 			entity.setAddress(addressField.getText());
 			entity.setCity(cityField.getText());
-			entity.setProvince((String)provinceBox.getSelectedItem());
+			//entity.setProvince((String)provinceBox.getSelectedItem());
+			entity.setProvince(provinceField.getText());
 			entity.setCap(capField.getText());		
 			entity.setCode(codeField.getText());
 			entity.setPhone(phoneField.getText());

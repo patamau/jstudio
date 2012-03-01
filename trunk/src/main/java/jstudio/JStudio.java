@@ -280,6 +280,10 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 				}
 			} catch (Exception e) {
 				logger.error("Loading "+f,e);
+				JOptionPane.showMessageDialog(gui, 
+						e.getLocalizedMessage(),
+						Language.string("Loading error"),
+						JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

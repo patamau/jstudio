@@ -10,6 +10,7 @@ import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import jstudio.gui.generic.EntityManagerPanel;
@@ -27,8 +28,8 @@ public class EventPanel extends EntityPanel<Event> {
 		timeField,
 		nameField,
 		lastnameField,
-		phoneField,
-		descriptionField;
+		phoneField;
+	private JTextArea descriptionArea;
 	private JButton okButton, cancelButton;
 	private JButton pickPersonButton;
 
@@ -60,7 +61,7 @@ public class EventPanel extends EntityPanel<Event> {
 		phoneField = GUITool.createField(this, gc,
 				Language.string("Phone"),
 				this.entity.getPhone(), editable);
-		descriptionField = GUITool.createField(this, gc, 
+		descriptionArea = GUITool.createArea(this, gc, 
 				Language.string("Description"), 
 				this.entity.getDescription(), editable);
 		
@@ -108,7 +109,7 @@ public class EventPanel extends EntityPanel<Event> {
 			entity.setName(nameField.getText());
 			entity.setLastname(lastnameField.getText());
 			entity.setPhone(phoneField.getText());
-			entity.setDescription(descriptionField.getText());
+			entity.setDescription(descriptionArea.getText());
 			controller.store(entity);
 			getDialog().dispose();
 			manager.refresh();
