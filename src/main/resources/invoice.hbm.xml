@@ -12,6 +12,7 @@
              <one-to-many class="jstudio.model.Product"/>
         </set>
         <property name="name" />
+        <property name="number" />
 		<property name="lastname" />
 		<property name="address" />
 		<property name="city" />

@@ -1,6 +1,7 @@
 package jstudio.model;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +15,7 @@ public class Invoice implements DatabaseObject {
 
 	public static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-	private Long id;
+	private Long id, number;
 	private Date date;
 	private String name, lastname, address, city, province, cap, code;
 	private Set<Product> products;
@@ -34,6 +35,7 @@ public class Invoice implements DatabaseObject {
 	public Invoice(Long id){
 		this.id=id;
 		this.date=new Date();
+		this.number=0l;
 		this.name="";
 		this.lastname="";
 		this.address="";
@@ -48,6 +50,22 @@ public class Invoice implements DatabaseObject {
 		return Long.toString(id);
 	}
 	
+	public Long getNumber(){
+		if(number==null) number=0l;
+		return number;
+	}
+	
+	public void setNumber(final Long number){
+		this.number = number;
+	}
+	
+	/** Number/Year **/
+	public String getFullNumber(){
+		Calendar c = Calendar.getInstance();
+		c.setTime(getDate());
+		Integer y = c.get(Calendar.YEAR);
+		return number+"/"+y;
+	}
 	
 	public String getName() {
 		return name;

@@ -375,6 +375,7 @@ public class SqlDB implements DatabaseInterface {
 			Statement s = connection.createStatement();
 			String sql;
 			for(String t: getTables()){
+				if(t.equals("sqlite_sequence")) continue;
 				sql = "DELETE FROM "+t+";";	
 				s.execute(sql);
 				sql = "DROP TABLE "+t+";";

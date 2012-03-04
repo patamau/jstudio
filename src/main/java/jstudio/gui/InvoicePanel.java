@@ -56,7 +56,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		
 		Calendar c = Calendar.getInstance();
 		c.setTime(invoice.getDate());
-		NicePanel panel = new NicePanel(invoice.getId()+"/"+c.get(Calendar.YEAR),editable?Language.string("Edit details"):Language.string("View details"));
+		NicePanel panel = new NicePanel(entity.getFullNumber(),editable?Language.string("Edit details"):Language.string("View details"));
 		panel.getBody().setLayout(new BorderLayout());
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
@@ -69,8 +69,8 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		
 		//id field
 		GUITool.createField(head, gc, 
-				Language.string("Id"), 
-				Long.toString(this.entity.getId()), false);
+				Language.string("Number"), 
+				Long.toString(this.entity.getNumber()), false);
 		
 		dateField = GUITool.createField(head, gc, 
 				Language.string("Date"), 
@@ -169,6 +169,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			entity.setCap(capField.getText());
 			entity.setCode(codeField.getText());
 			if(entity.getId()==0) entity.setId(controller.getNextId());
+			if(entity.getNumber()==0) entity.setNumber(((Accounting)controller).getNextInvoiceNumber());
 			//controller.store(entity);
 			long pid = ((Accounting)controller).getProducts().getNextId();
 			for(Product p: entity.getProducts()){
