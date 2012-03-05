@@ -383,6 +383,7 @@ public class SqlDB implements DatabaseInterface {
 				logger.debug("clear: "+t);
 				//initCache.remove(t);
 			}
+			initCache.clear();
 		}catch(Exception e){
 			logger.error("on clear",e);
 		}
