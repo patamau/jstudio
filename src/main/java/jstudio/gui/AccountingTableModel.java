@@ -13,7 +13,7 @@ import jstudio.util.TableSorter;
 public class AccountingTableModel extends DefaultTableModel {
 	
 	private static final Object[] cols = new Object[]{
-			Language.string("Id"),
+			Language.string("Number"),
 			Language.string("Date"), 
 			Language.string("Contact"), 
 			Language.string("Description"),
@@ -25,8 +25,8 @@ public class AccountingTableModel extends DefaultTableModel {
 		TableSorter ts = new TableSorter(this,table.getTableHeader());
 		table.setModel(ts);
 		ts.setSortingStatus(0, TableSorter.ASCENDING);
-		table.getColumn("Id").setMaxWidth(50);
-		table.getColumn("Id").setMinWidth(50);
+		//table.getColumn("Id").setMaxWidth(50);
+		//table.getColumn("Id").setMinWidth(50);
 	}
 
 	public boolean isCellEditable(int row, int col){
