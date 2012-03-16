@@ -70,7 +70,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		//id field
 		GUITool.createField(head, gc, 
 				Language.string("Number"), 
-				Long.toString(this.entity.getNumber()), false);
+				entity.getFullNumber(), false);
 		
 		dateField = GUITool.createField(head, gc, 
 				Language.string("Date"), 

@@ -31,7 +31,13 @@ public class Accounting extends Controller<Invoice>{
 		System.err.println("Number is "+o);
 		Long number;
 		if(o!=null){
-			number = ((Long)o)+1l;
+			if(o instanceof Long){
+				number = ((Long)o)+1l;
+			}else if(o instanceof Integer){
+				number = ((Integer)o).longValue()+1l;
+			}else{
+				number = 1l;
+			}
 		}else{
 			number = 1l;
 		}

@@ -9,7 +9,7 @@ import java.util.TreeSet;
 
 import jstudio.db.DatabaseObject;
 
-public class Invoice implements DatabaseObject {
+public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	
 	private static final long serialVersionUID = 2636840744342729819L;
 
@@ -47,7 +47,7 @@ public class Invoice implements DatabaseObject {
 	}
 	
 	public String toString(){
-		return Long.toString(id);
+		return getFullNumber();
 	}
 	
 	public Long getNumber(){
@@ -143,5 +143,10 @@ public class Invoice implements DatabaseObject {
 
 	public Long getId() {
 		return id;
+	}
+
+	@Override
+	public int compareTo(Invoice o) {
+		return this.id==o.id?0:(this.id>o.id?1:-1);
 	}
 }
