@@ -47,7 +47,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	}
 	
 	public String toString(){
-		return getFullNumber();
+		return getInvoiceId();
 	}
 	
 	public Long getNumber(){
@@ -60,11 +60,19 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	}
 	
 	/** Number/Year **/
-	public String getFullNumber(){
+	public String getInvoiceId(){
 		Calendar c = Calendar.getInstance();
 		c.setTime(getDate());
 		Integer y = c.get(Calendar.YEAR);
 		return number+"/"+y;
+	}
+	
+	/** Year_number **/
+	public String getFilePrefix(){
+		Calendar c = Calendar.getInstance();
+		c.setTime(getDate());
+		Integer y = c.get(Calendar.YEAR);
+		return Integer.toString(y)+"."+Long.toString(number)+".";
 	}
 	
 	public String getName() {
@@ -116,7 +124,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		return code;
 	}
 
-	public void setCode(String code) {
+	public void setCode(final String code) {
 		if(cap==null) cap = "";
 		this.code = code;
 	}
@@ -125,7 +133,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(final Date date) {
 		this.date = date;
 	}
 
@@ -133,7 +141,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		return products;
 	}
 
-	public void setProducts(Set<Product> products) {
+	public void setProducts(final Set<Product> products) {
 		this.products = new TreeSet<Product>(products);
 	}
 
@@ -146,7 +154,14 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	}
 
 	@Override
-	public int compareTo(Invoice o) {
-		return this.id==o.id?0:(this.id>o.id?1:-1);
+	public int compareTo(final Invoice o) {
+		Calendar c = Calendar.getInstance();
+		c.setTime(date);
+		int y = c.get(Calendar.YEAR);
+		c.setTime(o.date);
+		int oy = c.get(Calendar.YEAR);
+		return y<oy?-1:(y>oy?1:this.number<o.number?-1:(this.number>o.number?1:0));
+		//return this.date.before(o.date)?-1:(this.date.after(o.date)?1:0);
+		//return this.id==o.id?0:(this.id>o.id?1:-1);
 	}
 }

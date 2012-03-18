@@ -1,5 +1,6 @@
 package jstudio.gui;
 
+import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -15,6 +16,7 @@ import javax.swing.JTextField;
 
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
+import jstudio.gui.generic.NicePanel;
 import jstudio.model.Event;
 import jstudio.model.Person;
 import jstudio.util.GUITool;
@@ -36,38 +38,47 @@ public class EventPanel extends EntityPanel<Event> {
 	public EventPanel(Event event, EntityManagerPanel<Event> manager, boolean editable){
 		super(event, manager);
 		
-		this.setLayout(new GridBagLayout());
+		NicePanel panel = new NicePanel(Event.timeFormat.format(event.getDate()),editable?Language.string("Edit details"):Language.string("View details"));
+		panel.getBody().setLayout(new GridBagLayout());
+		this.setLayout(new BorderLayout());
+		this.add(panel, BorderLayout.CENTER);
+		
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.gridx=0;
 		gc.gridy=0;
 		gc.insets= new Insets(4,4,4,4);
-		dateField = GUITool.createDateField(this, gc, 
+		dateField = GUITool.createDateField(panel.getBody(), gc, 
 				Language.string("Date"), 
 				this.entity.getDate(), editable,
 				Person.birthdateFormat);
-		timeField = GUITool.createField(this, gc, 
+		timeField = GUITool.createField(panel.getBody(), gc, 
 				Language.string("Time"), 
 				Event.timeFormat.format(this.entity.getDate()), editable);
 		if(editable){
-			pickPersonButton = GUITool.createButton(this, gc, 
+			pickPersonButton = GUITool.createButton(panel.getBody(), gc, 
 				Language.string("Pick"), this);
 		}
-		nameField = GUITool.createField(this, gc, 
+		nameField = GUITool.createField(panel.getBody(), gc, 
 				Language.string("Name"), 
 				this.entity.getName(), editable);
-		lastnameField = GUITool.createField(this, gc,
+		lastnameField = GUITool.createField(panel.getBody(), gc,
 				Language.string("Lastname"),
 				this.entity.getLastname(), editable);
-		phoneField = GUITool.createField(this, gc,
+		phoneField = GUITool.createField(panel.getBody(), gc,
 				Language.string("Phone"),
 				this.entity.getPhone(), editable);
-		descriptionArea = GUITool.createArea(this, gc, 
+		descriptionArea = GUITool.createArea(panel.getBody(), gc, 
 				Language.string("Description"), 
 				this.entity.getDescription(), editable);
 		
 		if(editable){
-			okButton = GUITool.createButton(this, gc, Language.string("Ok"), this);
-			cancelButton = GUITool.createButton(this, gc, Language.string("Cancel"), this);
+			panel.addButtonsGlue();
+			okButton = new JButton(Language.string("Ok"));
+			okButton.addActionListener(this);
+			panel.addButton(okButton);
+			cancelButton = new JButton(Language.string("Cancel"));
+			cancelButton.addActionListener(this);
+			panel.addButton(cancelButton);
 		}
 	}
 

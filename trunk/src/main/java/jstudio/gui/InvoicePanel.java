@@ -10,6 +10,7 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -48,7 +49,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		capField,
 		codeField;
 	private ProductTable productTable;
-	private JButton okButton, cancelButton, printButton, closeButton;
+	private JButton okButton, cancelButton, printButton, closeButton, deleteButton, editButton, viewButton;
 	private JButton pickPersonButton;
 
 	public InvoicePanel(Invoice invoice, EntityManagerPanel<Invoice> manager, boolean editable){
@@ -56,7 +57,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		
 		Calendar c = Calendar.getInstance();
 		c.setTime(invoice.getDate());
-		NicePanel panel = new NicePanel(entity.getFullNumber(),editable?Language.string("Edit details"):Language.string("View details"));
+		NicePanel panel = new NicePanel(entity.getInvoiceId(),editable?Language.string("Edit details"):Language.string("View details"));
 		panel.getBody().setLayout(new BorderLayout());
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
@@ -68,9 +69,11 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		gc.insets= new Insets(4,4,4,4);
 		
 		//id field
+		/*
 		GUITool.createField(head, gc, 
 				Language.string("Number"), 
-				entity.getFullNumber(), false);
+				entity.getInvoiceId(), false);
+		*/
 		
 		dateField = GUITool.createField(head, gc, 
 				Language.string("Date"), 
@@ -105,18 +108,21 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		
 		productTable = new ProductTable(invoice, manager, editable);
 		productTable.refresh();
+		productTable.setBorder(BorderFactory.createTitledBorder(Language.string("Products")));
 		
 		body.add(productTable, BorderLayout.CENTER);
 		
 		panel.getBody().add(head, BorderLayout.NORTH);
 		panel.getBody().add(body, BorderLayout.CENTER);
 		
-		printButton = new JButton(Language.string("Print"));
-		printButton.addActionListener(this);
-		panel.addButton(printButton);
-		panel.addButtonsGlue();
-		
 		if(editable){
+			deleteButton = new JButton(Language.string("Delete"));
+			deleteButton.addActionListener(this);
+			panel.addButton(deleteButton);
+			viewButton = new JButton(Language.string("View"));
+			viewButton.addActionListener(this);
+			panel.addButton(viewButton);
+			panel.addButtonsGlue();
 			okButton = new JButton(Language.string("Ok"));
 			okButton.addActionListener(this);
 			panel.addButton(okButton);
@@ -124,6 +130,16 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			cancelButton.addActionListener(this);
 			panel.addButton(cancelButton);
 		}else{
+			deleteButton = new JButton(Language.string("Delete"));
+			deleteButton.addActionListener(this);
+			panel.addButton(deleteButton);
+			editButton = new JButton(Language.string("Edit"));
+			editButton.addActionListener(this);
+			panel.addButton(editButton);
+			printButton = new JButton(Language.string("Print"));
+			printButton.addActionListener(this);
+			panel.addButton(printButton);
+			panel.addButtonsGlue();
 			closeButton = new JButton(Language.string("Close"));
 			closeButton.addActionListener(this);
 			panel.addButton(closeButton);
@@ -188,8 +204,27 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			rg.setHeadValue("date", Person.birthdateFormat.format(entity.getDate()));
 			rg.setData(entity.getProducts());
 			rg.setHeadValue("totalcost", Float.toString(productTable.getTotal()));
-			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice"+entity.getId());
+			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,entity.getFilePrefix()+"invoice");
 			rgui.showGUI((Window)SwingUtilities.getRoot(this));
+		}else if(o==editButton){
+			getDialog().dispose();
+			JDialog dialog = new InvoicePanel(super.entity, super.manager, true).createDialog(super.manager.getTopLevelAncestor());
+			dialog.setVisible(true);
+		}else if(o==deleteButton){
+			int ch = JOptionPane.showConfirmDialog(super.manager, 
+					Language.string("Are you sure you want to remove {0} of {1}?",
+							entity.getInvoiceId(), Invoice.dateFormat.format(entity.getDate())),
+					Language.string("Remove invoice?"), 
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			if(ch==JOptionPane.YES_OPTION){
+				controller.delete(entity);
+				getDialog().dispose();
+				manager.refresh();
+			}
+		}else if(o==viewButton){
+			getDialog().dispose();
+			JDialog dialog = new InvoicePanel(super.entity, super.manager, false).createDialog(super.manager.getTopLevelAncestor());
+			dialog.setVisible(true);
 		}
 	}
 }

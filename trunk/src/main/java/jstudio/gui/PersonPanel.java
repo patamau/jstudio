@@ -8,7 +8,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -145,6 +144,10 @@ public class PersonPanel extends EntityPanel<Person> {
 		Object o = e.getSource();
 		if(o==closeButton){
 			getDialog().dispose();
+		}else if(o==viewButton){
+			getDialog().dispose();
+			JDialog dialog = new PersonPanel(super.entity, super.manager, false).createDialog(super.manager.getTopLevelAncestor());
+			dialog.setVisible(true);
 		}else if(o==editButton){
 			getDialog().dispose();
 			JDialog dialog = new PersonPanel(super.entity, super.manager, true).createDialog(super.manager.getTopLevelAncestor());
@@ -153,7 +156,7 @@ public class PersonPanel extends EntityPanel<Person> {
 			int ch = JOptionPane.showConfirmDialog(super.manager, 
 					Language.string("Are you sure you want to remove {0} {1}?",
 							entity.getName(),entity.getLastname()),
-					Language.string("Romove person?"), 
+					Language.string("Remove person?"), 
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if(ch==JOptionPane.YES_OPTION){
 				controller.delete(entity);
