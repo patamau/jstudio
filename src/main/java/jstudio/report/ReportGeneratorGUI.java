@@ -170,13 +170,10 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	}
 	
 	private String checkExtension(String src, String ext){
-		int last = src.lastIndexOf(File.separator);
-		if(last<0) last=0;
-		int pos = src.lastIndexOf('.');
-		if(pos<=last) pos=-1;
-		if(pos<0) src += '.'+ext;
-		else src = src.substring(0, pos)+'.'+ext;
-		return src;
+		ext = "."+ext;
+		int last = src.lastIndexOf(ext);
+		if(last<0) return src+ext;
+		else return src;
 	}
 	
 	public void doPrint(String destination, final PrintMode mode){
