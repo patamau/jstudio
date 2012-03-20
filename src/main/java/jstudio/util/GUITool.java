@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -17,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -68,8 +70,10 @@ public class GUITool {
 	public static JTextArea createArea(Container c, GridBagConstraints gc, String label, String value, boolean editable){
 		JTextArea f = new JTextArea(value);
 		f.setEditable(editable);
-		f.setColumns(0);
-		f.setRows(0);
+		f.setColumns(20);
+		f.setRows(5);
+		f.setLineWrap(true);
+		f.setWrapStyleWord(true);
 		gc.gridy++;
 		gc.anchor=GridBagConstraints.NORTH;
 		JLabel jlabel = new JLabel(label, JLabel.RIGHT);
@@ -81,11 +85,20 @@ public class GUITool {
 		gc.weighty=1.0f;
 		int px = gc.gridx;
 		gc.gridx++;
-		c.add(new JScrollPane(f),gc);
+		int ow = gc.gridwidth; //store old weight
+		gc.gridwidth=2;
+		if(!editable){
+			f.setBackground((Color)Toolkit.getDefaultToolkit().getDesktopProperty("control"));
+			f.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
+		}
+		JScrollPane fScroll = new JScrollPane(f, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		fScroll.setBorder(BorderFactory.createLineBorder(Color.gray));
+		c.add(fScroll,gc);
 		gc.fill=GridBagConstraints.NONE;
 		gc.weightx=0.0f;
 		gc.weighty=0.0f;
 		gc.gridx=px;
+		gc.gridwidth=ow;
 		return f;
 	}
 
@@ -101,11 +114,14 @@ public class GUITool {
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		gc.weightx=1.0f;
 		int px = gc.gridx;
-		gc.gridx++;
+		gc.gridx++;		
+		int ow = gc.gridwidth; //store old weight
+		gc.gridwidth=2;
 		c.add(f,gc);
 		gc.fill=GridBagConstraints.NONE;
 		gc.weightx=0.0f;
 		gc.gridx=px;
+		gc.gridwidth=ow;
 		return f;
 	}
 	
@@ -125,6 +141,8 @@ public class GUITool {
 		gc.weightx=1.0f;
 		int px = gc.gridx;
 		gc.gridx++;
+		int ow = gc.gridwidth; //store old weight
+		gc.gridwidth=2;
 		if(!editable){
 			if(values.length>0&&values[selected]!=null){
 				JLabel l = new JLabel(values[selected].toString(), JLabel.LEFT);
@@ -139,6 +157,7 @@ public class GUITool {
 		gc.fill=GridBagConstraints.NONE;
 		gc.weightx=0.0f;
 		gc.gridx=px;
+		gc.gridwidth=ow;
 		return f;
 	}
 	
@@ -268,10 +287,14 @@ public class GUITool {
 		gc.weightx=1.0f;
 		int px = gc.gridx;
 		gc.gridx++;
+		int ow = gc.gridwidth; //store old weight
+		gc.gridwidth=2;
 		c.add(f,gc);
 		gc.fill=GridBagConstraints.NONE;
+		gc.gridwidth=1;
 		gc.weightx=0.0f;
 		gc.gridx=px;
+		gc.gridwidth=ow;
 		return f;
 	}
 	
@@ -300,10 +323,13 @@ public class GUITool {
 		gc.weightx=1.0f;
 		int px = gc.gridx;
 		gc.gridx++;
+		int ow = gc.gridwidth; //store old weight
+		gc.gridwidth=2;
 		c.add(f,gc);
 		gc.fill=GridBagConstraints.NONE;
 		gc.weightx=0.0f;
 		gc.gridx=px;
+		gc.gridwidth=ow;
 		return f;
 	}
 	
