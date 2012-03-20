@@ -74,10 +74,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 				Language.string("Number"), 
 				entity.getInvoiceId(), false);
 		*/
-		
-		dateField = GUITool.createField(head, gc, 
-				Language.string("Date"), 
-				Invoice.dateFormat.format(this.entity.getDate()), editable);
+		dateField = GUITool.createDateField(head, gc, Language.string("Date"), this.entity.getDate(), editable, Invoice.dateFormat);
 		if(editable){
 			pickPersonButton = GUITool.createButton(head, gc, 
 				Language.string("Pick"), this);
