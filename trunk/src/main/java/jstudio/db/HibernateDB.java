@@ -38,7 +38,7 @@ public class HibernateDB implements DatabaseInterface{
     	this.driver = driver;
     }
     
-	public void initialize(String table, Class c){
+	public void initialize(String table, Class<?> c){
 		//do nothing here
 	}
 	

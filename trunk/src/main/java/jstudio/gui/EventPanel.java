@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -32,7 +33,7 @@ public class EventPanel extends EntityPanel<Event> {
 		lastnameField,
 		phoneField;
 	private JTextArea descriptionArea;
-	private JButton okButton, cancelButton;
+	private JButton okButton, cancelButton, closeButton, deleteButton, editButton, viewButton;;
 	private JButton pickPersonButton;
 
 	public EventPanel(Event event, EntityManagerPanel<Event> manager, boolean editable){
@@ -72,6 +73,12 @@ public class EventPanel extends EntityPanel<Event> {
 				this.entity.getDescription(), editable);
 		
 		if(editable){
+			deleteButton = new JButton(Language.string("Delete"));
+			deleteButton.addActionListener(this);
+			panel.addButton(deleteButton);
+			viewButton = new JButton(Language.string("View"));
+			viewButton.addActionListener(this);
+			panel.addButton(viewButton);
 			panel.addButtonsGlue();
 			okButton = new JButton(Language.string("Ok"));
 			okButton.addActionListener(this);
@@ -79,6 +86,17 @@ public class EventPanel extends EntityPanel<Event> {
 			cancelButton = new JButton(Language.string("Cancel"));
 			cancelButton.addActionListener(this);
 			panel.addButton(cancelButton);
+		}else{
+			deleteButton = new JButton(Language.string("Delete"));
+			deleteButton.addActionListener(this);
+			panel.addButton(deleteButton);
+			editButton = new JButton(Language.string("Edit"));
+			editButton.addActionListener(this);
+			panel.addButton(editButton);
+			panel.addButtonsGlue();
+			closeButton = new JButton(Language.string("Close"));
+			closeButton.addActionListener(this);
+			panel.addButton(closeButton);
 		}
 	}
 
@@ -124,8 +142,31 @@ public class EventPanel extends EntityPanel<Event> {
 			controller.store(entity);
 			getDialog().dispose();
 			manager.refresh();
-		}else if(o==cancelButton){
+		}else if(o==cancelButton||o==closeButton){
 			getDialog().dispose();
+		}else if(o==editButton){
+			getDialog().dispose();
+			JDialog dialog = new EventPanel(super.entity, super.manager, true).createDialog(super.manager.getTopLevelAncestor());
+			dialog.setVisible(true);
+		}else if(o==deleteButton){
+			String msg = entity.getDescription();
+			if(msg.length()>50){
+				msg = msg.substring(0, 50)+"...";
+			}
+			int ch = JOptionPane.showConfirmDialog(super.manager, 
+					Language.string("Are you sure you want to remove \"{0}\" at {1}?",
+							msg, Event.timeFormat.format(entity.getDate())),
+					Language.string("Remove invoice?"), 
+					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+			if(ch==JOptionPane.YES_OPTION){
+				controller.delete(entity);
+				getDialog().dispose();
+				manager.refresh();
+			}
+		}else if(o==viewButton){
+			getDialog().dispose();
+			JDialog dialog = new EventPanel(super.entity, super.manager, false).createDialog(super.manager.getTopLevelAncestor());
+			dialog.setVisible(true);
 		}
 	}
 }

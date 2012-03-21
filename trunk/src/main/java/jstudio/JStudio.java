@@ -3,6 +3,7 @@ package jstudio;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.Date;
@@ -36,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * @author Matteo
  *
  */
-public class JStudio implements Thread.UncaughtExceptionHandler{
+public class JStudio implements UncaughtExceptionHandler{
 
 	public static final String 
 		VERSION = "0.1a",
@@ -196,16 +197,24 @@ public class JStudio implements Thread.UncaughtExceptionHandler{
 	 * BEWARE: After this call initialize() is required for the rest of the stuff to work properly again :)
 	 */
 	public void finalize(){
-		logger.debug("Starting finalization...");
+		logger.debug("Finalizing");
 		//kill all gui listeners
-		if(gui!=null) gui.finalize();
-		logger.debug("GUI finalized");
+		if(gui!=null) {
+			gui.finalize();
+			logger.debug("GUI finalized");
+			gui = null;
+		}
 		//async call, dont care
-		if(database!=null) database.close();
-		logger.debug("DB closed");
-		// I dont care if overwrite
-		Configuration.getGlobalConfiguration().save(new File(this.getClass().getSimpleName()+Configuration.FILE_SUFFIX));
-		logger.debug("Configuration saved");
+		if(database!=null){
+			database.close();
+			logger.debug("DB closed");
+			database = null;
+		}
+		//configuration save!
+		if(Configuration.getGlobalConfiguration().isModified()){
+			Configuration.getGlobalConfiguration().save(new File(this.getClass().getSimpleName()+Configuration.FILE_SUFFIX));
+			logger.debug("Configuration saved");
+		}
 	}
 	
 	/**

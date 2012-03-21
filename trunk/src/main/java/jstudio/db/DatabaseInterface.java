@@ -38,7 +38,7 @@ public interface DatabaseInterface {
 	public void dump(File dest) throws Exception;
 	public void restore(File src) throws Exception;
 	public void clear();
-	public void initialize(String table, Class c);
+	public void initialize(String table, Class<?> c);
 	public DatabaseObject store(String table, DatabaseObject o);
 	public void delete(String table, DatabaseObject o);
 	public List<? extends DatabaseObject> getAll(String table);

@@ -26,11 +26,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import org.apache.log4j.Logger;
-
 public class GUITool {
-	
-	private static final Logger logger = Logger.getLogger(GUITool.class);
 	
 	public static final DateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy");
 	
