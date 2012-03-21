@@ -8,17 +8,15 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 
 public class NicePanel extends JPanel {
+
+	private static final long serialVersionUID = -2075319032588741433L;
 
 	public static void main(String args[]){
 		NicePanel p = new NicePanel("Create new Contact", "Fill the form to create a new contact");

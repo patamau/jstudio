@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import javax.swing.Box;
 import javax.swing.JFrame;
@@ -27,7 +25,7 @@ import jstudio.util.ConfigurationDialog;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
-public class JStudioGUI extends JFrame implements ActionListener, WindowListener {
+public class JStudioGUI extends JFrame implements ActionListener {
 	
 	private static final Logger logger = Logger.getLogger(JStudioGUI.class);
 	
@@ -61,15 +59,14 @@ public class JStudioGUI extends JFrame implements ActionListener, WindowListener
 
 	public JStudioGUI(String title, JStudio app){
 		super(title);
-		//super.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		super.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.addWindowListener(this);
 		super.setSize(
 				Configuration.getGlobal(WIDTH_KEY, WIDTH_DEF),
 				Configuration.getGlobal(HEIGHT_KEY, HEIGHT_DEF));
 		super.setLocationRelativeTo(null);
 		statusLabel = new JLabel(Language.string("Ready..."));
 		this.app = app;
+		logger.debug("GUI initialized");
 	}
 	
 	public JStudio getApplication(){
@@ -184,44 +181,9 @@ public class JStudioGUI extends JFrame implements ActionListener, WindowListener
 			p.finalize();
 		}
 	}
-
-	@Override
-	public void windowOpened(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowClosing(WindowEvent e) {
-		
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e) {
-		app.finalize();
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-		
+	
+	public void dispose(){
+		super.dispose();
+		finalize();
 	}
 }

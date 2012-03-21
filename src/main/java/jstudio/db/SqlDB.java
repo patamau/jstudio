@@ -9,7 +9,6 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
-import java.util.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,7 +19,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,10 +31,6 @@ import jstudio.util.Language;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.mapping.PersistentClass;
-import org.sqlite.SQLite;
 
 public class SqlDB implements DatabaseInterface {
 		
@@ -82,15 +76,12 @@ public class SqlDB implements DatabaseInterface {
 	
 	private static final Logger logger = Logger.getLogger(SqlDB.class);
 	public static final DateFormat SQLDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-	private String protocol, driver;
-	private File dbfile;
-	private Connection connection;
-	
-	private Map<String, Class<?>> initCache;
+	private final String protocol, driver;
+	private Connection connection;	
+	private final Map<String, Class<?>> initCache;
 	
 	public SqlDB(final File dbfile){
 		this(dbfile.getName());
-		this.dbfile = dbfile;
 	}
 	
 	public SqlDB(final String dbfilename){
@@ -150,7 +141,7 @@ public class SqlDB implements DatabaseInterface {
 		return tables.toArray(new String[0]);
 	}
 	
-	public void initialize(String table, Class c){
+	public void initialize(String table, Class<?> c){
 		initialize(c);
 	}
 	
@@ -198,7 +189,6 @@ public class SqlDB implements DatabaseInterface {
 		String sql = "CREATE TABLE IF NOT EXISTS "+classname+"(";
 		int factual = 0;
 		for(Field f: getFields(c)){
-			Class<?> tc = f.getType();
 			String fname = f.getName();
 			//logger.debug(fname+" "+f.getType().getName()+" "+getGenericType(f));
 			String ftype = f.getType().getSimpleName();
@@ -239,7 +229,7 @@ public class SqlDB implements DatabaseInterface {
 				//custom object type
 				String clazz = f.getType().getName();
 				try {
-					Class refc = Class.forName(clazz);
+					Class<?> refc = Class.forName(clazz);
 					initialize(refc);
 					fdef+=" INTEGER (11)";
 				} catch (ClassNotFoundException e1) {
@@ -339,7 +329,6 @@ public class SqlDB implements DatabaseInterface {
     	ObjectInputStream ios = new ObjectInputStream(fis);
     	DatabaseObject o;
     	int nobjs = 0;
-    	String t = null;
 		PreparedStatement ps = null;
     	try{
     		Class<?> c=null;
@@ -421,6 +410,7 @@ public class SqlDB implements DatabaseInterface {
 				switch(EntryType.valueOf(ftype)){
 					case Set:
 						//the set requires another table referring to this entities
+						@SuppressWarnings("unchecked")
 						Set<DatabaseObject> _s = (Set<DatabaseObject>)f.get(o);
 						String _t = getSetTable(f);
 						for(DatabaseObject dob: _s){
@@ -525,7 +515,7 @@ public class SqlDB implements DatabaseInterface {
 			for(Field f: fs){
 				ftype = f.getType().getSimpleName();
 				try{
-					logger.debug("Trying to get field "+f.getName()+" as "+ftype);
+					//logger.debug("Trying to get field "+f.getName()+" as "+ftype);
 					switch(EntryType.valueOf(ftype)){
 						case Float:
 							f.set(o, ((Double)rs.getObject(f.getName())).floatValue());
@@ -552,10 +542,10 @@ public class SqlDB implements DatabaseInterface {
 							List<DatabaseObject> _li = execute(table,"SELECT * FROM "+table+" WHERE "+c.getSimpleName().toLowerCase()+"="+o.getId(), o);
 							Set<DatabaseObject> s = new HashSet<DatabaseObject>(_li);
 							f.set(o, s);
-							logger.debug("Set list of "+f.getName()+" "+ftype+" for "+o.getId()+" where parent is "+parent);
+							//logger.debug("Set list of "+f.getName()+" "+ftype+" for "+o.getId()+" where parent is "+parent);
 							break;
 						default:
-							logger.error("EntryType "+ftype+" not implemented");
+							logger.warn("EntryType "+ftype+" not implemented");
 							continue;
 					}
 				}catch(IllegalArgumentException e){
