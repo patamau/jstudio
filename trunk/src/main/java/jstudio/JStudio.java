@@ -15,7 +15,6 @@ import javax.swing.JWindow;
 import jstudio.control.Accounting;
 import jstudio.control.AddressBook;
 import jstudio.control.Agenda;
-import jstudio.control.Comuni;
 import jstudio.db.DatabaseInterface;
 import jstudio.gui.AccountingPanel;
 import jstudio.gui.AddressBookPanel;
@@ -69,7 +68,6 @@ public class JStudio implements UncaughtExceptionHandler{
 	private Agenda agenda;
 	private AddressBook addressBook;
 	private Accounting accounting;
-	private Comuni comuni;
 	
 	public JStudio(){
 	}
@@ -141,7 +139,6 @@ public class JStudio implements UncaughtExceptionHandler{
 		agenda = new Agenda(this);
 		addressBook = new AddressBook(this);
 		accounting = new Accounting(this);
-		comuni = new Comuni(this);
 		return true;
 	}
 	
@@ -228,7 +225,6 @@ public class JStudio implements UncaughtExceptionHandler{
 		agenda = new Agenda(this);
 		addressBook = new AddressBook(this);
 		accounting = new Accounting(this);
-		comuni = new Comuni(this);
 	}
 	
 	public DatabaseInterface getDatabase(){
@@ -245,10 +241,6 @@ public class JStudio implements UncaughtExceptionHandler{
 	
 	public Accounting getAccounting(){
 		return accounting;
-	}
-	
-	public Comuni getComuni(){
-		return comuni;
 	}
 	
 	public JStudioGUI getGUI(){

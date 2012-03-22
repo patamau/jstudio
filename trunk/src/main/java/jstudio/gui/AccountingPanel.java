@@ -85,11 +85,14 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 	public synchronized void addEntity(Invoice i){
 		StringBuffer sb = new StringBuffer();
 		float total = 0f;
+		int c = i.getProducts().size();
 		for(Product t: i.getProducts()){
-			//FIXME: proper formatting plz
-			sb.append(" ");
 			sb.append(t.getDescription());
 			total += t.getCost()*t.getQuantity();
+			--c;
+			if(c>0){
+				sb.append(", ");
+			}
 		}
 		model.addRow(new Object[]{
 				i,
