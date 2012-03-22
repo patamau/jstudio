@@ -99,6 +99,48 @@ public class EventPanel extends EntityPanel<Event> {
 			panel.addButton(closeButton);
 		}
 	}
+	
+	private boolean applyChanges(){
+		Calendar cd = Calendar.getInstance();
+		Calendar ct = Calendar.getInstance();
+		try {
+			Date d = Person.birthdateFormat.parse(dateField.getText());
+			cd.setTime(d);
+		} catch (ParseException e1) {
+			String msg = Language.string("Wrong date format for {0}, expected {1}",dateField.getText(),Person.birthdateFormat.toPattern());
+			JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		try {
+			Date t = Event.timeFormat.parse(timeField.getText());
+			ct.setTime(t);
+		} catch (ParseException e1) {
+			String msg = Language.string("Wrong date format for {0}, expected {1}",timeField.getText(),Event.timeFormat.toPattern());
+			JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		cd.set(Calendar.HOUR_OF_DAY, ct.get(Calendar.HOUR_OF_DAY));
+		cd.set(Calendar.MINUTE, ct.get(Calendar.MINUTE));
+		cd.set(Calendar.SECOND, 0);
+		if(entity.getId()==0) entity.setId(controller.getNextId());
+		entity.setDate(cd.getTime());
+		entity.setName(nameField.getText());
+		entity.setLastname(lastnameField.getText());
+		entity.setPhone(phoneField.getText());
+		entity.setDescription(descriptionArea.getText());
+		controller.store(entity);
+		return true;
+	}
+	
+	private boolean checkModified(){
+		if(!entity.getName().equals(nameField.getText())) return true;
+		if(!entity.getLastname().equals(lastnameField.getText())) return true;
+		if(!entity.getDescription().equals(descriptionArea.getText())) return true;
+		if(!Person.birthdateFormat.format(entity.getDate()).equals(dateField.getText())) return true;
+		if(!Event.timeFormat.format(entity.getDate()).equals(timeField.getText())) return true;
+		if(!entity.getPhone().equals(phoneField.getText())) return true;
+		return false;
+	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
@@ -112,36 +154,10 @@ public class EventPanel extends EntityPanel<Event> {
 				phoneField.setText(p.getPhone());
 			}
 		}else if(o==okButton){
-			Calendar cd = Calendar.getInstance();
-			Calendar ct = Calendar.getInstance();
-			try {
-				Date d = Person.birthdateFormat.parse(dateField.getText());
-				cd.setTime(d);
-			} catch (ParseException e1) {
-				String msg = Language.string("Wrong date format for {0}, expected {1}",dateField.getText(),Person.birthdateFormat.toPattern());
-				JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
-				return;
+			if(applyChanges()){
+				getDialog().dispose();
+				manager.refresh();
 			}
-			try {
-				Date t = Event.timeFormat.parse(timeField.getText());
-				ct.setTime(t);
-			} catch (ParseException e1) {
-				String msg = Language.string("Wrong date format for {0}, expected {1}",timeField.getText(),Event.timeFormat.toPattern());
-				JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			cd.set(Calendar.HOUR_OF_DAY, ct.get(Calendar.HOUR_OF_DAY));
-			cd.set(Calendar.MINUTE, ct.get(Calendar.MINUTE));
-			cd.set(Calendar.SECOND, 0);
-			if(entity.getId()==0) entity.setId(controller.getNextId());
-			entity.setDate(cd.getTime());
-			entity.setName(nameField.getText());
-			entity.setLastname(lastnameField.getText());
-			entity.setPhone(phoneField.getText());
-			entity.setDescription(descriptionArea.getText());
-			controller.store(entity);
-			getDialog().dispose();
-			manager.refresh();
 		}else if(o==cancelButton||o==closeButton){
 			getDialog().dispose();
 		}else if(o==editButton){
@@ -164,6 +180,15 @@ public class EventPanel extends EntityPanel<Event> {
 				manager.refresh();
 			}
 		}else if(o==viewButton){
+			if(checkModified()){
+				int ch = JOptionPane.showConfirmDialog(this, 
+						Language.string("Apply changes to {0}?",Event.timeFormat.format(entity.getDate())), 
+						Language.string("Changes made"), JOptionPane.YES_NO_CANCEL_OPTION);
+				if(ch==JOptionPane.CANCEL_OPTION) return;
+				if(ch==JOptionPane.YES_OPTION){
+					if(!applyChanges()) return;
+				}
+			}
 			getDialog().dispose();
 			JDialog dialog = new EventPanel(super.entity, super.manager, false).createDialog(super.manager.getTopLevelAncestor());
 			dialog.setVisible(true);

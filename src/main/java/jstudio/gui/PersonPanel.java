@@ -1,13 +1,11 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
-import java.util.Calendar;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -15,16 +13,19 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
+import org.apache.log4j.Logger;
+
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
 import jstudio.gui.generic.NicePanel;
 import jstudio.model.Person;
-import jstudio.util.CodeGenerator;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
 public class PersonPanel extends EntityPanel<Person> {
+	
+	private static final Logger logger = Logger.getLogger(PersonPanel.class);
 	
 	private JComboBox
 		genderBox;
@@ -41,7 +42,6 @@ public class PersonPanel extends EntityPanel<Person> {
 	private JButton okButton, cancelButton;
 	private JButton viewButton, editButton, deleteButton;
 	private JButton closeButton;
-	private JButton generateButton;
 
 	public PersonPanel(Person person, EntityManagerPanel<Person> manager, boolean editable){
 		super(person, manager);
@@ -62,30 +62,9 @@ public class PersonPanel extends EntityPanel<Person> {
 		birthdateField = GUITool.createDateField(panel.getBody(), gc, Language.string("Birthdate"), this.entity.getBirthdate(), editable, Person.birthdateFormat);
 		addressField = GUITool.createField(panel.getBody(), gc, Language.string("Address"), this.entity.getAddress(), editable);
 		cityField = GUITool.createField(panel.getBody(), gc, Language.string("City"), this.entity.getCity(), editable);
-		/*
-		if(controller!=null){
-			List<String> pvs = controller.getApplication().getComuni().getProvinces();
-			int sel = pvs==null?0:pvs.indexOf(this.entity.getProvince());
-			if(sel<0) sel=0;
-			provinceBox = GUITool.createCombo(panel.getBody(), gc, Language.string("Province"), sel, pvs.toArray(), editable);
-		}else{
-			provinceBox = GUITool.createCombo(panel.getBody(), gc, Language.string("Province"), 0, new Object[]{this.entity.getProvince()}, editable);
-		}
-		*/
 		provinceField = GUITool.createProvinceField(panel.getBody(), gc, Language.string("Province"), this.entity.getProvince(), editable);
 		capField = GUITool.createCAPField(panel.getBody(), gc, Language.string("CAP"), this.entity.getCap(), editable);
 		codeField = GUITool.createField(panel.getBody(), gc, Language.string("Code"), this.entity.getCode(), editable);
-		if(editable){
-			String blabel = Language.string("Generate");
-			generateButton = new JButton(blabel);
-			int swidth = generateButton.getFontMetrics(generateButton.getFont()).stringWidth(blabel);
-			generateButton.setPreferredSize(new Dimension(swidth+40,20));
-			generateButton.addActionListener(this);
-			gc.gridx+=2;
-			panel.getBody().add(generateButton,gc);
-			gc.gridx=0;
-			gc.gridy++;
-		}
 		phoneField = GUITool.createField(panel.getBody(), gc, Language.string("Phone"), this.entity.getPhone(), editable);
 		
 		if(editable){
@@ -116,28 +95,41 @@ public class PersonPanel extends EntityPanel<Person> {
 		}
 	}
 	
-	public String getCode(){
-		boolean male = genderBox.getSelectedIndex()==Person.Gender.Male.getId();
-		//String pv = (String)provinceBox.getSelectedItem();
-		String pv = provinceField.getText();
-		String loc = controller.getApplication().getComuni().getCode(pv, cityField.getText());
-		Calendar c = Calendar.getInstance();
-		try{
-			c.setTime(Person.birthdateFormat.parse(birthdateField.getText()));
-		}catch(ParseException pe){
-			c.set(Calendar.YEAR, 1);
-			c.set(Calendar.MONTH, 1);
-			c.set(Calendar.DAY_OF_YEAR, 1);
+	private boolean applyChanges(){
+		try {
+			entity.setBirthdate(Person.birthdateFormat.parse(birthdateField.getText()));
+		} catch (ParseException e1) {
+			String msg = Language.string("Wrong date format for {0}, expected {1}",birthdateField.getText(),Person.birthdateFormat.toPattern());
+			JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
+			return false;
 		}
-		return CodeGenerator.generate(
-				nameField.getText(), 
-				lastnameField.getText(), 
-				male, 
-				c.get(Calendar.YEAR), 
-				c.get(Calendar.MONTH)+1, 
-				c.get(Calendar.DAY_OF_MONTH),
-				loc
-				);
+		if(entity.getId()==0) entity.setId(controller.getNextId());
+		entity.setName(nameField.getText());
+		entity.setLastname(lastnameField.getText());
+		entity.setAddress(addressField.getText());
+		entity.setCity(cityField.getText());
+		//entity.setProvince((String)provinceBox.getSelectedItem());
+		entity.setProvince(provinceField.getText());
+		entity.setCap(capField.getText());		
+		entity.setCode(codeField.getText());
+		entity.setPhone(phoneField.getText());
+		entity.setGender(genderBox.getSelectedIndex());
+		controller.store(entity);
+		return true;
+	}
+	
+	private boolean checkModified(){
+		if(!entity.getName().equals(nameField.getText())) return true;
+		if(!entity.getLastname().equals(lastnameField.getText())) return true;
+		if(!entity.getAddress().equals(addressField.getText())) return true;
+		if(!Person.birthdateFormat.format(entity.getBirthdate()).equals(birthdateField.getText())) return true;
+		if(!entity.getCap().equals(capField.getText())) return true;
+		if(!entity.getCity().equals(cityField.getText())) return true;
+		if(!entity.getCode().equals(codeField.getText())) return true;
+		if(entity.getGender()!=genderBox.getSelectedIndex()) return true;
+		if(!entity.getPhone().equals(phoneField.getText())) return true;
+		if(!entity.getProvince().equals(provinceField.getText())) return true;
+		return false;
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -145,6 +137,13 @@ public class PersonPanel extends EntityPanel<Person> {
 		if(o==closeButton){
 			getDialog().dispose();
 		}else if(o==viewButton){
+			if(checkModified()){
+				int ch = JOptionPane.showConfirmDialog(this, 
+						Language.string("Apply changes to {0}?",entity.getName()+" "+entity.getLastname()), 
+						Language.string("Changes made"), JOptionPane.YES_NO_CANCEL_OPTION);
+				if(ch==JOptionPane.CANCEL_OPTION) return;
+				if(ch==JOptionPane.YES_OPTION) applyChanges();
+			}
 			getDialog().dispose();
 			JDialog dialog = new PersonPanel(super.entity, super.manager, false).createDialog(super.manager.getTopLevelAncestor());
 			dialog.setVisible(true);
@@ -163,28 +162,8 @@ public class PersonPanel extends EntityPanel<Person> {
 				getDialog().dispose();
 				manager.refresh();
 			}
-		}else if(o==generateButton){
-			codeField.setText(getCode());
 		}else if(o==okButton){
-			try {
-				entity.setBirthdate(Person.birthdateFormat.parse(birthdateField.getText()));
-			} catch (ParseException e1) {
-				String msg = Language.string("Wrong date format for {0}, expected {1}",birthdateField.getText(),Person.birthdateFormat.toPattern());
-				JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			if(entity.getId()==0) entity.setId(controller.getNextId());
-			entity.setName(nameField.getText());
-			entity.setLastname(lastnameField.getText());
-			entity.setAddress(addressField.getText());
-			entity.setCity(cityField.getText());
-			//entity.setProvince((String)provinceBox.getSelectedItem());
-			entity.setProvince(provinceField.getText());
-			entity.setCap(capField.getText());		
-			entity.setCode(codeField.getText());
-			entity.setPhone(phoneField.getText());
-			entity.setGender(genderBox.getSelectedIndex());
-			controller.store(entity);
+			applyChanges();
 			getDialog().dispose();
 			manager.refresh();
 		}else if(o==cancelButton){
