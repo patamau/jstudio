@@ -68,12 +68,14 @@ public class PersonPanel extends EntityPanel<Person> {
 		phoneField = GUITool.createField(panel.getBody(), gc, Language.string("Phone"), this.entity.getPhone(), editable);
 		
 		if(editable){
-			deleteButton = new JButton(Language.string("Delete"));
-			deleteButton.addActionListener(this);
-			panel.addButton(deleteButton);
-			viewButton = new JButton(Language.string("View"));
-			viewButton.addActionListener(this);
-			panel.addButton(viewButton);
+			if(entity.getId()>0){
+				deleteButton = new JButton(Language.string("Delete"));
+				deleteButton.addActionListener(this);
+				panel.addButton(deleteButton);
+				viewButton = new JButton(Language.string("View"));
+				viewButton.addActionListener(this);
+				panel.addButton(viewButton);
+			}
 			panel.addButtonsGlue();
 			okButton = new JButton(Language.string("Ok"));
 			okButton.addActionListener(this);

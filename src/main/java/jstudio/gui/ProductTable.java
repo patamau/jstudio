@@ -1,11 +1,17 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
@@ -23,11 +29,10 @@ import jstudio.util.Language;
 public class ProductTable 
 		extends EntityManagerPanel<Product> {
 	
-	private JTable totals;
-	private DefaultTableModel totalsModel;
+	private JLabel totalLabel;
 	private Invoice invoice;
 	private EntityManagerPanel<Invoice> accounting;
-	private JButton newButton, removeButton;
+	private JButton newButton;
 	
 	private float total;
 	
@@ -42,12 +47,9 @@ public class ProductTable
 			JToolBar toolBar = new JToolBar();
 			toolBar.setPreferredSize(new Dimension(0,20));
 			toolBar.setFloatable(false);
-			newButton = new JButton("+");
+			newButton = new JButton(Language.string("Add Product"));
 			newButton.addActionListener(this);
-			removeButton = new JButton("-");
-			removeButton.addActionListener(this);
 			toolBar.add(newButton);
-			toolBar.add(removeButton);
 			this.add(toolBar, BorderLayout.NORTH);
 		}
 
@@ -58,8 +60,17 @@ public class ProductTable
 		};
 		model = new ProductTableModel(table, invoice);
 		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		if(!editable){
+			table.setBackground(this.getBackground());
+			table.setCellSelectionEnabled(false);
+			table.setFocusable(false);
+			table.setShowGrid(false);
+		}
+		table.setMinimumSize(new Dimension(50,50));
+		table.setPreferredSize(new Dimension(50,50));
 
 		JScrollPane scrollpane = new JScrollPane(table);
+		scrollpane.setBorder(BorderFactory.createEmptyBorder(0, 0, 5, 0));
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 		this.add(scrollpane, BorderLayout.CENTER);
 		
@@ -70,11 +81,18 @@ public class ProductTable
 			table.addMouseListener(new PopupListener<Product>(table, popup));
 		}
 		
-		totals = new JTable();
-		totalsModel = new ProductTableModel(totals, null);
-		totals.setRowSelectionAllowed(false);		
-		
-		this.add(totals, BorderLayout.SOUTH);
+		JPanel totalPanel = new JPanel(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx=gc.gridy=0;
+		gc.weightx=1.0f;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		totalPanel.add(new JLabel("Total"), gc);
+		totalLabel = new JLabel("0");
+		++gc.gridx;
+		gc.weightx=0.0f;
+		gc.fill=GridBagConstraints.NONE;
+		totalPanel.add(totalLabel,gc);
+		this.add(totalPanel, BorderLayout.SOUTH);
 	}
 	
 	public String getLabel(){
@@ -96,7 +114,11 @@ public class ProductTable
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		//Object o = e.getSource();
+		Object o = e.getSource();
+		if(o==newButton){
+			JDialog dialog = new ProductPanel(new Product(), this, invoice, accounting).createDialog(this.getTopLevelAncestor());
+			dialog.setVisible(true);
+		}
 	}
 	
 	public float getTotal(){
@@ -113,11 +135,6 @@ public class ProductTable
 			quantity_tot += t.getQuantity();
 			total += t.getQuantity()*t.getCost();
 		}
-		while(totalsModel.getRowCount()>0) totalsModel.removeRow(0);
-		totalsModel.addRow(new Object[]{
-				Language.string("Total"),
-				quantity_tot,
-				total
-		});
+		totalLabel.setText(Float.toString(total));
 	}
 }

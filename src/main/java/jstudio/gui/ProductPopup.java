@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import com.lowagie.text.Font;
+
 import jstudio.gui.generic.ContextualMenu;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.model.Invoice;
@@ -21,14 +23,13 @@ public class ProductPopup extends ContextualMenu<Product> {
 		super(parent);
 		this.invoice = invoice;
 		this.accounting = accounting;
+		this.remove(viewItem);
+		editItem.setFont(editItem.getFont().deriveFont(Font.BOLD));
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
-		if(o==viewItem){
-			JDialog dialog = new ProductPanel(context, parent, null, accounting).createDialog(parent.getTopLevelAncestor());
-			dialog.setVisible(true);
-		}else if(o==editItem){
+		if(o==editItem){
 			JDialog dialog = new ProductPanel(context, parent, invoice, accounting).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
 		}else if(o==removeItem){
