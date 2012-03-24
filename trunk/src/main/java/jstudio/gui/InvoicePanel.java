@@ -149,6 +149,45 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		JDialog dialog = new ProductPanel(t, productTable, entity, manager).createDialog(getDialog());
 		dialog.setVisible(true);
 	}
+	
+	private boolean applyChanges(){
+		try {
+			Date d = Person.birthdateFormat.parse(dateField.getText());
+			entity.setDate(d);
+		} catch (ParseException e1) {
+			String msg = Language.string("Wrong date format for {0}, expected {1}",dateField.getText(),Person.birthdateFormat.toPattern());
+			JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		entity.setName(nameField.getText());
+		entity.setLastname(lastnameField.getText());
+		entity.setAddress(addressField.getText());
+		entity.setCity(cityField.getText());
+		entity.setProvince(provinceField.getText());
+		entity.setCap(capField.getText());
+		entity.setCode(codeField.getText());
+		if(entity.getId()==0) entity.setId(controller.getNextId());
+		if(entity.getNumber()==0) entity.setNumber(((Accounting)controller).getNextInvoiceNumber());
+		//controller.store(entity);
+		long pid = ((Accounting)controller).getProducts().getNextId();
+		for(Product p: entity.getProducts()){
+			if(p.getId()==0) p.setId(++pid);
+			p.setInvoice(entity);
+		}
+		controller.store(entity);
+		return true;
+	}
+	
+	private boolean checkModified(){
+		if(!entity.getName().equals(nameField.getText())) return true;
+		if(!entity.getLastname().equals(lastnameField.getText())) return true;
+		if(!entity.getAddress().equals(addressField.getText())) return true;
+		if(!entity.getCap().equals(capField.getText())) return true;
+		if(!entity.getCity().equals(cityField.getText())) return true;
+		if(!entity.getCode().equals(codeField.getText())) return true;
+		if(!entity.getProvince().equals(provinceField.getText())) return true;
+		return false;
+	}
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
@@ -166,32 +205,10 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 				provinceField.setText(p.getProvince());
 			}
 		}else if(o==okButton){
-			try {
-				Date d = Person.birthdateFormat.parse(dateField.getText());
-				entity.setDate(d);
-			} catch (ParseException e1) {
-				String msg = Language.string("Wrong date format for {0}, expected {1}",dateField.getText(),Person.birthdateFormat.toPattern());
-				JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
-				return;
+			if(applyChanges()){
+				getDialog().dispose();
+				manager.refresh();
 			}
-			entity.setName(nameField.getText());
-			entity.setLastname(lastnameField.getText());
-			entity.setAddress(addressField.getText());
-			entity.setCity(cityField.getText());
-			entity.setProvince(provinceField.getText());
-			entity.setCap(capField.getText());
-			entity.setCode(codeField.getText());
-			if(entity.getId()==0) entity.setId(controller.getNextId());
-			if(entity.getNumber()==0) entity.setNumber(((Accounting)controller).getNextInvoiceNumber());
-			//controller.store(entity);
-			long pid = ((Accounting)controller).getProducts().getNextId();
-			for(Product p: entity.getProducts()){
-				if(p.getId()==0) p.setId(++pid);
-				p.setInvoice(entity);
-			}
-			controller.store(entity);
-			getDialog().dispose();
-			manager.refresh();
 		}else if(o==cancelButton||o==closeButton){
 			getDialog().dispose();
 		}else if(o==printButton){
@@ -219,6 +236,13 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 				manager.refresh();
 			}
 		}else if(o==viewButton){
+			if(checkModified()){
+				int ch = JOptionPane.showConfirmDialog(this, 
+						Language.string("Apply changes to {0}?",entity.getInvoiceId()), 
+						Language.string("Changes made"), JOptionPane.YES_NO_CANCEL_OPTION);
+				if(ch==JOptionPane.CANCEL_OPTION) return;
+				if(ch==JOptionPane.YES_OPTION) applyChanges();
+			}
 			getDialog().dispose();
 			JDialog dialog = new InvoicePanel(super.entity, super.manager, false).createDialog(super.manager.getTopLevelAncestor());
 			dialog.setVisible(true);

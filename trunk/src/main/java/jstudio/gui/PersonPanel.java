@@ -1,6 +1,7 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -57,15 +58,25 @@ public class PersonPanel extends EntityPanel<Person> {
 		gc.insets= new Insets(4,4,4,4);
 		
 		nameField = GUITool.createField(panel.getBody(), gc, Language.string("Name"), this.entity.getName(), editable);
+		nameField.addActionListener(this);
 		lastnameField = GUITool.createField(panel.getBody(), gc, Language.string("Lastname"), this.entity.getLastname(), editable);
+		lastnameField.addActionListener(this);
 		genderBox = GUITool.createCombo(panel.getBody(), gc, Language.string("Gender"), this.entity.getGender(), Person.Gender.values(), editable);
+		genderBox.addActionListener(this);
 		birthdateField = GUITool.createDateField(panel.getBody(), gc, Language.string("Birthdate"), this.entity.getBirthdate(), editable, Person.birthdateFormat);
+		birthdateField.addActionListener(this);
 		addressField = GUITool.createField(panel.getBody(), gc, Language.string("Address"), this.entity.getAddress(), editable);
+		addressField.addActionListener(this);
 		cityField = GUITool.createField(panel.getBody(), gc, Language.string("City"), this.entity.getCity(), editable);
+		cityField.addActionListener(this);
 		provinceField = GUITool.createProvinceField(panel.getBody(), gc, Language.string("Province"), this.entity.getProvince(), editable);
+		provinceField.addActionListener(this);
 		capField = GUITool.createCAPField(panel.getBody(), gc, Language.string("CAP"), this.entity.getCap(), editable);
-		codeField = GUITool.createField(panel.getBody(), gc, Language.string("Code"), this.entity.getCode(), editable);
+		capField.addActionListener(this);
+		codeField = GUITool.createCodeField(panel.getBody(), gc, Language.string("Code"), this.entity.getCode(), editable);
+		codeField.addActionListener(this);
 		phoneField = GUITool.createField(panel.getBody(), gc, Language.string("Phone"), this.entity.getPhone(), editable);
+		phoneField.addActionListener(this);
 		
 		if(editable){
 			if(entity.getId()>0){
@@ -165,11 +176,14 @@ public class PersonPanel extends EntityPanel<Person> {
 				manager.refresh();
 			}
 		}else if(o==okButton){
-			applyChanges();
-			getDialog().dispose();
-			manager.refresh();
+			if(applyChanges()){
+				getDialog().dispose();
+				manager.refresh();
+			}
 		}else if(o==cancelButton){
 			getDialog().dispose();
+		}else{
+			((Component)o).transferFocus();
 		}
 	}
 }

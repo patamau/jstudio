@@ -26,7 +26,7 @@ public class EventPopup extends ContextualMenu<Event> {
 		}else if(o==editItem){
 			JDialog dialog = new EventPanel(context, parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
-		}else if(o==removeItem){
+		}else if(o==deleteItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
 					Language.string("Are you sure you want to remove the event {0}?",context.getDescription()),
 					Language.string("Romove event?"), 

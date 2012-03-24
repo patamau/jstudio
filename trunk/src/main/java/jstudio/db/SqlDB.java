@@ -17,6 +17,7 @@ import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -372,7 +373,13 @@ public class SqlDB implements DatabaseInterface {
 				logger.debug("clear: "+t);
 				//initCache.remove(t);
 			}
+			Collection<Class<?>> cs = new ArrayList<Class<?>>();
+			cs.addAll(initCache.values());
 			initCache.clear();
+			for(Class<?> c: cs){
+				this.initialize(c);
+			}
+			
 		}catch(Exception e){
 			logger.error("on clear",e);
 		}
