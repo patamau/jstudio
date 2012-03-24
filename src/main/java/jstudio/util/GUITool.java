@@ -97,6 +97,33 @@ public class GUITool {
 		gc.gridwidth=ow;
 		return f;
 	}
+	
+	public static JTextField createCodeField(Container c, GridBagConstraints gc, String label, String value, boolean editable){
+		final JTextField f = new JTextField(value);
+		f.setEditable(editable);
+		f.setColumns(16);
+		if(editable){
+			f.addKeyListener(new CodeKeyListener(f));	
+		}
+		gc.gridy++;
+		gc.anchor=GridBagConstraints.EAST;
+		JLabel l = new JLabel(label, JLabel.RIGHT);
+		c.add(l,gc);
+		gc.anchor=GridBagConstraints.WEST;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=1.0f;
+		int px = gc.gridx;
+		gc.gridx++;
+		int ow = gc.gridwidth; //store old weight
+		gc.gridwidth=2;
+		c.add(f,gc);
+		gc.fill=GridBagConstraints.NONE;
+		gc.gridwidth=1;
+		gc.weightx=0.0f;
+		gc.gridx=px;
+		gc.gridwidth=ow;
+		return f;
+	}
 
 	public static JTextField createField(Container c, GridBagConstraints gc, String label, String value, boolean editable){
 		JTextField f = new JTextField(value);
@@ -155,6 +182,36 @@ public class GUITool {
 		gc.gridx=px;
 		gc.gridwidth=ow;
 		return f;
+	}
+	
+	private static class CodeKeyListener implements KeyListener {
+		final JTextField field;
+		public CodeKeyListener(final JTextField f){
+			field = f;
+		}
+		@Override
+		public void keyTyped(KeyEvent e) {
+			e.consume();
+			char ch = e.getKeyChar();
+			int pos = field.getCaretPosition();
+			if(pos>15) return;
+			if(KeyEvent.VK_BACK_SPACE==ch) return;
+			if(pos<6 || pos==8 || pos==11 || pos==15){
+				if(Character.isLetter(ch)){
+					field.setText(field.getText().substring(0,pos)+Character.toUpperCase(ch));
+					++pos;
+				}
+			}else {
+				if(Character.isDigit(ch)){
+					field.setText(field.getText().substring(0,pos)+Character.toUpperCase(ch));
+					++pos;
+				}
+			}
+		}
+		@Override
+		public void keyPressed(KeyEvent e) {}
+		@Override
+		public void keyReleased(KeyEvent e) {}
 	}
 	
 	private static class DateKeyListener implements KeyListener {

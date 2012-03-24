@@ -32,7 +32,7 @@ public class ProductPopup extends ContextualMenu<Product> {
 		if(o==editItem){
 			JDialog dialog = new ProductPanel(context, parent, invoice, accounting).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
-		}else if(o==removeItem){
+		}else if(o==deleteItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
 					Language.string("Are you sure you want to remove the product {0}?",context.getDescription()),
 					Language.string("Romove product?"), 

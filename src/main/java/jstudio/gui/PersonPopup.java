@@ -26,7 +26,7 @@ public class PersonPopup extends ContextualMenu<Person> {
 		}else if(o==editItem){
 			JDialog dialog = new PersonPanel(context, parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
-		}else if(o==removeItem){
+		}else if(o==deleteItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
 					Language.string("Are you sure you want to remove {0} {1}?",context.getName(),context.getLastname()),
 					Language.string("Romove person?"), 
