@@ -96,6 +96,7 @@ public class Event implements DatabaseObject {
 	}	
 	
 	public String toString(){
+		System.err.println("Event date is "+date);
 		return timeFormat.format(date);
 	}
 }

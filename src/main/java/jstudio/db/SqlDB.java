@@ -76,7 +76,7 @@ public class SqlDB implements DatabaseInterface {
 		SQLITE_DRIVER = "org.sqlite.JDBC";
 	
 	private static final Logger logger = Logger.getLogger(SqlDB.class);
-	public static final DateFormat SQLDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	public static final DateFormat SQLDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	private final String protocol, driver;
 	private Connection connection;	
 	private final Map<String, Class<?>> initCache;
