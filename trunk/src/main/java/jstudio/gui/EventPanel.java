@@ -12,8 +12,11 @@ import java.util.Date;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
+import org.apache.log4j.Logger;
 
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
@@ -26,12 +29,14 @@ import jstudio.util.Language;
 @SuppressWarnings("serial")
 public class EventPanel extends EntityPanel<Event> {
 	
+	private static final Logger logger = Logger.getLogger(EventPanel.class);
+	
 	private JTextField 
-		dateField, 
-		timeField,
+		dateField,
 		nameField,
 		lastnameField,
 		phoneField;
+	private JSpinner timeSpinner;
 	private JTextArea descriptionArea;
 	private JButton okButton, cancelButton, closeButton, deleteButton, editButton, viewButton;;
 	private JButton pickPersonButton;
@@ -52,9 +57,9 @@ public class EventPanel extends EntityPanel<Event> {
 				Language.string("Date"), 
 				this.entity.getDate(), editable,
 				Person.birthdateFormat);
-		timeField = GUITool.createField(panel.getBody(), gc, 
+		timeSpinner = GUITool.createTimeSpinner(panel.getBody(), gc, 
 				Language.string("Time"), 
-				Event.timeFormat.format(this.entity.getDate()), editable);
+				this.entity.getDate(), editable);
 		if(editable){
 			pickPersonButton = GUITool.createButton(panel.getBody(), gc, 
 				Language.string("Pick"), this);
@@ -108,22 +113,25 @@ public class EventPanel extends EntityPanel<Event> {
 		try {
 			Date d = Person.birthdateFormat.parse(dateField.getText());
 			cd.setTime(d);
+			logger.debug("Date is "+Person.birthdateFormat.format(ct.getTime()));
 		} catch (ParseException e1) {
 			String msg = Language.string("Wrong date format for {0}, expected {1}",dateField.getText(),Person.birthdateFormat.toPattern());
 			JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		try {
-			Date t = Event.timeFormat.parse(timeField.getText());
+			Date t = Event.timeFormat.parse((String)timeSpinner.getValue());
 			ct.setTime(t);
+			logger.debug("Time is "+Event.timeFormat.format(ct.getTime()));
 		} catch (ParseException e1) {
-			String msg = Language.string("Wrong date format for {0}, expected {1}",timeField.getText(),Event.timeFormat.toPattern());
+			String msg = Language.string("Wrong date format for {0}, expected {1}",timeSpinner.getValue(),Event.timeFormat.toPattern());
 			JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
 		cd.set(Calendar.HOUR_OF_DAY, ct.get(Calendar.HOUR_OF_DAY));
 		cd.set(Calendar.MINUTE, ct.get(Calendar.MINUTE));
 		cd.set(Calendar.SECOND, 0);
+		logger.debug("Final date is "+cd.getTime());
 		if(entity.getId()==0) entity.setId(controller.getNextId());
 		entity.setDate(cd.getTime());
 		entity.setName(nameField.getText());
@@ -139,7 +147,7 @@ public class EventPanel extends EntityPanel<Event> {
 		if(!entity.getLastname().equals(lastnameField.getText())) return true;
 		if(!entity.getDescription().equals(descriptionArea.getText())) return true;
 		if(!Person.birthdateFormat.format(entity.getDate()).equals(dateField.getText())) return true;
-		if(!Event.timeFormat.format(entity.getDate()).equals(timeField.getText())) return true;
+		if(!Event.timeFormat.format(entity.getDate()).equals(timeSpinner.getValue())) return true;
 		if(!entity.getPhone().equals(phoneField.getText())) return true;
 		return false;
 	}

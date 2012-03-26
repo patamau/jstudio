@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,12 +22,53 @@ import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SpinnerModel;
+
+import jstudio.gui.generic.CyclingSpinnerListModel;
+import jstudio.gui.generic.TimeSpinnerModel;
+import jstudio.model.Event;
 
 public class GUITool {
+	
+	public static void main(String args[]){
+		JFrame frame = new JFrame();
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		GridBagConstraints gc = new GridBagConstraints();
+		frame.getContentPane().setLayout(new GridBagLayout());		
+		frame.getContentPane().add(GUITool.createTimeSpinner(frame.getContentPane(), gc, "Time", new Date(), true));
+		
+		//Add the third label-spinner pair.
+		Calendar calendar = Calendar.getInstance();
+        Date initDate = calendar.getTime();
+        //calendar.add(Calendar.YEAR, -100);
+        calendar.add(Calendar.YEAR, -24);
+        Date earliestDate = calendar.getTime();
+        //calendar.add(Calendar.YEAR, 200);
+        calendar.add(Calendar.YEAR, +24);
+        Date latestDate = calendar.getTime();
+        SpinnerModel dateModel = new SpinnerDateModel(initDate,
+                                     null,
+                                     null,
+                                     Calendar.MINUTE);//ignored for user input
+        JSpinner spinner = new JSpinner(dateModel);
+        spinner.setEditor(new JSpinner.DateEditor(spinner, "kk:mm dd/MM/yyyy"));
+        gc.gridwidth=2;
+        gc.gridy++;
+        frame.getContentPane().add(spinner, gc);
+		
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+		
+		frame.setVisible(true);
+	}
 	
 	public static final DateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy");
 	
@@ -96,6 +138,38 @@ public class GUITool {
 		gc.gridx=px;
 		gc.gridwidth=ow;
 		return f;
+	}
+	
+	public static JSpinner createTimeSpinner(Container c, GridBagConstraints gc, String label, Date value, boolean editable){
+		final TimeSpinnerModel m = new TimeSpinnerModel(value);
+		//final SpinnerModel m = new CyclingSpinnerListModel(new String[]{"ciao","come","va?"}); 
+		final JSpinner s = new JSpinner(m);
+		JFormattedTextField ftf = ((JSpinner.DefaultEditor)s.getEditor()).getTextField();
+		ftf.setHorizontalAlignment(JTextField.LEFT);
+		gc.gridy++;
+		gc.anchor=GridBagConstraints.EAST;
+		JLabel l = new JLabel(label, JLabel.RIGHT);
+		c.add(l,gc);
+		gc.anchor=GridBagConstraints.WEST;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=1.0f;
+		int px = gc.gridx;
+		gc.gridx++;
+		int ow = gc.gridwidth; //store old weight
+		gc.gridwidth=2;
+		if(editable){
+			c.add(s,gc);
+		}else{
+			JTextField field = new JTextField(Event.timeFormat.format(value));
+			field.setEditable(false);
+			c.add(field, gc);
+		}
+		gc.fill=GridBagConstraints.NONE;
+		gc.gridwidth=1;
+		gc.weightx=0.0f;
+		gc.gridx=px;
+		gc.gridwidth=ow;
+		return s;
 	}
 	
 	public static JTextField createCodeField(Container c, GridBagConstraints gc, String label, String value, boolean editable){
