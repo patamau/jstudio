@@ -1,9 +1,13 @@
 package jstudio.report;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,6 +17,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -26,7 +31,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
+
 import jstudio.db.DatabaseObject;
+import jstudio.model.DummyObject;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
 import net.sf.jasperreports.engine.JRDataSource;
@@ -47,7 +56,10 @@ import net.sf.jasperreports.engine.export.JRTextExporter;
  */
 public class ReportGenerator {
 	
+	private static final Logger logger = Logger.getLogger(ReportGenerator.class);
+	
 	public static void main(String args[]){		
+		BasicConfigurator.configure();
 		ReportGenerator rg = new ReportGenerator();
 		rg.setReport("/reports/invoice.jasper");
 		Invoice i = new Invoice(1l);
@@ -74,8 +86,16 @@ public class ReportGenerator {
 		set.add(p2);
 		i.setProducts(set);
 		rg.setHead(i);
-		rg.setData(i.getProducts());
-		rg.setHeadValue("total", Float.toString(350f));
+		rg.setHeadValue("note", "Questa fattura è conforme agli standard 675/10");
+		//rg.setData(i.getProducts());
+		for(Product pe: i.getProducts()){
+			rg.addData(pe.getPrintData());
+		}
+		//rg.setHeadValue("stamp", Float.toString(1.80f));
+		//rg.setHeadValue("totalcost", Float.toString(350f));
+		rg.setHeadValue("totalcost", NumberFormat.getCurrencyInstance().format(350f));
+		//rg.setHeadValue("stamp", Float.toString(1.80f));
+		rg.setHeadValue("stamp", NumberFormat.getCurrencyInstance().format(1.8f));
 		try {
 			rg.generatePdf(".","sampleReportInvoice.pdf");
 		} catch (Exception e) {
@@ -84,22 +104,75 @@ public class ReportGenerator {
 		
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(250,400);
+		frame.setSize(800,600);
 		frame.setLocationRelativeTo(null);
 		
-		Image img;
+		final Image img;
 		try {
 			img = rg.getPreviewImage();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
 		
-		ImageIcon icon = rg.doResizeImage(img, 210, 297);
-		frame.getContentPane().add(new JLabel(icon));
+		final ImageIcon icon = new ImageIcon(img); //ReportGenerator.doResizeImage(img, 420, 594);
+		final JLabel lbl = new JLabel(icon);
+		frame.getContentPane().add(lbl);
+		ImageMouseController imc = new ImageMouseController(img, lbl, img.getWidth(null), img.getHeight(null));
+		frame.getContentPane().addMouseMotionListener(imc);
+		frame.getContentPane().addMouseListener(imc);
 		frame.setVisible(true);
 		//System.exit(0);
+	}
+	
+	private static class ImageMouseController implements MouseListener, MouseMotionListener{
+		private int x=-1, y=-1, w, h ,dx, dy;
+		private Image panimg;
+		private JLabel lbl;
+		
+		public ImageMouseController(final Image img, final JLabel label, final int w, final int h){
+			panimg = img;
+			lbl = label;
+			this.w = w;
+			this.h = h;
+		}
+		
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			dx += e.getX()-x;
+			dy += e.getY()-y;
+			lbl.setIcon(new ImageIcon(doPanImage(panimg,dx,dy,w,h)));
+			lbl.invalidate();
+			lbl.revalidate();
+			x = e.getX();
+			y = e.getY();
+		}
+		@Override
+		public void mouseMoved(MouseEvent e) {}
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void mousePressed(MouseEvent e) {
+			x=e.getX();
+			y=e.getY();
+		}
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			x=y=0;
+		}
+		@Override
+		public void mouseEntered(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		@Override
+		public void mouseExited(MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		} 
 	}
 	
 	private String reportName;
@@ -136,16 +209,8 @@ public class ReportGenerator {
 	        	if(o!=null){
 	        		head.put(fname, o.toString());
 	        	}
-			} catch (SecurityException e1) {
-				e1.printStackTrace();
-			} catch (NoSuchMethodException e1) {
-				e1.printStackTrace();
-			} catch (IllegalArgumentException e1) {
-				e1.printStackTrace();
-			} catch (IllegalAccessException e1) {
-				e1.printStackTrace();
-			} catch (InvocationTargetException e1) {
-				e1.printStackTrace();
+			} catch (Exception ex) {
+				logger.error(ex);
 			}
         }
 	}
@@ -188,16 +253,8 @@ public class ReportGenerator {
 		        	if(o!=null){
 		        		row.put(fname, o.toString());
 		        	}
-				} catch (SecurityException e1) {
-					e1.printStackTrace();
-				} catch (NoSuchMethodException e1) {
-					e1.printStackTrace();
-				} catch (IllegalArgumentException e1) {
-					e1.printStackTrace();
-				} catch (IllegalAccessException e1) {
-					e1.printStackTrace();
-				} catch (InvocationTargetException e1) {
-					e1.printStackTrace();
+				} catch (Exception ex){
+					logger.error(ex);				
 				}
 	        }
     		this.data.add(row);
@@ -205,7 +262,20 @@ public class ReportGenerator {
 		}
 	}
 	
-	public ImageIcon doResizeImage(final Image image, final int width, final int height){
+	public static Image doPanImage(final Image image, final int offsetx, final int offsety, final int w, final int h){
+		logger.debug("Panning image to "+offsetx+","+offsety);
+		BufferedImage resizedImage = new BufferedImage(w, h, BufferedImage.TYPE_USHORT_GRAY);
+		Graphics2D g = resizedImage.createGraphics();
+		g.setComposite(AlphaComposite.Src);
+		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		g.drawImage(image, offsetx, offsety, w, h, null);
+		g.dispose();		
+		return resizedImage;
+	}
+	
+	public static Image doResizeImage(final Image image, final int width, final int height){
 		BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
 		Graphics2D g = resizedImage.createGraphics();
 		g.setComposite(AlphaComposite.Src);
@@ -213,9 +283,8 @@ public class ReportGenerator {
 		g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 		g.drawImage(image, 0, 0, width, height, null);
-		g.dispose();
-		
-		return new ImageIcon(resizedImage);
+		g.dispose();		
+		return resizedImage;
 	}
 	
 	public Image getPreviewImage() throws Exception {
@@ -223,8 +292,17 @@ public class ReportGenerator {
         if(is==null){
         	throw new Exception("No such report "+reportName);
         }
-		JasperPrint print = JasperFillManager.fillReport(is, null, new JREmptyDataSource()); 
+		JasperPrint print = JasperFillManager.fillReport(is, null, getDataSource()); 
 		return JasperPrintManager.printPageToImage(print, 0, 1.0f);
+	}
+	
+	private JRDataSource getDataSource(){
+		if(data.size()==0){
+			List<DummyObject> dummyData = new ArrayList<DummyObject>(1);
+			dummyData.add(new DummyObject());
+			setData(dummyData);
+		}
+		return new JRMapCollectionDataSource(data);
 	}
  
     public void generatePdf(String outputDir, String outputFile) throws Exception {
@@ -235,8 +313,7 @@ public class ReportGenerator {
         File outDir = new File(outputDir);
         outDir.mkdirs();
         OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
-        JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data);
-        JasperRunManager.runReportToPdfStream(is, os, null, dataSource);
+        JasperRunManager.runReportToPdfStream(is, os, null, getDataSource());
         os.close();
         is.close();
     }
@@ -249,8 +326,7 @@ public class ReportGenerator {
         File outDir = new File(outputDir);
         outDir.mkdirs();
         OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
-        JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
-        runReportToRtfStream(is, os, null, dataSource);
+        runReportToRtfStream(is, os, null, getDataSource());
         os.close();
         is.close();
     }
@@ -264,7 +340,7 @@ public class ReportGenerator {
         outDir.mkdirs();
         OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
         JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
-        runReportToRtfStream(is, os, null, dataSource);
+        runReportToRtfStream(is, os, null, getDataSource());
         os.close();
         is.close();
     }
