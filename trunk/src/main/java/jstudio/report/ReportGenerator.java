@@ -199,6 +199,7 @@ public class ReportGenerator {
 	
 	public void setHead(DatabaseObject entry){
 		if(head.size()>0) head.clear();
+		/*
         for(Field f: entry.getClass().getDeclaredFields()){
         	if(Modifier.isStatic(f.getModifiers())) continue;
         	try{
@@ -213,6 +214,8 @@ public class ReportGenerator {
 				logger.error(ex);
 			}
         }
+        */
+		head.putAll(entry.getPrintData());
 	}
 	
 	/**
@@ -243,6 +246,7 @@ public class ReportGenerator {
 		if(this.data.size()>0) this.data.clear();
 		Map<String,String> row = this.head;
 		for(DatabaseObject e: data){	  
+			/*
 	        for(Field f: e.getClass().getDeclaredFields()){
 	        	if(Modifier.isStatic(f.getModifiers())) continue;
 	        	try{
@@ -257,6 +261,8 @@ public class ReportGenerator {
 					logger.error(ex);				
 				}
 	        }
+	        */
+			row.putAll(e.getPrintData());
     		this.data.add(row);
     		row = new HashMap<String,String>();
 		}
