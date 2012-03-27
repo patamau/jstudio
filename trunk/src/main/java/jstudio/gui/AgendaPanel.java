@@ -220,7 +220,7 @@ public class AgendaPanel
 				map.put("phone", ev.getPhone());
 				map.put("description",ev.getDescription());
 				rg.addData(map);
-			}
+			}			
 			ReportGeneratorGUI rggui = new ReportGeneratorGUI(rg,"day_"+timestampFormat.format(getDate()));
 			rggui.showGUI((Window)SwingUtilities.getRoot(this));
 		}else{

@@ -67,12 +67,14 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		return number+"/"+y;
 	}
 	
-	/** Year_number **/
+	/** Year_Number **/
 	public String getFilePrefix(){
 		Calendar c = Calendar.getInstance();
 		c.setTime(getDate());
 		Integer y = c.get(Calendar.YEAR);
-		return Integer.toString(y)+"."+Long.toString(number)+".";
+		//%[argument_index$][flags][width][.precision]conversion
+		return String.format("%1$4d_%2$03d", y, number); 
+		//return Integer.toString(y)+"_"+String.format("number);
 	}
 	
 	public String getName() {

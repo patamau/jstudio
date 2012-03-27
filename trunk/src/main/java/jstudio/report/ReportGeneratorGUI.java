@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -26,6 +27,8 @@ import javax.swing.border.BevelBorder;
 
 import org.apache.log4j.Logger;
 
+import jstudio.gui.generic.NicePanel;
+import jstudio.model.Event;
 import jstudio.util.Configuration;
 import jstudio.util.Language;
 
@@ -33,13 +36,15 @@ import jstudio.util.Language;
 public class ReportGeneratorGUI extends JPanel implements ActionListener {
 
 	public static final String PRINTPATH_KEY = "print.path";
+	private static final int PRV_SIZX=210, PRV_SIZY=297; //A4 standard
 	
 	private static final Logger logger = Logger.getLogger(ReportGeneratorGUI.class);
 	
-	private ReportGenerator rg;
+	private final ReportGenerator rg;
 	//private DefaultTableModel htable, dtable;
 	private JTextField fileField;
-	private JButton browseButton, okButton, cancelButton;
+	private JLabel preview;
+	private JButton browseButton, printButton, cancelButton;
 	private JComboBox formatBox;
 	
 	public enum PrintMode {
@@ -52,26 +57,46 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	 * @param rg
 	 * @param filename
 	 */
-	public ReportGeneratorGUI(ReportGenerator rg, final String filename){
+	public ReportGeneratorGUI(final ReportGenerator rg, final String filename){
 		this.rg = rg;
+		
+		NicePanel panel = new NicePanel(Language.string("Printing {0}", filename), Language.string("Configure printing"));
+		panel.getBody().setLayout(new GridBagLayout());
 		this.setLayout(new BorderLayout());
-		this.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-		JPanel body = new JPanel(new BorderLayout());
+		this.add(panel, BorderLayout.CENTER);
+		
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx=gc.gridy=0;
+		panel.getBody().add(getBodyPanel(filename), gc);
+		++gc.gridx;
+		panel.getBody().add(getPreviewPanel(), gc);
+		
+		panel.addButtonsGlue();
+		printButton = new JButton(Language.string("Print"));
+		printButton.addActionListener(this);
+		cancelButton = new JButton(Language.string("Cancel"));
+		cancelButton.addActionListener(this);
+		panel.addButton(printButton);
+		panel.addButton(cancelButton);
+	}
+	
+	private Component getBodyPanel(final String filename){
+		final JPanel body = new JPanel(new BorderLayout());
 		body.add(getFilePanel(filename),BorderLayout.CENTER);
-		body.add(getButtonsPanel(), BorderLayout.SOUTH);
-		this.add(body, BorderLayout.CENTER);
-		this.add(getPreviewPanel(), BorderLayout.EAST);
+		return body;
 	}
 	
 	private Component getPreviewPanel(){
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-		JLabel preview;
+		final JPanel panel = new JPanel(new BorderLayout());
+		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Language.string("Preview")));
 		try {
 			Image img = rg.getPreviewImage();
-			preview = new JLabel(rg.doResizeImage(img, 210, 297));
+			preview = new JLabel();
+			preview.setIcon(new ImageIcon(ReportGenerator.doResizeImage(img, PRV_SIZX, PRV_SIZY)));
 		} catch (Exception e) {
-			preview = new JLabel("N/A");
+			logger.error(e);
+			JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), Language.string("Preview error"), JOptionPane.ERROR_MESSAGE);
+			preview = new JLabel(Language.string("N/A"));
 		}
 		panel.add(preview, BorderLayout.CENTER);
 		return panel;
@@ -98,31 +123,6 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		note.setFont(note.getFont().deriveFont(Font.PLAIN));
 		gc.gridy++;
 		panel.add(note, gc);
-		return panel;
-	}
-	
-	private Component getButtonsPanel(){
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridBagLayout());
-		GridBagConstraints gc = new GridBagConstraints();
-		gc.gridx=0;
-		gc.gridy=0;
-		/*
-		gc.gridwidth=2;
-		gc.fill=GridBagConstraints.HORIZONTAL;
-		panel.add(getFormatsPanel(), gc);
-		*/
-		gc.fill=GridBagConstraints.NONE;
-		gc.weightx=1.0f;
-		//gc.gridy++;
-		//gc.gridwidth=1;
-		okButton = new JButton(Language.string("Ok"));
-		okButton.addActionListener(this);
-		panel.add(okButton,gc);
-		gc.gridx++;
-		cancelButton = new JButton(Language.string("Cancel"));
-		cancelButton.addActionListener(this);
-		panel.add(cancelButton,gc);
 		return panel;
 	}
 	
@@ -237,7 +237,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 			}
 		}else if(src==cancelButton){
 			((Window)SwingUtilities.getRoot(this)).dispose();
-		}else if(src==okButton){
+		}else if(src==printButton){
 			String lastPath;
 			int pos = fileField.getText().lastIndexOf(File.separator);
 			if(pos<0) lastPath = ".";

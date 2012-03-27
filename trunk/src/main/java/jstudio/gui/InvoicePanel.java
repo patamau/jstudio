@@ -218,7 +218,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			rg.setHeadValue("date", Person.birthdateFormat.format(entity.getDate()));
 			rg.setData(entity.getProducts());
 			rg.setHeadValue("totalcost", Float.toString(productTable.getTotal()));
-			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,entity.getFilePrefix()+"invoice");
+			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice_"+entity.getFilePrefix());
 			rgui.showGUI((Window)SwingUtilities.getRoot(this));
 		}else if(o==editButton){
 			getDialog().dispose();
@@ -226,7 +226,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			dialog.setVisible(true);
 		}else if(o==deleteButton){
 			int ch = JOptionPane.showConfirmDialog(super.manager, 
-					Language.string("Are you sure you want to remove {0} of {1}?",
+					Language.string("Are you sure you want to remove invoice {0} of {1}?",
 							entity.getInvoiceId(), Invoice.dateFormat.format(entity.getDate())),
 					Language.string("Remove invoice?"), 
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);

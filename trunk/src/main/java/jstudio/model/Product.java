@@ -1,5 +1,9 @@
 package jstudio.model;
 
+import java.text.NumberFormat;
+import java.util.HashMap;
+import java.util.Map;
+
 import jstudio.db.DatabaseObject;
 
 public class Product implements DatabaseObject, Comparable<Product> {
@@ -77,5 +81,13 @@ public class Product implements DatabaseObject, Comparable<Product> {
 	public int compareTo(Product o) {
 		if(o.id==0||this.id==0) return -1;		
 		return id.compareTo(o.id);
+	}
+	
+	public Map<String,String> getPrintData(){
+		Map<String,String> data = new HashMap<String,String>();
+		data.put("description", description);
+		data.put("cost", NumberFormat.getCurrencyInstance().format(cost));
+		data.put("quantity", Integer.toString(quantity));
+		return data;
 	}
 }
