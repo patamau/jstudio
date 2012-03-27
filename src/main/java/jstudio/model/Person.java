@@ -2,6 +2,8 @@ package jstudio.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import jstudio.db.DatabaseObject;
 
@@ -13,17 +15,27 @@ public class Person implements DatabaseObject, Comparable<Object> {
 	public static final SimpleDateFormat birthdateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	
 	public enum Gender{
-		Male(0),
-		Female(1);
+		Male("M",0),
+		Female("F",1);
 		
 		private int id;
+		private String str;
 		
-		private Gender(int id){
+		private Gender(final String str, final int id){
 			this.id=id;
+			this.str=str;
+		}
+		
+		public String toString(){
+			return str;
 		}
 		
 	    public int getId() {
 	        return id;
+	    }
+	    
+	    public static Gender getGender(final int id){
+	    	return id==0?Male:Female;
 	    }
 	}
 	
@@ -160,5 +172,21 @@ public class Person implements DatabaseObject, Comparable<Object> {
 
 	public String toString(){
 		return lastname;
+	}
+
+	@Override
+	public Map<String, String> getPrintData() {
+		Map<String,String> map = new HashMap<String,String>();
+		map.put("name",name);
+		map.put("lastname",lastname);
+		map.put("gender", Gender.getGender(gender).toString());
+		map.put("address",address);
+		map.put("city",city);
+		map.put("province", province);
+		map.put("cap",cap);
+		map.put("code", code);
+		map.put("phone", phone);
+		map.put("birthdate", Person.birthdateFormat.format(birthdate));
+		return map;
 	}	
 }

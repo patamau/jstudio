@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -216,7 +217,9 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			rg.setReport(Configuration.getGlobal(INVOICE_REPORT, INVOICE_REPORT_DEF));
 			rg.setHead(entity);
 			rg.setHeadValue("date", Person.birthdateFormat.format(entity.getDate()));
+			rg.setHeadValue("note", Language.string("Fattura legge 675"));
 			rg.setData(entity.getProducts());
+			rg.setHeadValue("stamp", NumberFormat.getCurrencyInstance().format(1.8f));
 			rg.setHeadValue("totalcost", Float.toString(productTable.getTotal()));
 			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice_"+entity.getFilePrefix());
 			rgui.showGUI((Window)SwingUtilities.getRoot(this));

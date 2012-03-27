@@ -3,7 +3,9 @@ package jstudio.model;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -165,5 +167,20 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		return y<oy?-1:(y>oy?1:this.number<o.number?-1:(this.number>o.number?1:0));
 		//return this.date.before(o.date)?-1:(this.date.after(o.date)?1:0);
 		//return this.id==o.id?0:(this.id>o.id?1:-1);
+	}
+
+	@Override
+	public Map<String, String> getPrintData() {
+		Map<String,String> map = new HashMap<String,String>();
+		map.put("number", Long.toString(number));
+		map.put("date", dateFormat.format(date));
+		map.put("name", name);
+		map.put("lastname", lastname);
+		map.put("code",code);
+		map.put("address",address);
+		map.put("cap",cap);
+		map.put("city",city);
+		map.put("province",province);
+		return map;
 	}
 }

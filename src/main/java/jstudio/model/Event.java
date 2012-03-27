@@ -2,6 +2,8 @@ package jstudio.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import jstudio.db.DatabaseObject;
 
@@ -97,5 +99,16 @@ public class Event implements DatabaseObject {
 	
 	public String toString(){
 		return timeFormat.format(date);
+	}
+
+	@Override
+	public Map<String, String> getPrintData() {
+		Map<String,String> map = new HashMap<String,String>();
+		map.put("date", timeFormat.format(date));
+		map.put("name", name);
+		map.put("lastname", lastname);
+		map.put("phone", phone);
+		map.put("description", description);
+		return map;
 	}
 }
