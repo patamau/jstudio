@@ -13,6 +13,7 @@ import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -42,6 +43,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 	private JTextField 
 		//idField,
 		dateField, 
+		stampField,
 		nameField,
 		lastnameField,
 		addressField,
@@ -49,6 +51,8 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		provinceField,
 		capField,
 		codeField;
+	private JCheckBox
+		noteCheck;
 	private ProductTable productTable;
 	private JButton okButton, cancelButton, printButton, closeButton, deleteButton, editButton, viewButton;
 	private JButton pickPersonButton;
@@ -101,6 +105,10 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		codeField = GUITool.createField(head, gc,
 				Language.string("Code"),
 				this.entity.getCode(), editable);
+		
+		String sval = editable?Float.toString(entity.getStamp()):Product.formatCurrency(entity.getStamp());
+		stampField = GUITool.createField(head, gc, Language.string("Stamp"), sval, editable);
+		noteCheck = GUITool.createCheck(head, gc, Language.string("L675 Compliant"), this.entity.getNote(), editable);
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
@@ -160,6 +168,13 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
+		try{
+			entity.setStamp(Float.parseFloat(stampField.getText()));
+		}catch(NumberFormatException e){
+			String msg = Language.string("Wrong stamp currency format for {0}", stampField.getText());
+			JOptionPane.showMessageDialog(this, msg, Language.string("Stamp format error"),JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
 		entity.setName(nameField.getText());
 		entity.setLastname(lastnameField.getText());
 		entity.setAddress(addressField.getText());
@@ -169,6 +184,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		entity.setCode(codeField.getText());
 		if(entity.getId()==0) entity.setId(controller.getNextId());
 		if(entity.getNumber()==0) entity.setNumber(((Accounting)controller).getNextInvoiceNumber());
+		entity.setNote(noteCheck.isSelected()?Language.string("L675 compliant"):"");
 		//controller.store(entity);
 		long pid = ((Accounting)controller).getProducts().getNextId();
 		for(Product p: entity.getProducts()){
@@ -187,6 +203,9 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		if(!entity.getCity().equals(cityField.getText())) return true;
 		if(!entity.getCode().equals(codeField.getText())) return true;
 		if(!entity.getProvince().equals(provinceField.getText())) return true;
+		if((entity.getNote().length()>0&&!noteCheck.isSelected())||
+				entity.getNote().length()==0&&noteCheck.isSelected()) return true;
+		if(!Float.toString(entity.getStamp()).equals(stampField.getText())) return true;
 		return false;
 	}
 
@@ -217,10 +236,10 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			rg.setReport(Configuration.getGlobal(INVOICE_REPORT, INVOICE_REPORT_DEF));
 			rg.setHead(entity);
 			rg.setHeadValue("date", Person.birthdateFormat.format(entity.getDate()));
-			rg.setHeadValue("note", Language.string("Fattura legge 675"));
+			rg.setHeadValue("note", entity.getNote());
 			rg.setData(entity.getProducts());
-			rg.setHeadValue("stamp", NumberFormat.getCurrencyInstance().format(1.8f));
-			rg.setHeadValue("totalcost", Float.toString(productTable.getTotal()));
+			rg.setHeadValue("stamp", Product.formatCurrency(entity.getStamp()));
+			rg.setHeadValue("totalcost", Product.formatCurrency(productTable.getTotal()));
 			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice_"+entity.getFilePrefix());
 			rgui.showGUI((Window)SwingUtilities.getRoot(this));
 		}else if(o==editButton){

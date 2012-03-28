@@ -182,6 +182,6 @@ public class ProductTable
 			quantity_tot += t.getQuantity();
 			total += t.getQuantity()*t.getCost();
 		}
-		totalLabel.setText(Float.toString(total));
+		totalLabel.setText(Product.formatCurrency(total));
 	}
 }

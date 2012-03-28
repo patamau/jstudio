@@ -9,6 +9,8 @@ import jstudio.db.DatabaseObject;
 
 public class DummyObject  implements DatabaseObject {
 
+	private static final long serialVersionUID = -6359419505980691099L;
+
 	@Override
 	public Long getId() {
 		return 1l;

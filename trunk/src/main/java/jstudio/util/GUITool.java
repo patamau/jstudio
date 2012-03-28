@@ -21,6 +21,7 @@ import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
@@ -198,6 +199,31 @@ public class GUITool {
 		gc.gridwidth=ow;
 		return f;
 	}
+	
+	public static JCheckBox createCheck(Container c, GridBagConstraints gc, String label, String value, boolean editable){
+		JCheckBox f = new JCheckBox();
+		f.setSelected(value.length()>0);
+		gc.gridy++;
+		gc.anchor=GridBagConstraints.EAST;
+		if(editable){
+			JLabel l = new JLabel(label, JLabel.RIGHT);
+			c.add(l,gc);
+		}
+		gc.anchor=GridBagConstraints.WEST;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=1.0f;
+		int px = gc.gridx;
+		gc.gridx++;		
+		int ow = gc.gridwidth; //store old weight
+		gc.gridwidth=2;
+		c.add(editable?f:new JLabel(value),gc);
+		gc.fill=GridBagConstraints.NONE;
+		gc.weightx=0.0f;
+		gc.gridx=px;
+		gc.gridwidth=ow;
+		return f;
+	}
+	
 
 	public static JTextField createField(Container c, GridBagConstraints gc, String label, String value, boolean editable){
 		JTextField f = new JTextField(value);
