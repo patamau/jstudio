@@ -1,6 +1,5 @@
 package jstudio.model;
 
-import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +8,10 @@ import jstudio.db.DatabaseObject;
 public class Product implements DatabaseObject, Comparable<Product> {
 
 	private static final long serialVersionUID = -3847404193905268779L;
+	public static final String formatCurrency(final float val){
+		//%[argument_index$][flags][width][.precision]conversion
+		return String.format("%1$.2f EUR",val);
+	}
 	
 	private Long id;
 	private Invoice invoice;
@@ -28,7 +31,7 @@ public class Product implements DatabaseObject, Comparable<Product> {
 		this.id=id;
 		this.invoice=invoice;
 		this.description="";
-		this.quantity=0;
+		this.quantity=1;
 		this.cost=0f;
 	}
 	
@@ -86,7 +89,8 @@ public class Product implements DatabaseObject, Comparable<Product> {
 	public Map<String,String> getPrintData(){
 		Map<String,String> data = new HashMap<String,String>();
 		data.put("description", description);
-		data.put("cost", NumberFormat.getCurrencyInstance().format(cost));
+		//data.put("cost", NumberFormat.getCurrencyInstance().format(cost));
+		data.put("cost", formatCurrency(cost));
 		data.put("quantity", Integer.toString(quantity));
 		return data;
 	}

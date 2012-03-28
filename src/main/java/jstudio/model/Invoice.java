@@ -19,7 +19,8 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 
 	private Long id, number;
 	private Date date;
-	private String name, lastname, address, city, province, cap, code;
+	private String name, lastname, address, city, province, cap, code, note;
+	private Float stamp;
 	private Set<Product> products;
 	
 	public String getProvince() {
@@ -45,9 +46,27 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		this.cap="";
 		this.province="";
 		this.code="";
+		this.note="";
+		this.stamp=0f;
 		this.products = new HashSet<Product>();
 	}
 	
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(final String note) {
+		this.note = note;
+	}
+
+	public float getStamp() {
+		return stamp;
+	}
+
+	public void setStamp(final float stamp) {
+		this.stamp = stamp;
+	}
+
 	public String toString(){
 		return getInvoiceId();
 	}
@@ -181,6 +200,8 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		map.put("cap",cap);
 		map.put("city",city);
 		map.put("province",province);
+		map.put("stamp", Product.formatCurrency(stamp));
+		map.put("note", note);
 		return map;
 	}
 }

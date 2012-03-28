@@ -23,12 +23,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
 
 import org.apache.log4j.Logger;
 
 import jstudio.gui.generic.NicePanel;
-import jstudio.model.Event;
 import jstudio.util.Configuration;
 import jstudio.util.Language;
 
@@ -176,33 +174,36 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		else return src;
 	}
 	
-	public void doPrint(String destination, final PrintMode mode){
+	public boolean doPrint(String destination, final PrintMode mode){
 		File f;
+		boolean printed = false;
 		try{
-		switch(mode){
-		case PdfMode:
-			f = new File(checkExtension(destination, "pdf"));		
-			if(checkOverwrite(f)){
-				rg.generatePdf(f.getParent(), f.getName());
+			switch(mode){
+			case PdfMode:
+				f = new File(checkExtension(destination, "pdf"));		
+				if(checkOverwrite(f)){
+					rg.generatePdf(f.getParent(), f.getName());
+					printed=true;
+				}
+				break;
+			case DocMode:
+				f = new File(checkExtension(destination, "rtf"));
+				if(checkOverwrite(f)){
+					rg.generateRtf(f.getParent(), f.getName());
+					printed=true;
+				}
+				break;
+			case XlsMode:
+				f = new File(checkExtension(destination, "xls"));
+				if(checkOverwrite(f)){
+					//rg.generateRtf(f.getParent(), f.getName());
+					JOptionPane.showMessageDialog(this,"INTERNAL: XLS NOT IMPLEMENTED");
+				}
+				break;
+			default:
+				logger.error("Unrecognized print mode "+mode);
+				break;
 			}
-			break;
-		case DocMode:
-			f = new File(checkExtension(destination, "rtf"));
-			if(checkOverwrite(f)){
-				rg.generateRtf(f.getParent(), f.getName());
-			}
-			break;
-		case XlsMode:
-			f = new File(checkExtension(destination, "xls"));
-			if(checkOverwrite(f)){
-				//rg.generateRtf(f.getParent(), f.getName());
-				JOptionPane.showMessageDialog(this,"INTERNAL: XLS NOT IMPLEMENTED");
-			}
-			break;
-		default:
-			logger.error("Unrecognized print mode "+mode);
-			break;
-		}
 		}catch(Exception e){
 			logger.error("Cannot print ("+mode+") "+destination,e);
 			JOptionPane.showMessageDialog(this, 
@@ -210,6 +211,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 					Language.string("Print error"),
 					JOptionPane.ERROR_MESSAGE);
 		}
+		return printed;
 	}
 	
 	public void showGUI(Window parent){
@@ -225,14 +227,13 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		Object src = e.getSource();
 		if(src==browseButton){
-			JFileChooser fc = new JFileChooser();
-			File f = new File(browseButton.getText());
+			JFileChooser fc = new JFileChooser(new File("."));
+			File f = new File(this.fileField.getText());
 			fc.setSelectedFile(f);
 			fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			fc.setCurrentDirectory(f);
-			fc.showSaveDialog(this);
+			int ch = fc.showSaveDialog(this);
 			File sf = fc.getSelectedFile();
-			if(f!=null){
+			if(ch==JFileChooser.APPROVE_OPTION&&f!=null){
 				fileField.setText(sf.getAbsolutePath());
 			}
 		}else if(src==cancelButton){
@@ -246,15 +247,18 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 			int idx = formatBox.getSelectedIndex();
 			switch(idx){
 			case 0:
-				doPrint(fileField.getText(), PrintMode.PdfMode);
+				if(doPrint(fileField.getText(), PrintMode.PdfMode)){
+					((Window)SwingUtilities.getRoot(this)).dispose();
+				}
 				break;
 			case 1:
-				doPrint(fileField.getText(), PrintMode.DocMode);
+				if(doPrint(fileField.getText(), PrintMode.DocMode)){
+					((Window)SwingUtilities.getRoot(this)).dispose();
+				}
 				break;
 			default:
 				logger.error("Unmapped print mode "+idx);
 			}
-			((Window)SwingUtilities.getRoot(this)).dispose();
 		}
 	}
 }

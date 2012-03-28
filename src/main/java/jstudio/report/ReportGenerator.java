@@ -1,7 +1,6 @@
 package jstudio.report;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
@@ -13,10 +12,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,15 +26,11 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
-
 import jstudio.db.DatabaseObject;
 import jstudio.model.DummyObject;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
 import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JREmptyDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -49,6 +40,9 @@ import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRRtfExporter;
 import net.sf.jasperreports.engine.export.JRTextExporter;
+
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
  
 /**
  * Hello world!
@@ -199,22 +193,6 @@ public class ReportGenerator {
 	
 	public void setHead(DatabaseObject entry){
 		if(head.size()>0) head.clear();
-		/*
-        for(Field f: entry.getClass().getDeclaredFields()){
-        	if(Modifier.isStatic(f.getModifiers())) continue;
-        	try{
-	        	String fname = f.getName();
-	        	String mname = "get"+fname.substring(0,1).toUpperCase()+fname.substring(1);
-	        	Method m = entry.getClass().getMethod(mname);
-	        	Object o = m.invoke(entry);
-	        	if(o!=null){
-	        		head.put(fname, o.toString());
-	        	}
-			} catch (Exception ex) {
-				logger.error(ex);
-			}
-        }
-        */
 		head.putAll(entry.getPrintData());
 	}
 	
@@ -245,23 +223,7 @@ public class ReportGenerator {
 	public void setData(Collection<? extends DatabaseObject> data){
 		if(this.data.size()>0) this.data.clear();
 		Map<String,String> row = this.head;
-		for(DatabaseObject e: data){	  
-			/*
-	        for(Field f: e.getClass().getDeclaredFields()){
-	        	if(Modifier.isStatic(f.getModifiers())) continue;
-	        	try{
-		        	String fname = f.getName();
-		        	String mname = "get"+fname.substring(0,1).toUpperCase()+fname.substring(1);
-		        	Method m = e.getClass().getMethod(mname);
-		        	Object o = m.invoke(e);
-		        	if(o!=null){
-		        		row.put(fname, o.toString());
-		        	}
-				} catch (Exception ex){
-					logger.error(ex);				
-				}
-	        }
-	        */
+		for(DatabaseObject e: data){
 			row.putAll(e.getPrintData());
     		this.data.add(row);
     		row = new HashMap<String,String>();
