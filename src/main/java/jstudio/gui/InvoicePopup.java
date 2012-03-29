@@ -1,9 +1,12 @@
 package jstudio.gui;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JDialog;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JSeparator;
 
 import jstudio.gui.generic.ContextualMenu;
 import jstudio.gui.generic.EntityManagerPanel;
@@ -13,8 +16,15 @@ import jstudio.util.Language;
 @SuppressWarnings("serial")
 public class InvoicePopup extends ContextualMenu<Invoice> {
 	
+	private JMenuItem printItem;
+	
 	public InvoicePopup(EntityManagerPanel<Invoice> parent){
 		super(parent);
+		this.add(new JSeparator());
+		printItem = new JMenuItem("Print");
+	    printItem.setFont(deleteItem.getFont().deriveFont(Font.PLAIN));
+	    printItem.addActionListener(this);
+	    this.add(printItem);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -34,9 +44,11 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 				controller.delete(context);
 				parent.refresh();
 			}
-		}else if(o==newItem){
+		}else if(o==viewItem){
 			JDialog dialog = new InvoicePanel(new Invoice(0l), parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
+		}else if(o==printItem){
+			//TODO: guess			
 		}
 	}
 
