@@ -1,9 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-	<property name="ireport.zoom" value="2.0"/>
-	<property name="ireport.x" value="279"/>
-	<property name="ireport.y" value="421"/>
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="64"/>
+	<property name="ireport.y" value="1133"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#999999"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#D5CBBF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#999999"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#FFF4E6">
+		<box>
+			<pen lineWidth="0.5" lineColor="#999999"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#999999"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#FFFCF8"/>
+		</conditionalStyle>
+	</style>
 	<subDataset name="dataset1"/>
+	<subDataset name="Table Dataset 1"/>
 	<field name="number" class="java.lang.String"/>
 	<field name="date" class="java.lang.String"/>
 	<field name="name" class="java.lang.String"/>
@@ -23,7 +48,7 @@
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="335" splitType="Stretch">
+		<band height="325" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="0" width="281" height="24"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -140,7 +165,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{lastname}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="313" y="251" width="242" height="16"/>
+				<reportElement x="313" y="251" width="203" height="16"/>
 				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{address}]]></textFieldExpression>
@@ -152,13 +177,13 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{cap}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="392" y="267" width="153" height="15"/>
+				<reportElement x="355" y="267" width="124" height="15"/>
 				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{city}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="313" y="227" width="242" height="15"/>
+				<reportElement x="313" y="227" width="203" height="15"/>
 				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{code}]]></textFieldExpression>
@@ -170,7 +195,7 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{note}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="355" y="267" width="37" height="15"/>
+				<reportElement x="479" y="267" width="37" height="15"/>
 				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{province}]]></textFieldExpression>
@@ -181,23 +206,32 @@
 		<band splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="23" splitType="Stretch">
+		<band height="28" splitType="Stretch">
 			<textField>
-				<reportElement x="0" y="0" width="330" height="20"/>
+				<reportElement x="0" y="0" width="392" height="20"/>
 				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
-				<textElement/>
+				<textElement verticalAlignment="Bottom"/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="355" y="0" width="100" height="20"/>
-				<textElement/>
+				<reportElement x="413" y="0" width="32" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{quantity}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="455" y="0" width="100" height="20"/>
-				<textElement textAlignment="Right"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{cost}]]></textFieldExpression>
 			</textField>
+			<line>
+				<reportElement x="1" y="20" width="554" height="1" forecolor="#999999"/>
+			</line>
+			<line>
+				<reportElement x="450" y="15" width="1" height="5" forecolor="#999999"/>
+			</line>
+			<line>
+				<reportElement x="402" y="15" width="1" height="5" forecolor="#999999"/>
+			</line>
 		</band>
 	</detail>
 	<lastPageFooter>
