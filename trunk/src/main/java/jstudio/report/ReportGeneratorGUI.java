@@ -205,9 +205,10 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 				break;
 			}
 		}catch(Exception e){
+			File fd = new File(destination);
 			logger.error("Cannot print ("+mode+") "+destination,e);
 			JOptionPane.showMessageDialog(this, 
-					Language.string("While printing {0}: {1}",destination,e.getMessage()), 
+					Language.string("While printing {0}: {1}",fd.getName(),e.getMessage()), 
 					Language.string("Print error"),
 					JOptionPane.ERROR_MESSAGE);
 		}
