@@ -13,7 +13,6 @@ import javax.swing.JTextField;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
 import jstudio.gui.generic.NicePanel;
-import jstudio.model.Event;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
 import jstudio.util.GUITool;

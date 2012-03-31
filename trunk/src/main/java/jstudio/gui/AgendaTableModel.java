@@ -19,9 +19,14 @@ public class AgendaTableModel extends DefaultTableModel {
 	
 	public AgendaTableModel(JTable table) {
 		super(cols, 0);
+		/*
 		TableSorter ts = new TableSorter(this,table.getTableHeader());
 		table.setModel(ts);
 		ts.setSortingStatus(0, TableSorter.ASCENDING);
+		*/
+		table.setModel(this);
+		table.setAutoCreateRowSorter(true);
+		table.getRowSorter().toggleSortOrder(0);
 		table.getColumn("Time").setMaxWidth(50);
 		table.getColumn("Time").setMinWidth(50);
 	}

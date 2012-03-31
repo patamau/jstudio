@@ -4,7 +4,6 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Invoice;
-import jstudio.util.Language;
 
 @SuppressWarnings("serial")
 public class ProductTableModel extends DefaultTableModel {

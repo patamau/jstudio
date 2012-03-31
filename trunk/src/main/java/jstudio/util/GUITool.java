@@ -33,7 +33,6 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerDateModel;
 import javax.swing.SpinnerModel;
 
-import jstudio.gui.generic.CyclingSpinnerListModel;
 import jstudio.gui.generic.TimeSpinnerModel;
 import jstudio.model.Event;
 
@@ -201,14 +200,9 @@ public class GUITool {
 	}
 	
 	public static JCheckBox createCheck(Container c, GridBagConstraints gc, String label, String value, boolean editable){
-		JCheckBox f = new JCheckBox();
+		JCheckBox f = new JCheckBox(label);
 		f.setSelected(value.length()>0);
 		gc.gridy++;
-		gc.anchor=GridBagConstraints.EAST;
-		if(editable){
-			JLabel l = new JLabel(label, JLabel.RIGHT);
-			c.add(l,gc);
-		}
 		gc.anchor=GridBagConstraints.WEST;
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		gc.weightx=1.0f;
@@ -350,7 +344,7 @@ public class GUITool {
 						field.setCaretPosition(3);
 					}else if(pos==4){
 						field.setText(field.getText().substring(0,3)+'0'+field.getText().charAt(3)+'/');
-						field.setCaretPosition(7);
+						field.setCaretPosition(6);
 					}
 				}
 			}

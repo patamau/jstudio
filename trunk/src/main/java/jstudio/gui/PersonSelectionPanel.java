@@ -83,8 +83,8 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 		return Resources.getImage(PIC_ADDRESSBOOK);
 	}
 	
-	public void showEntity(Person p){
-		JDialog dialog = new PersonPanel(p,this, false).createDialog((Frame)this.getTopLevelAncestor());
+	public void showEntity(Person p, boolean edit){
+		JDialog dialog = new PersonPanel(p,this, edit).createDialog((Frame)this.getTopLevelAncestor());
 		dialog.setVisible(true);
 	}
 

@@ -35,7 +35,7 @@ public class EventPopup extends ContextualMenu<Event> {
 				controller.delete(context);
 				parent.refresh();
 			}
-		}else if(o==viewItem){
+		}else if(o==newItem){
 			//override default event date using the current agendapanel date
 			Date d = ((AgendaPanel)parent).getDate();
 			Event ev = new Event(0l);

@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import jstudio.model.Person;
 import jstudio.util.Language;
 import jstudio.util.TableSorter;
 
@@ -20,9 +21,15 @@ public class AddressBookTableModel extends DefaultTableModel {
 	
 	public AddressBookTableModel(JTable table) {
 		super(cols, 0);
+		/*
 		TableSorter ts = new TableSorter(this,table.getTableHeader());
 		table.setModel(ts);
 		ts.setSortingStatus(0, TableSorter.DESCENDING);
+		*/
+		table.setModel(this);
+		table.setAutoCreateRowSorter(true);
+		table.getRowSorter().toggleSortOrder(0);
+		table.getRowSorter().toggleSortOrder(0);
 	}
 
 	public boolean isCellEditable(int row, int col){
@@ -31,6 +38,7 @@ public class AddressBookTableModel extends DefaultTableModel {
 	
 	public Class<?> getColumnClass(int col){
 		switch(col){
+		case 0: return Person.class;
 		case 2: return Date.class;
 		default: return String.class;
 		}

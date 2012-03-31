@@ -96,7 +96,8 @@ public class NicePanel extends JPanel {
 	 * and the last button is rightmost
 	 * @param button
 	 */
-	public void addButton(final Component button){
+	public void addButton(final JButton button){
+		button.setMnemonic(button.getText().charAt(0));
 		footer.add(button, footerConstraints);
 		footerConstraints.gridx++;
 	}
