@@ -1,16 +1,23 @@
 package jstudio.gui;
 
 import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
+import javax.swing.SwingUtilities;
 
 import jstudio.gui.generic.ContextualMenu;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.model.Invoice;
+import jstudio.model.Person;
+import jstudio.model.Product;
+import jstudio.report.ReportGenerator;
+import jstudio.report.ReportGeneratorGUI;
+import jstudio.util.Configuration;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
@@ -44,11 +51,24 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 				controller.delete(context);
 				parent.refresh();
 			}
-		}else if(o==viewItem){
+		}else if(o==newItem){
 			JDialog dialog = new InvoicePanel(new Invoice(0l), parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
 		}else if(o==printItem){
-			//TODO: guess			
+			ReportGenerator rg = new ReportGenerator();
+			rg.setReport(Configuration.getGlobal(InvoicePanel.INVOICE_REPORT, InvoicePanel.INVOICE_REPORT_DEF));
+			rg.setHead(context);
+			rg.setHeadValue("date", Person.birthdateFormat.format(context.getDate()));
+			rg.setHeadValue("note", context.getNote());
+			rg.setData(context.getProducts());
+			rg.setHeadValue("stamp", Product.formatCurrency(context.getStamp()));
+			float tot = 0f;
+			for(Product p: context.getProducts()){
+				tot += p.getCost()*p.getQuantity();
+			}
+			rg.setHeadValue("totalcost", Product.formatCurrency(tot));
+			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice_"+context.getFilePrefix());
+			rgui.showGUI((Window)SwingUtilities.getRoot(this));		
 		}
 	}
 

@@ -109,7 +109,7 @@ public class ProductTable
 		return Language.string("Products");
 	}
 	
-	public void showEntity(Product p){
+	public void showEntity(Product p, boolean edit){
 		JDialog dialog;
 		dialog = new ProductPanel(p, this, invoice, accounting).createDialog(this.getTopLevelAncestor());
 		dialog.setVisible(true);

@@ -180,8 +180,8 @@ public class AgendaPanel
 		return calendar.getTime();
 	}
 	
-	public void showEntity(Event e){
-		JDialog dialog = new EventPanel(e,this,false).createDialog(this.getTopLevelAncestor());
+	public void showEntity(Event e, boolean edit){
+		JDialog dialog = new EventPanel(e,this,edit).createDialog(this.getTopLevelAncestor());
 		dialog.setVisible(true);
 	}
 

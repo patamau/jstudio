@@ -16,7 +16,7 @@ public abstract class ContextualMenu<Context extends DatabaseObject>
 		implements ActionListener {
 	
 	protected JMenuItem
-		viewItem, editItem, deleteItem;
+		newItem, viewItem, editItem, deleteItem;
 	protected EntityManagerPanel<Context> parent;
 	protected Controller<Context> controller;
 	protected Context context;
@@ -36,10 +36,10 @@ public abstract class ContextualMenu<Context extends DatabaseObject>
 	    deleteItem.addActionListener(this);
 	    this.add(deleteItem);	    
 	    this.add(new JSeparator());
-	    viewItem = new JMenuItem("New");
-	    viewItem.setFont(deleteItem.getFont().deriveFont(Font.PLAIN));
-	    viewItem.addActionListener(this);
-	    this.add(viewItem);
+	    newItem = new JMenuItem("New");
+	    newItem.setFont(newItem.getFont().deriveFont(Font.PLAIN));
+	    newItem.addActionListener(this);
+	    this.add(newItem);
 	}
 	
 	public void setContext(Context context){

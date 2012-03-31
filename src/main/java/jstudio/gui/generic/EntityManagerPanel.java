@@ -155,14 +155,14 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	
 	public abstract void addEntity(T entity);
 	
-	public abstract void showEntity(T entity);
+	public abstract void showEntity(T entity, boolean edit);
 	
 	@SuppressWarnings("unchecked")
 	public void mouseClicked(MouseEvent e){ 
 		if(e.getClickCount()==2){
 			int row = table.rowAtPoint(e.getPoint());
 			if(row>=0){
-				showEntity((T)table.getValueAt(row, 0));
+				showEntity((T)table.getValueAt(row, 0), false);
 			}
 		}
 	}

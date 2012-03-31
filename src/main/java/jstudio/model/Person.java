@@ -15,8 +15,8 @@ public class Person implements DatabaseObject, Comparable<Object> {
 	public static final SimpleDateFormat birthdateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	
 	public enum Gender{
-		Male("M",0),
-		Female("F",1);
+		Male("Male",0),
+		Female("Female",1);
 		
 		private int id;
 		private String str;

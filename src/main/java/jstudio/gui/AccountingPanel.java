@@ -73,8 +73,8 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		return Resources.getImage(PIC_ACCOUNTING);
 	}
 	
-	public void showEntity(Invoice i){
-		JDialog dialog = new InvoicePanel(i, this, false).createDialog(this.getTopLevelAncestor());
+	public void showEntity(Invoice i, boolean edit){
+		JDialog dialog = new InvoicePanel(i, this, edit).createDialog(this.getTopLevelAncestor());
 		dialog.setVisible(true);
 	}
 	

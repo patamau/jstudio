@@ -22,9 +22,15 @@ public class AccountingTableModel extends DefaultTableModel {
 	
 	public AccountingTableModel(JTable table) {
 		super(cols, 0);
+		/*
 		TableSorter ts = new TableSorter(this,table.getTableHeader());
 		table.setModel(ts);
 		ts.setSortingStatus(0, TableSorter.ASCENDING);
+		*/
+		table.setModel(this);
+		table.setAutoCreateRowSorter(true);
+		table.getRowSorter().toggleSortOrder(0);
+		table.getRowSorter().toggleSortOrder(0);
 		//table.getColumn("Id").setMaxWidth(50);
 		//table.getColumn("Id").setMinWidth(50);
 	}
