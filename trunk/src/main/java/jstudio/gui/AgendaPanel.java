@@ -2,6 +2,7 @@ package jstudio.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
@@ -13,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -57,17 +59,13 @@ public class AgendaPanel
 		AGENDA_REPORT_DEF = "/reports/day.jasper";
 	
 	private JButton[] weekButtons = new JButton[7];
-	private JButton refreshButton, printButton, 
-		nextWeekButton, prevWeekButton;
+	private JButton printButton, nextWeekButton, prevWeekButton;
 	private Calendar calendar = Calendar.getInstance();
 
 	public AgendaPanel(Controller<Event> controller){
 		super(controller);
 		this.setLayout(new BorderLayout());
-
-		table = new JTable();
 		model = new AgendaTableModel(table);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane scrollpane = new JScrollPane(table);
 		scrollpane.addMouseListener(this);
@@ -98,18 +96,21 @@ public class AgendaPanel
 		gc.fill=GridBagConstraints.NONE;
 		setDate(new Date());
 		topPanel.add(weekPanel,BorderLayout.NORTH);
-
+		
 		JToolBar actionPanel = new JToolBar(Language.string("Actions"));
 		actionPanel.setFloatable(false);
-		refreshButton = new JButton(Language.string("Refresh"));
-		refreshButton.addActionListener(this);
+		actionPanel.add(newButton);
+		actionPanel.addSeparator();
+		actionPanel.add(viewButton);
+		actionPanel.add(editButton);
+		actionPanel.add(deleteButton);
+		actionPanel.add(Box.createHorizontalGlue());
+		actionPanel.add(filterField);
+		actionPanel.setPreferredSize(new Dimension(0,25));
 		actionPanel.add(refreshButton);
 		printButton = new JButton(Language.string("Print"));
 		printButton.addActionListener(this);
 		actionPanel.add(printButton);
-		filterField = new JTextField();
-		filterField.addKeyListener(this);
-		actionPanel.add(filterField);
 		topPanel.add(actionPanel, BorderLayout.CENTER);
 		this.add(topPanel, BorderLayout.NORTH);
 		
@@ -255,9 +256,12 @@ public class AgendaPanel
 		}
 	}
 	
-	public void filter(String text){
+	public synchronized void filter(String text){
 		text = text.trim();
-		if(text.length()==0) return;
+		if(text.length()==0){
+			this.refresh();
+			return;
+		}
 		this.clear();
 		String[] vals = text.split(" ");
 		String[] cols = new String[]{

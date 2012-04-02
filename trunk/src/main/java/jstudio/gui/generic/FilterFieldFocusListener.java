@@ -31,7 +31,7 @@ public class FilterFieldFocusListener implements FocusListener {
 		if(this.field.getText().length()==0){
 			this.field.setForeground(Color.GRAY);
 			this.field.setFont(this.field.getFont().deriveFont(Font.ITALIC));
-			this.field.setText(Language.string("Filter name and lastname"));
+			this.field.setText(Language.string("Filter"));
 		}
 	}
 
