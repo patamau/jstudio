@@ -1,5 +1,6 @@
 package jstudio.gui.generic;
 
+import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -8,24 +9,28 @@ import java.awt.event.MouseListener;
 import java.util.Collection;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import jstudio.control.Controller;
 import jstudio.db.DatabaseObject;
 import jstudio.util.Language;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @SuppressWarnings("serial")
 public abstract class EntityManagerPanel<T extends DatabaseObject> 
 		extends JPanel
-		implements ActionListener, MouseListener, KeyListener {
+		implements ActionListener, MouseListener, KeyListener, ListSelectionListener {
 	
 	private static final Logger logger = LoggerFactory.getLogger(EntityManagerPanel.class);
 	
@@ -33,6 +38,8 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	protected JTable table;
 	protected ContextualMenu<T> popup;
 	protected Controller<T> controller;
+	
+	protected JButton newButton, viewButton, editButton, deleteButton, refreshButton;
 	
 	//filterig stuff
 	protected JTextField filterField;
@@ -42,6 +49,7 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 		boolean stop = false;
 		public void run(){
 			try {
+				String lastFilter = "", search;
 				while(!stop){					
 					synchronized(this){
 						wait();
@@ -49,7 +57,11 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 						wait(100);
 					}		
 					//logger.debug("going to filter! "+filterField.getText());
-					filter(filterField.getText());
+					search = filterField.getText();
+					if(!search.equals(lastFilter)){
+						lastFilter = search;
+						filter(search);
+					}
 				}
 			} catch (InterruptedException e) {
 				logger.error("Filter thread interrupted");
@@ -89,11 +101,42 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 			filterThread = new FilterThread();
 			filterThread.start();
 		}
+		
+		table = new JTable();
+		table.getSelectionModel().addListSelectionListener(this);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		newButton = new JButton(Language.string("New"));
+		newButton.addActionListener(this);
+		newButton.setMnemonic(KeyEvent.VK_N);
+		viewButton = new JButton(Language.string("View"));
+		viewButton.addActionListener(this);
+		viewButton.setMnemonic(KeyEvent.VK_V);
+		viewButton.setEnabled(false);
+		editButton = new JButton(Language.string("Edit"));
+		editButton.addActionListener(this);
+		editButton.setMnemonic(KeyEvent.VK_E);
+		editButton.setEnabled(false);
+		deleteButton = new JButton(Language.string("Delete"));
+		deleteButton.addActionListener(this);
+		deleteButton.setMnemonic(KeyEvent.VK_D);
+		deleteButton.setEnabled(false);
+		filterField = new JTextField();
+		filterField.addKeyListener(this);
+		filterField.setMaximumSize(new Dimension(250,25));
+		filterField.setPreferredSize(new Dimension(250,25));
+		filterField.addFocusListener(new FilterFieldFocusListener(filterField));
+		refreshButton = new JButton(Language.string("Refresh"));
+		refreshButton.addActionListener(this);
+		refreshButton.setMnemonic(KeyEvent.VK_R);
 	}
 	
-	public void filter(String text){
+	public synchronized void filter(String text){
 		text = text.trim();
-		if(text.length()==0) return;
+		if(text.length()==0){
+			this.refresh();
+			return;
+		}
 		this.clear();
 		String[] vals = text.split(" ");
 		String[] cols = new String[]{
@@ -186,4 +229,20 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 			}
 		}
 	}
+	
+	public void valueChanged(ListSelectionEvent e) {
+        //Ignore extra messages.
+        if (e.getValueIsAdjusting()) return;
+
+        ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+        if (lsm.isSelectionEmpty()) {
+            viewButton.setEnabled(false);
+            editButton.setEnabled(false);
+            deleteButton.setEnabled(false);
+        } else {
+        	viewButton.setEnabled(true);
+            editButton.setEnabled(true);
+            deleteButton.setEnabled(true);
+        }
+    }
 }

@@ -1,26 +1,22 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.Collection;
 
+import javax.swing.Box;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
 import jstudio.control.Controller;
 import jstudio.gui.generic.EntityManagerPanel;
-import jstudio.gui.generic.FilterFieldFocusListener;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Person;
 import jstudio.util.Language;
@@ -36,15 +32,10 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 
 	public static final String PIC_ADDRESSBOOK="personicon.png";
 	
-	private JButton newButton, viewButton, editButton, deleteButton, refreshButton;
-	
 	public AddressBookPanel(Controller<Person> controller){
 		super(controller);
 		this.setLayout(new BorderLayout());
-		
-		table = new JTable();
 		model = new AddressBookTableModel(table);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane scrollpane = new JScrollPane(table);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
@@ -52,36 +43,15 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 
 		JToolBar actionPanel = new JToolBar(Language.string("Actions"));
 		actionPanel.setFloatable(false);
-		newButton = new JButton(Language.string("New"));
-		newButton.addActionListener(this);
-		newButton.setMnemonic(KeyEvent.VK_N);
 		actionPanel.add(newButton);
 		actionPanel.addSeparator();
-		viewButton = new JButton(Language.string("View"));
-		viewButton.addActionListener(this);
-		viewButton.setMnemonic(KeyEvent.VK_V);
 		actionPanel.add(viewButton);
-		editButton = new JButton(Language.string("Edit"));
-		editButton.addActionListener(this);
-		editButton.setMnemonic(KeyEvent.VK_E);
 		actionPanel.add(editButton);
-		deleteButton = new JButton(Language.string("Delete"));
-		deleteButton.addActionListener(this);
-		deleteButton.setMnemonic(KeyEvent.VK_D);
 		actionPanel.add(deleteButton);
-		actionPanel.addSeparator();
-		refreshButton = new JButton(Language.string("Refresh"));
-		refreshButton.addActionListener(this);
-		refreshButton.setPreferredSize(new Dimension(60,25));
-		refreshButton.setMnemonic(KeyEvent.VK_R);
-		actionPanel.add(refreshButton);
-		actionPanel.addSeparator();
-		filterField = new JTextField();
-		filterField.addKeyListener(this);
-		filterField.setPreferredSize(new Dimension(0,25));
-		filterField.addFocusListener(new FilterFieldFocusListener(filterField));
+		actionPanel.add(Box.createHorizontalGlue());
 		actionPanel.add(filterField);
 		actionPanel.setPreferredSize(new Dimension(0,25));
+		actionPanel.add(refreshButton);
 		this.add(actionPanel, BorderLayout.NORTH);
 		
 		scrollpane.addMouseListener(this);
@@ -112,8 +82,12 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 				p.getPhone()});
 	}
 	
-	public void filter(String text){
+	public synchronized void filter(String text){
 		text = text.trim();
+		if(text.length()==0){
+			this.refresh();
+			return;
+		}
 		this.clear();
 		String[] vals = text.split(" ");
 		String[] cols = new String[]{
