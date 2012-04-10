@@ -7,7 +7,6 @@ import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Invoice;
 import jstudio.util.Language;
-import jstudio.util.TableSorter;
 
 @SuppressWarnings("serial")
 public class AccountingTableModel extends DefaultTableModel {

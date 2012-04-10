@@ -5,7 +5,6 @@ import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Event;
 import jstudio.util.Language;
-import jstudio.util.TableSorter;
 
 @SuppressWarnings("serial")
 public class AgendaTableModel extends DefaultTableModel {

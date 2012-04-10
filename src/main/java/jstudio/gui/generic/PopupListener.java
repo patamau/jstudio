@@ -7,7 +7,6 @@ import javax.swing.JTable;
 
 import jstudio.db.DatabaseObject;
 
-
 public class PopupListener<Context extends DatabaseObject> extends MouseAdapter {
 	private JTable table;
 	private ContextualMenu<Context> popup;
@@ -30,8 +29,9 @@ public class PopupListener<Context extends DatabaseObject> extends MouseAdapter 
         	int row = table.rowAtPoint(e.getPoint());
         	if(row>=0){
 	        	table.setRowSelectionInterval(row, row);
+	        	int mrow = table.convertRowIndexToModel(row);
 	        	@SuppressWarnings("unchecked")
-				Context c = (Context)table.getModel().getValueAt(row, 0);
+				Context c = (Context)table.getModel().getValueAt(mrow, 0);
 	        	popup.setContext(c);
 	            popup.show(e.getComponent(), e.getX(), e.getY());
         	}

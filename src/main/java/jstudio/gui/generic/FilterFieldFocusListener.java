@@ -13,10 +13,16 @@ import jstudio.util.Language;
 public class FilterFieldFocusListener implements FocusListener {
 	
 	private final JTextField field;
+	private boolean valid;
 	
 	public FilterFieldFocusListener(final JTextField field){
 		this.field = field;
+		this.valid=false;
 		this.focusLost(null);
+	}
+	
+	public boolean isValid(){
+		return valid;
 	}
 
 	@Override
@@ -24,6 +30,7 @@ public class FilterFieldFocusListener implements FocusListener {
 		this.field.setText("");
 		this.field.setFont(this.field.getFont().deriveFont(Font.NORMAL));
 		this.field.setForeground(Color.BLACK);
+		this.valid=true;
 	}
 
 	@Override
@@ -32,6 +39,9 @@ public class FilterFieldFocusListener implements FocusListener {
 			this.field.setForeground(Color.GRAY);
 			this.field.setFont(this.field.getFont().deriveFont(Font.ITALIC));
 			this.field.setText(Language.string("Filter"));
+			this.valid=false;
+		}else{
+			this.valid=true;
 		}
 	}
 

@@ -11,19 +11,22 @@ import jstudio.model.Event;
 
 public class TimeSpinnerModel extends SpinnerListModel {
 	private static final long serialVersionUID = 8373126228193599307L;
+	
+	public static final int MIN_STEP = 15;
+	private static final int MIN_SIZ = 60*24/MIN_STEP;  
 
 	static Calendar calendar = Calendar.getInstance();
 
 	public static Object[] createTimeList(final Date date) {
-		ArrayList<Object> list = new ArrayList<Object>(48);
+		ArrayList<Object> list = new ArrayList<Object>(MIN_SIZ);
 		calendar.setTime(date);
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, 0);
-		for (int i = 0; i < 48; ++i) {
-			calendar.add(Calendar.MINUTE, 30);
+		for (int i = 0; i < MIN_SIZ; ++i) {
+			calendar.add(Calendar.MINUTE, MIN_STEP);
 			list.add(Event.timeFormat.format(calendar.getTime()));
 		}
-		return list.toArray(new Object[48]);
+		return list.toArray(new Object[MIN_SIZ]);
 	}
 
 	Object firstValue, lastValue;

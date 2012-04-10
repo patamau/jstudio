@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
@@ -21,10 +22,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 
 import jstudio.control.Agenda;
@@ -82,6 +80,7 @@ public class AgendaPanel
 		gc.fill=GridBagConstraints.BOTH;
 		prevWeekButton = new JButton("<<");
 		prevWeekButton.addActionListener(this);
+		prevWeekButton.setMnemonic(KeyEvent.VK_LEFT);
 		weekPanel.add(prevWeekButton,gc);
 		gc.gridx++;
 		for(int i=0; i<weekButtons.length; ++i){
@@ -92,6 +91,7 @@ public class AgendaPanel
 		}
 		nextWeekButton = new JButton(">>");
 		nextWeekButton.addActionListener(this);
+		nextWeekButton.setMnemonic(KeyEvent.VK_RIGHT);
 		weekPanel.add(nextWeekButton,gc);
 		gc.fill=GridBagConstraints.NONE;
 		setDate(new Date());
@@ -200,11 +200,39 @@ public class AgendaPanel
 		String ac = e.getActionCommand();
 		if(o==refreshButton){
 			refresh();
+		}else if(o==newButton){
+			showEntity(new Event(), true);
+			this.refresh();
+		}else if(o==editButton){
+			int row = table.convertRowIndexToModel(table.getSelectedRow());
+			if(row>=0){
+				showEntity((Event)model.getValueAt(row, 0), false);
+				this.refresh();
+			}
+		}else if(o==viewButton){
+			int row = table.convertRowIndexToModel(table.getSelectedRow());
+			if(row>=0){
+				showEntity((Event)model.getValueAt(row, 0), false);
+				this.refresh();
+			}
+		}else if(o==deleteButton){
+			int row = table.convertRowIndexToModel(table.getSelectedRow());
+			if(row>=0){
+				Event context = (Event)model.getValueAt(row, 0);
+				int ch = JOptionPane.showConfirmDialog(this, 
+						Language.string("Are you sure you want to remove the event {0} at {1}?", context.getDescription(), Event.timeFormat.format(context.getDate())),
+						Language.string("Romove event?"), 
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if(ch==JOptionPane.YES_OPTION){
+					controller.delete(context);
+					this.refresh();
+				}
+			}
 		}else if(o==prevWeekButton){
-			calendar.set(Calendar.WEEK_OF_YEAR, calendar.get(Calendar.WEEK_OF_YEAR)-1);
+			calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR)-1);
 			setDate(getDate());
 		}else if(o==nextWeekButton){
-			calendar.set(Calendar.WEEK_OF_YEAR, calendar.get(Calendar.WEEK_OF_YEAR)+1);
+			calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR)+1);
 			setDate(getDate());
 		}else if(o==printButton){
 			ReportGenerator rg = new ReportGenerator();
@@ -246,6 +274,10 @@ public class AgendaPanel
 	@Override
 	public void refresh() {
 		this.clear();
+		if(isFilterValid()&&super.filterField.getText().trim().length()>0){
+			this.filter(super.filterField.getText());
+			return;
+		}
 		Collection<Event> list = ((Agenda)controller).getByDate(getDate());
 		if(list!=null){
 			for(Event e: list){

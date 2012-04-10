@@ -17,12 +17,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
-import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 
 import jstudio.control.Controller;
 import jstudio.gui.generic.EntityManagerPanel;
-import jstudio.gui.generic.PopupListener;
+import jstudio.gui.generic.NicePanel;
 import jstudio.model.Person;
 import jstudio.util.Language;
 import jstudio.util.Resources;
@@ -38,19 +37,25 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 	public static final String PIC_ADDRESSBOOK="personicon.png";
 
 	private Person selectedPerson;
-	private JButton refreshButton;
+	private JButton refreshButton, okButton, cancelButton;
 	
 	public PersonSelectionPanel(Controller<Person> controller){
 		super(controller);
+		NicePanel panel = new NicePanel(Language.string("Address Book"));
+		panel.getBody().setLayout(new BorderLayout());
 		this.setLayout(new BorderLayout());
+		this.add(panel, BorderLayout.CENTER);
 		
-		table = new JTable();
+		table = new JTable(){
+			public Dimension getPreferredScrollableViewportSize() {
+				return getPreferredSize();
+			}
+		};
 		model = new PersonSelectionTableModel(table);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		JScrollPane scrollpane = new JScrollPane(table);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
-		this.add(scrollpane, BorderLayout.CENTER);
+		panel.getBody().add(scrollpane, BorderLayout.CENTER);
 
 		JToolBar actionPanel = new JToolBar(Language.string("Actions"));
 		actionPanel.setFloatable(false);
@@ -63,12 +68,23 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 		filterField.setPreferredSize(new Dimension(0,25));
 		actionPanel.add(filterField);
 		actionPanel.setPreferredSize(new Dimension(0,25));
-		this.add(actionPanel, BorderLayout.NORTH);
+		panel.getBody().add(actionPanel, BorderLayout.NORTH);
 		
-		scrollpane.addMouseListener(this);
+		//scrollpane.addMouseListener(this);
 		table.addMouseListener(this);
+		/*
 		this.popup = new PersonPopup(this, controller);
 	    table.addMouseListener(new PopupListener<Person>(table, super.popup));
+	    */
+		
+		okButton = new JButton(Language.string("Ok"));
+		okButton.addActionListener(this);
+		cancelButton = new JButton(Language.string("Cancel"));
+		cancelButton.addActionListener(this);
+		
+		panel.addButtonsGlue();
+		panel.addButton(okButton);
+		panel.addButton(cancelButton);
 	}
 	
 	public Person getSelected(){
@@ -123,6 +139,15 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 		Object o = e.getSource();
 		if(o==refreshButton){
 			refresh();
+		} else if(o==okButton){
+			if(selectedPerson!=null){
+				Window w = (Window)SwingUtilities.getRoot(this);
+				w.dispose();
+			}
+		} else if(o==cancelButton){
+			selectedPerson=null;
+			Window w = (Window)SwingUtilities.getRoot(this);
+			w.dispose();
 		} else {
 			logger.warn("Event source not mapped: "+o);
 		}
@@ -132,14 +157,15 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 		this.showDialog(parent, null);
 	}
 	
-	public void showDialog(Component parent, String filterText){
+	public void showDialog(final Component parent, final String filterText){
 		JDialog dialog = new JDialog();
 		dialog.setTitle(Language.string("Select Person"));
 		dialog.setModal(true);
 		dialog.add(this);
 		this.filterField.setText(filterText);
 		this.filter(filterText);
-		dialog.pack();
+		//dialog.pack();
+		dialog.setSize(500, 300);
 		dialog.setLocationRelativeTo(parent);
 		dialog.setVisible(true);
 		logger.debug("Finalizing selection panel");
@@ -150,6 +176,7 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 	public void mouseClicked(MouseEvent e){ 
 		int row = table.rowAtPoint(e.getPoint());
 		if(row>=0){
+			row = table.convertRowIndexToModel(row);
 			selectedPerson = (Person)table.getValueAt(row, 0);
 			if(e.getClickCount()==2){
 				Window w = (Window)SwingUtilities.getRoot(this);

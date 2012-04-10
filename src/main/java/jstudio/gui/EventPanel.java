@@ -44,7 +44,8 @@ public class EventPanel extends EntityPanel<Event> {
 	public EventPanel(Event event, EntityManagerPanel<Event> manager, boolean editable){
 		super(event, manager);
 		
-		NicePanel panel = new NicePanel(Event.timeFormat.format(event.getDate()),editable?Language.string("Edit details"):Language.string("View details"));
+		final String title = event.getId()>0l?Event.timeFormat.format(event.getDate()):"00:00";
+		NicePanel panel = new NicePanel(title,editable?Language.string("Edit details"):Language.string("View details"));
 		panel.getBody().setLayout(new GridBagLayout());
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
