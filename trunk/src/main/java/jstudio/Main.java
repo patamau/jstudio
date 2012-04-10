@@ -60,7 +60,7 @@ public class Main {
 			logger = Logger.getLogger(Main.class);
 		}
 		
-		logger.debug("Staring jstudio");
+		logger.debug("Starting jStudio ");
 		//create jstudio resources
 		final JStudio jstudio = new JStudio();
 		

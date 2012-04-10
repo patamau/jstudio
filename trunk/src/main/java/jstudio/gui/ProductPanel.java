@@ -51,9 +51,11 @@ public class ProductPanel extends EntityPanel<Product> {
 		costField = GUITool.createField(panel.getBody(), gc, Language.string("Cost"), Float.toString(this.entity.getCost()), editable);	
 		
 		if(editable){
-			deleteButton = new JButton(Language.string("Delete"));
-			deleteButton.addActionListener(this);
-			panel.addButton(deleteButton);
+			if(product.getId()>0l){
+				deleteButton = new JButton(Language.string("Delete"));
+				deleteButton.addActionListener(this);
+				panel.addButton(deleteButton);
+			}
 			panel.addButtonsGlue();
 			okButton = new JButton(Language.string("Ok"));
 			okButton.addActionListener(this);

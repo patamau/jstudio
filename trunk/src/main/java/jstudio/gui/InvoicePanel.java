@@ -121,9 +121,11 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		panel.getBody().add(body, BorderLayout.CENTER);
 		
 		if(editable){
-			deleteButton = new JButton(Language.string("Delete"));
-			deleteButton.addActionListener(this);
-			panel.addButton(deleteButton);
+			if(entity.getId()>0l){
+				deleteButton = new JButton(Language.string("Delete"));
+				deleteButton.addActionListener(this);
+				panel.addButton(deleteButton);
+			}
 			viewButton = new JButton(Language.string("View"));
 			viewButton.addActionListener(this);
 			panel.addButton(viewButton);
@@ -182,14 +184,8 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		entity.setCap(capField.getText());
 		entity.setCode(codeField.getText());
 		if(entity.getId()==0) entity.setId(controller.getNextId());
-		if(entity.getNumber()==0) entity.setNumber(((Accounting)controller).getNextInvoiceNumber());
+		if(entity.getNumber()==0) entity.setNumber(((Accounting)controller).getNextInvoiceNumber(entity.getDate()));
 		entity.setNote(noteCheck.isSelected()?Language.string("L675 compliant"):"");
-		//controller.store(entity);
-		long pid = ((Accounting)controller).getProducts().getNextId();
-		for(Product p: entity.getProducts()){
-			if(p.getId()==0) p.setId(++pid);
-			p.setInvoice(entity);
-		}
 		controller.store(entity);
 		return true;
 	}

@@ -19,7 +19,7 @@ public class Event implements DatabaseObject {
 	private String description;
 	
 	public Event(){
-		
+		id = 0l;
 	}
 	
 	public Event(Long id){
@@ -77,6 +77,7 @@ public class Event implements DatabaseObject {
 	}
 	
 	public Date getDate(){
+		if(date==null) date = new Date();
 		return date;
 	}
 	

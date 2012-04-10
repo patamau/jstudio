@@ -11,9 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JToolBar;
-import javax.swing.ListSelectionModel;
 
 import jstudio.control.Controller;
 import jstudio.gui.generic.EntityManagerPanel;
@@ -109,17 +107,20 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 			refresh();
 		} else if(o==newButton){
 			showEntity(new Person(), true);
+			this.refresh();
 		} else if(o==viewButton){
 			int row = table.convertRowIndexToModel(table.getSelectedRow());
 			if(row>=0){
 				logger.debug("ROW Selected "+row);
 				showEntity((Person)model.getValueAt(row, 0), false);
+				this.refresh();
 			}
 		} else if(o==editButton){
 			int row = table.convertRowIndexToModel(table.getSelectedRow());
 			if(row>=0){
 				logger.debug("ROW Selected "+row);
 				showEntity((Person)model.getValueAt(row, 0), true);
+				this.refresh();
 			}
 		} else if(o==deleteButton){
 			int row = table.convertRowIndexToModel(table.getSelectedRow());

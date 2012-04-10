@@ -10,6 +10,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 
+import org.apache.log4j.Logger;
+
 import jstudio.gui.generic.ContextualMenu;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.model.Invoice;
@@ -23,15 +25,24 @@ import jstudio.util.Language;
 @SuppressWarnings("serial")
 public class InvoicePopup extends ContextualMenu<Invoice> {
 	
+	private static final Logger logger = Logger.getLogger(InvoicePopup.class);
+	
 	private JMenuItem printItem;
 	
 	public InvoicePopup(EntityManagerPanel<Invoice> parent){
 		super(parent);
-		this.add(new JSeparator());
-		printItem = new JMenuItem("Print");
+		this.remove(newItem);
+		printItem = new JMenuItem(Language.string("Print..."));
 	    printItem.setFont(deleteItem.getFont().deriveFont(Font.PLAIN));
 	    printItem.addActionListener(this);
 	    this.add(printItem);
+		this.add(new JSeparator());
+		this.add(newItem);
+	}
+	
+	public void setContext(Invoice invoice){
+		super.setContext(invoice);
+		printItem.setEnabled(invoice!=null);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -45,7 +56,7 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 		}else if(o==deleteItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
 					Language.string("Are you sure you want to remove invoice {0} {1}?",context.getId(),Invoice.dateFormat.format(context.getDate())),
-					Language.string("Romove contact?"), 
+					Language.string("Romove invoice?"), 
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if(ch==JOptionPane.YES_OPTION){
 				controller.delete(context);
@@ -55,6 +66,7 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 			JDialog dialog = new InvoicePanel(new Invoice(0l), parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
 		}else if(o==printItem){
+			if(context==null) logger.error("No such context");
 			ReportGenerator rg = new ReportGenerator();
 			rg.setReport(Configuration.getGlobal(InvoicePanel.INVOICE_REPORT, InvoicePanel.INVOICE_REPORT_DEF));
 			rg.setHead(context);

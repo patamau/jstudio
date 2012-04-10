@@ -1,22 +1,30 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
 
 import jstudio.control.Controller;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Invoice;
+import jstudio.model.Person;
 import jstudio.model.Product;
+import jstudio.report.ReportGenerator;
+import jstudio.report.ReportGeneratorGUI;
+import jstudio.util.Configuration;
 import jstudio.util.Language;
 import jstudio.util.Resources;
 
@@ -32,30 +40,33 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		LABEL_ACCOUNTING="Accounting",
 		PIC_ACCOUNTING="invoiceicon.png";
 	
-	private JButton refreshButton;
+	private JButton printButton;
 
 	public AccountingPanel(Controller<Invoice> controller){
 		super(controller);
 		this.setLayout(new BorderLayout());
-
-		table = new JTable();
+		
 		model = new AccountingTableModel(table);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-	
+		
 		JScrollPane scrollpane = new JScrollPane(table);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 		this.add(scrollpane, BorderLayout.CENTER);
 
 		JToolBar actionPanel = new JToolBar(Language.string("Actions"));
 		actionPanel.setFloatable(false);
-		refreshButton = new JButton(Language.string("Refresh"));
-		refreshButton.addActionListener(this);
-		actionPanel.add(refreshButton);
-		filterField = new JTextField();
-		filterField.addKeyListener(this);
-		filterField.addActionListener(this);
+		actionPanel.add(newButton);
+		actionPanel.addSeparator();
+		actionPanel.add(viewButton);
+		actionPanel.add(editButton);
+		actionPanel.add(deleteButton);
+		printButton = new JButton(Language.string("Print"));
+		printButton.setEnabled(false);
+		printButton.addActionListener(this);
+		actionPanel.add(printButton);
+		actionPanel.add(Box.createHorizontalGlue());
 		actionPanel.add(filterField);
+		actionPanel.setPreferredSize(new Dimension(0,25));
+		actionPanel.add(refreshButton);
 		
 		this.add(actionPanel, BorderLayout.NORTH);
 		
@@ -122,8 +133,67 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		Object o = e.getSource();
 		if(o==refreshButton){
 			refresh();
+		}else if(o==newButton){
+			showEntity(new Invoice(), true);
+			this.refresh();
+		}else if(o==editButton){
+			int row = table.convertRowIndexToModel(table.getSelectedRow());
+			if(row>=0){
+				showEntity((Invoice)model.getValueAt(row, 0), false);
+				this.refresh();
+			}
+		}else if(o==viewButton){
+			int row = table.convertRowIndexToModel(table.getSelectedRow());
+			if(row>=0){
+				showEntity((Invoice)model.getValueAt(row, 0), false);
+				this.refresh();
+			}
+		}else if(o==deleteButton){
+			int row = table.convertRowIndexToModel(table.getSelectedRow());
+			if(row>=0){
+				Invoice context = (Invoice)model.getValueAt(row, 0);
+				int ch = JOptionPane.showConfirmDialog(this, 
+						Language.string("Are you sure you want to remove invoice {0} {1}?",context.getId(),Invoice.dateFormat.format(context.getDate())),
+						Language.string("Romove invoice?"), 
+						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+				if(ch==JOptionPane.YES_OPTION){
+					controller.delete(context);
+					this.refresh();
+				}
+			}
+		}else if(o==printButton){
+			int row = table.convertRowIndexToModel(table.getSelectedRow());
+			if(row<0) return;
+			Invoice context = (Invoice)model.getValueAt(row, 0);
+			ReportGenerator rg = new ReportGenerator();
+			rg.setReport(Configuration.getGlobal(InvoicePanel.INVOICE_REPORT, InvoicePanel.INVOICE_REPORT_DEF));
+			rg.setHead(context);
+			rg.setHeadValue("date", Person.birthdateFormat.format(context.getDate()));
+			rg.setHeadValue("note", context.getNote());
+			rg.setData(context.getProducts());
+			rg.setHeadValue("stamp", Product.formatCurrency(context.getStamp()));
+			float tot = 0f;
+			for(Product p: context.getProducts()){
+				tot += p.getCost()*p.getQuantity();
+			}
+			rg.setHeadValue("totalcost", Product.formatCurrency(tot));
+			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice_"+context.getFilePrefix());
+			rgui.showGUI((Window)SwingUtilities.getRoot(this));		
 		}else{
 			logger.warn("Event source not mapped: "+o);
 		}
 	}
+	
+	public void valueChanged(ListSelectionEvent e) {
+        //Ignore extra messages.
+        if (e.getValueIsAdjusting()) return;		
+		super.valueChanged(e);
+
+        ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+        if (lsm.isSelectionEmpty()) {
+            printButton.setEnabled(false);
+        } else {
+        	printButton.setEnabled(true);
+        }
+    }
 }

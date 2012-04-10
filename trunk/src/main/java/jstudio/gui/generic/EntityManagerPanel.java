@@ -39,6 +39,7 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	protected ContextualMenu<T> popup;
 	protected Controller<T> controller;
 	
+	private FilterFieldFocusListener filterFieldFocusListener;
 	protected JButton newButton, viewButton, editButton, deleteButton, refreshButton;
 	
 	//filterig stuff
@@ -77,6 +78,10 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 				filterThread.notify();
 			}
 		}
+	}
+	
+	public boolean isFilterValid(){
+		return filterFieldFocusListener.isValid();
 	}
 	
 	public void keyPressed(KeyEvent e){}
@@ -125,7 +130,8 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 		filterField.addKeyListener(this);
 		filterField.setMaximumSize(new Dimension(250,25));
 		filterField.setPreferredSize(new Dimension(250,25));
-		filterField.addFocusListener(new FilterFieldFocusListener(filterField));
+		filterFieldFocusListener = new FilterFieldFocusListener(filterField);
+		filterField.addFocusListener(filterFieldFocusListener);
 		refreshButton = new JButton(Language.string("Refresh"));
 		refreshButton.addActionListener(this);
 		refreshButton.setMnemonic(KeyEvent.VK_R);
