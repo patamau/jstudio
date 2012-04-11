@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 
 import javax.swing.ImageIcon;
@@ -50,7 +51,7 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 		boolean stop = false;
 		public void run(){
 			try {
-				String lastFilter = "", search;
+				String lastFilter = "";
 				while(!stop){					
 					synchronized(this){
 						wait();
@@ -58,10 +59,19 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 						wait(100);
 					}		
 					//logger.debug("going to filter! "+filterField.getText());
-					search = filterField.getText();
+					final String search = filterField.getText();
 					if(!search.equals(lastFilter)){
 						lastFilter = search;
-						filter(search);
+						try {
+							SwingUtilities.invokeAndWait(new Runnable(){
+								public void run(){
+									filter(search);
+								}
+							});
+						} catch (InvocationTargetException e) {
+							e.printStackTrace();
+							logger.error(e.getMessage());
+						}
 					}
 				}
 			} catch (InterruptedException e) {
