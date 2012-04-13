@@ -8,17 +8,12 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JToolBar;
-import javax.swing.ListSelectionModel;
-
-import org.apache.log4j.Logger;
 
 import jstudio.control.Accounting;
 import jstudio.gui.generic.EntityManagerPanel;
@@ -26,6 +21,8 @@ import jstudio.gui.generic.PopupListener;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
 import jstudio.util.Language;
+
+import org.apache.log4j.Logger;
 
 @SuppressWarnings("serial")
 public class ProductTable 
@@ -36,7 +33,7 @@ public class ProductTable
 	private JLabel totalLabel;
 	private Invoice invoice;
 	private EntityManagerPanel<Invoice> accounting;
-	private JButton newButton, editButton, removeButton;
+	//private JButton newButton, editButton, deleteButton;
 	
 	private float total;
 	
@@ -51,26 +48,21 @@ public class ProductTable
 			JToolBar toolBar = new JToolBar();
 			toolBar.setPreferredSize(new Dimension(0,20));
 			toolBar.setFloatable(false);
-			editButton = new JButton(Language.string("Edit"));
-			editButton.addActionListener(this);
-			toolBar.add(editButton);
-			removeButton = new JButton(Language.string("Remove"));
-			removeButton.addActionListener(this);
-			toolBar.add(removeButton);
-			toolBar.add(Box.createHorizontalGlue());
-			newButton = new JButton(Language.string("New"));
-			newButton.addActionListener(this);
 			toolBar.add(newButton);
+			toolBar.add(Box.createHorizontalGlue());
+			toolBar.add(editButton);
+			toolBar.add(deleteButton);
 			this.add(toolBar, BorderLayout.NORTH);
 		}
 
+		/*
 		table = new JTable(){
 			public Dimension getPreferredScrollableViewportSize() {
 				return getPreferredSize();
 			}
 		};
+		*/
 		model = new ProductTableModel(table, invoice);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		if(!editable){
 			table.setBackground(this.getBackground());
 			table.setCellSelectionEnabled(false);
@@ -141,7 +133,7 @@ public class ProductTable
 			}else{
 				logger.warn("No row selected");
 			}
-		}else if(o==removeButton){
+		}else if(o==deleteButton){
 			int r = table.getSelectedRow();
 			if(0<=r){
 				Product p = (Product) model.getValueAt(r, 0);
