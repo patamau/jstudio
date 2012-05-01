@@ -279,8 +279,12 @@ public class ReportGenerator {
         	throw new Exception("No such report "+reportName);
         }
         File outDir = new File(outputDir);
-        outDir.mkdirs();
-        OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
+        if(!outDir.exists()){
+        	logger.warn("Creating output dir "+outputDir);
+        	outDir.mkdirs();
+        }
+        File f = new File(outDir, outputFile);
+        OutputStream os = new FileOutputStream(f); 
         JasperRunManager.runReportToPdfStream(is, os, null, getDataSource());
         os.close();
         is.close();
@@ -292,7 +296,10 @@ public class ReportGenerator {
         	throw new Exception("No such report "+reportName);
         }
         File outDir = new File(outputDir);
-        outDir.mkdirs();
+        if(!outDir.exists()){
+        	logger.warn("Creating output dir "+outputDir);
+        	outDir.mkdirs();
+        }
         OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
         runReportToRtfStream(is, os, null, getDataSource());
         os.close();
@@ -305,7 +312,10 @@ public class ReportGenerator {
         	throw new Exception("No such report "+reportName);
         }
         File outDir = new File(outputDir);
-        outDir.mkdirs();
+        if(!outDir.exists()){
+        	logger.warn("Creating output dir "+outputDir);
+        	outDir.mkdirs();
+        }
         OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
         JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
         runReportToRtfStream(is, os, null, getDataSource());
