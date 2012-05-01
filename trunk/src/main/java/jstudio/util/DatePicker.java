@@ -131,7 +131,9 @@ public class DatePicker {
 		calendar.setTime(date);
 		calendar.set(Calendar.DAY_OF_MONTH, 1);
 		int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)-2;
+		if(dayOfWeek<0) dayOfWeek+=7;
 		int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+		System.err.println("DEBUG: "+dayOfWeek+" "+daysInMonth);
 		int day = 1;
 		for (int x=0;x<buttons.length; x++) {
 			int dow = x%7;
