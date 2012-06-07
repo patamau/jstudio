@@ -53,14 +53,14 @@ public class Main {
 				fa = new FileAppender(new PatternLayout(LOG_PATTERN), LOG_FILE, false);
 				root.addAppender(fa);
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(null, "File log error. Using console...", "Log Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "File log error "+e.getMessage()+". Using console...", "Log Error", JOptionPane.ERROR_MESSAGE);
 				root.addAppender(new ConsoleAppender(new PatternLayout(LOG_PATTERN)));
 			}
-			root.setLevel(Level.DEBUG);
+			root.setLevel(Level.WARN);
 			logger = Logger.getLogger(Main.class);
 		}
 		
-		logger.debug("Starting jStudio ");
+		logger.debug("Creating JStudio instance");
 		//create jstudio resources
 		final JStudio jstudio = new JStudio();
 		
@@ -68,7 +68,7 @@ public class Main {
 		Thread.setDefaultUncaughtExceptionHandler(jstudio);
 		Runtime.getRuntime().addShutdownHook(new Thread(){
 			public void run(){
-				logger.debug("Shutdown hook activated...");
+				logger.debug("Shutdown hook called...");
 				jstudio.finalize();
 			}
 		});
@@ -81,6 +81,6 @@ public class Main {
 			System.exit(1);
 		}
 		//waiting for threads to finish
-		//finalization is called by the shutdown hook
+		//finalization is called automatically by the shutdown hook
 	}
 }

@@ -186,6 +186,7 @@ public class JStudio implements UncaughtExceptionHandler{
 	}
 
 	public void uncaughtException(Thread t, Throwable e) {
+		gui.setStatusLabel(e.getLocalizedMessage());
 		logger.error("Uncaught exception in "+t.toString(), e);
 		JOptionPane.showMessageDialog(null, e.getLocalizedMessage(), Language.string("Uncaught exception"), JOptionPane.ERROR_MESSAGE);
 	}
@@ -255,11 +256,13 @@ public class JStudio implements UncaughtExceptionHandler{
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		int ch = fc.showOpenDialog(gui);
 		if(ch!=JFileChooser.APPROVE_OPTION){
+			gui.setStatusLabel(Language.string("Load canceled by user"));
 			logger.info("Load canceled by user");
 			return;
 		}
 		File f = fc.getSelectedFile();
 		if(!f.exists()||!f.canRead()){
+			gui.setStatusLabel(Language.string("Unable to access {0}", f.getName()));
 			JOptionPane.showMessageDialog(gui, 
 					Language.string("Unable to access file"),
 					Language.string("Load error"),
@@ -297,10 +300,12 @@ public class JStudio implements UncaughtExceptionHandler{
 		int ch = fc.showOpenDialog(gui);
 		if(ch!=JFileChooser.APPROVE_OPTION){
 			logger.info("Restore canceled by user");
+			gui.setStatusLabel(Language.string("Restore canceled by user"));
 			return;
 		}
 		File f = fc.getSelectedFile();
 		if(!f.exists()||!f.canRead()){
+			gui.setStatusLabel(Language.string("Unable to access {0}",f.getName()));
 			JOptionPane.showMessageDialog(gui, 
 					Language.string("Unable to access backup file"),
 					Language.string("Restore error"),
@@ -309,8 +314,10 @@ public class JStudio implements UncaughtExceptionHandler{
 			if(doClear()){
 				try {
 					database.restore(f);
+					gui.setStatusLabel(Language.string("Database restored from {0}",f.getName()));
 				} catch (Exception e) {
-					e.printStackTrace();
+					gui.setStatusLabel(Language.string("Restore error"));
+					JOptionPane.showMessageDialog(gui, e.getLocalizedMessage(), Language.string("Restore error"), JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}
@@ -324,8 +331,10 @@ public class JStudio implements UncaughtExceptionHandler{
 				JOptionPane.QUESTION_MESSAGE);
 		if(ch==JOptionPane.YES_OPTION){
 			database.clear();
+			gui.setStatusLabel(Language.string("Database cleared"));
 			return true;
 		}else{
+			gui.setStatusLabel(Language.string("Database clear canceled"));
 			return false;
 		}
 	}
@@ -338,8 +347,10 @@ public class JStudio implements UncaughtExceptionHandler{
 				JOptionPane.WARNING_MESSAGE);
 		if(ch==JOptionPane.YES_OPTION){
 			database.clear();
+			gui.setStatusLabel(Language.string("Database cleared"));
 			return true;
 		}else{
+			gui.setStatusLabel(Language.string("Database clear canceled"));
 			return false;
 		}
 	}
@@ -392,8 +403,10 @@ public class JStudio implements UncaughtExceptionHandler{
 		Configuration.getGlobalConfiguration().setProperty(BACKUPFILE_KEY, sf.getAbsolutePath());
 		try {
 			database.dump(sf);
+			gui.setStatusLabel(Language.string("Backup {0} completed", sf.getName()));		
 		} catch (Exception e) {
-			e.printStackTrace();
+			gui.setStatusLabel(Language.string("Backup {0} error", sf.getName()));	
+			JOptionPane.showMessageDialog(gui, e.getLocalizedMessage(), Language.string("Dump error"), JOptionPane.ERROR_MESSAGE);
 		}
 	}
 }

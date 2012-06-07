@@ -202,12 +202,14 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	
 	public void refresh(){
 		this.clear();
-		Collection<T> ts = controller.getAll();
-		if(ts!=null){
-			for(T t: ts){
+		Collection<T> list = controller.getAll();
+		if(list!=null){
+			for(T t: list){
 				this.addEntity(t);
 			}
+			controller.getApplication().getGUI().setStatusLabel(Language.string("Loaded {0} entities from {1}", list.size(), controller.getSource()));
 		}else{
+			controller.getApplication().getGUI().setStatusLabel(Language.string("No {0} data loaded", controller.getSource()));
 			JOptionPane.showMessageDialog(this, Language.string("Unable to load data"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
 		}
 	}
