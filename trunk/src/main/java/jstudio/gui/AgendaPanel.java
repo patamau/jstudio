@@ -283,7 +283,9 @@ public class AgendaPanel
 			for(Event e: list){
 				this.addEntity(e);
 			}
+			controller.getApplication().getGUI().setStatusLabel(Language.string("Loaded {0} entities from {1}", list.size(), controller.getSource()));
 		}else{
+			controller.getApplication().getGUI().setStatusLabel(Language.string("No {0} data loaded", controller.getSource()));
 			JOptionPane.showMessageDialog(this, Language.string("Unable to load events"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
 		}
 	}

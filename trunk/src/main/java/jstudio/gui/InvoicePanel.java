@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -40,7 +41,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		INVOICE_REPORT_DEF = "/reports/invoice.jasper";
 	
 	private JTextField 
-		//idField,
+		numberField,
 		dateField, 
 		stampField,
 		nameField,
@@ -72,12 +73,11 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		gc.gridy=0;
 		gc.insets= new Insets(4,4,4,4);
 		
-		//id field
-		/*
-		GUITool.createField(head, gc, 
-				Language.string("Number"), 
-				entity.getInvoiceId(), false);
-		*/
+		if(editable){
+			numberField = GUITool.createField(head, gc, 
+					Language.string("Number"), 
+					Long.toString(entity.getNumber()), editable);
+		}
 		dateField = GUITool.createDateField(head, gc, Language.string("Date"), this.entity.getDate(), editable, Invoice.dateFormat);
 		if(editable){
 			pickPersonButton = GUITool.createButton(head, gc, 
@@ -162,6 +162,17 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 	
 	private boolean applyChanges(){
 		try {
+			entity.setNumber(Long.parseLong(numberField.getText()));
+			if(((Accounting)controller).getByNumber(entity.getId(), entity.getNumber(),entity.getDate())>0){
+				JOptionPane.showMessageDialog(this, Language.string("An invoice with the same number already exists"), Language.string("Invoice id error"), JOptionPane.ERROR_MESSAGE);
+				return false;
+			}
+		} catch (NumberFormatException e){
+			String msg = Language.string("Wrong number format for {0}", numberField.getText());
+			JOptionPane.showMessageDialog(this, msg, Language.string("Number format error"),JOptionPane.ERROR_MESSAGE);
+			return false;
+		}
+		try {
 			Date d = Person.birthdateFormat.parse(dateField.getText());
 			entity.setDate(d);
 		} catch (ParseException e1) {
@@ -191,6 +202,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 	}
 	
 	private boolean checkModified(){
+		if(!Long.toString(entity.getNumber()).equals(numberField.getText())) return true;
 		if(!entity.getName().equals(nameField.getText())) return true;
 		if(!entity.getLastname().equals(lastnameField.getText())) return true;
 		if(!entity.getAddress().equals(addressField.getText())) return true;

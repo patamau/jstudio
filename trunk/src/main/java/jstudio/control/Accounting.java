@@ -1,11 +1,14 @@
 package jstudio.control;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Calendar;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import jstudio.JStudio;
+import jstudio.model.Event;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
 
@@ -13,15 +16,31 @@ public class Accounting extends Controller<Invoice>{
 	
 	private static final Logger logger = Logger.getLogger(Accounting.class);
 	
+	public static final SimpleDateFormat dayDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	
 	private Controller<Product> products;
+	private Calendar calendar;
 
 	public Accounting(JStudio app){
 		super(app, Invoice.class);
 		this.products = new Controller<Product>(app, Product.class);
+		this.calendar = Calendar.getInstance();
 	}
 	
 	public Controller<Product> getProducts(){
 		return products;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Integer getByNumber(final long id, final long number, final Date date){
+		calendar.setTime(date);
+		calendar.set(Calendar.DAY_OF_YEAR, 1);
+		calendar.set(Calendar.MONTH, 1);
+		String from = dayDateFormat.format(calendar.getTime());
+		calendar.add(Calendar.YEAR, 1);
+		String to = dayDateFormat.format(calendar.getTime());
+		String sql = "SELECT COUNT(id) FROM "+source+" WHERE id!="+id+" AND number="+number+" AND (date BETWEEN '"+from+"' AND '"+to+"')";
+		return (Integer)getApplication().getDatabase().executeQuery(sql);
 	}
 	
 	public Long getNextInvoiceNumber(final Date date){
