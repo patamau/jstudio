@@ -66,6 +66,10 @@ public class Configuration {
 		return globalConfiguration.getProperty(key, def);
 	}
 	
+	public static float getGlobal(String key, float def){
+		return globalConfiguration.getProperty(key, def);
+	}
+	
 	public static double getGlobal(String key, double def){
 		return globalConfiguration.getProperty(key, def);
 	}
@@ -213,6 +217,16 @@ public class Configuration {
 			return def;
 		}else{
 			return Integer.valueOf(v);
+		}
+	}
+	
+	public float getProperty(String key, float def){
+		String v = properties.getProperty(key);
+		if(v==null){
+			setProperty(key, String.valueOf(def));
+			return def;
+		}else{
+			return Float.valueOf(v);
 		}
 	}
 	

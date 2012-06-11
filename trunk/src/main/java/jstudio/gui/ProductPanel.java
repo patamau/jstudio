@@ -76,6 +76,8 @@ public class ProductPanel extends EntityPanel<Product> {
 				if(!invoice.getProducts().contains(entity)){
 					invoice.getProducts().add(entity);
 				}
+				//TODO: check modified
+				invoice.setModified(true);
 				//accountingManager.getController().store(invoice);
 				getDialog().dispose();
 				//accountingManager.refresh();

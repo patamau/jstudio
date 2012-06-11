@@ -10,18 +10,27 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import jstudio.db.DatabaseObject;
+import jstudio.util.Configuration;
 
 public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	
 	private static final long serialVersionUID = 2636840744342729819L;
 
 	public static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+	
+	public static final String 
+		INVOICE_STAMP_THRESHOLD = "invoice.stamp.threshold",
+		INVOICE_STAMP_VALUE = "invoice.stamp.value";
+	public static final float
+		INVOICE_STAMP_THRESHOLD_DEF = 77.48f,
+		INVOICE_STAMP_VALUE_DEF = 1.81f;
 
 	private Long id, number;
 	private Date date;
 	private String name, lastname, address, city, province, cap, code, note;
 	private Float stamp;
 	private Set<Product> products;
+	private transient boolean modified;
 	
 	public String getProvince() {
 		return province;
@@ -51,6 +60,14 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		this.products = new HashSet<Product>();
 	}
 	
+	public void setModified(final boolean modified){
+		this.modified = modified;
+	}
+	
+	public boolean isModified(){
+		return modified;
+	}
+	
 	public String getNote() {
 		return note;
 	}
@@ -78,6 +95,23 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	
 	public void setNumber(final Long number){
 		this.number = number;
+	}
+	
+	/** Compute and return the sum of product cost **/
+	public float getTotal(){
+		final float threshold = Configuration.getGlobal(Invoice.INVOICE_STAMP_THRESHOLD, Invoice.INVOICE_STAMP_THRESHOLD_DEF);
+		float total = 0f;
+		for(Product t: products){
+			total += t.getQuantity()*t.getCost();
+		}
+		if(total>threshold){
+			final float stamp = Configuration.getGlobal(Invoice.INVOICE_STAMP_VALUE, Invoice.INVOICE_STAMP_VALUE_DEF);
+			setStamp(stamp);
+			total += stamp;
+		}else{
+			setStamp(0f);
+		}
+		return total;
 	}
 	
 	/** Number/Year **/
@@ -184,8 +218,6 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		c.setTime(o.date);
 		int oy = c.get(Calendar.YEAR);
 		return y<oy?-1:(y>oy?1:this.number<o.number?-1:(this.number>o.number?1:0));
-		//return this.date.before(o.date)?-1:(this.date.after(o.date)?1:0);
-		//return this.id==o.id?0:(this.id>o.id?1:-1);
 	}
 
 	@Override

@@ -20,6 +20,7 @@ import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
+import jstudio.util.Configuration;
 import jstudio.util.Language;
 
 import org.apache.log4j.Logger;
@@ -55,13 +56,6 @@ public class ProductTable
 			this.add(toolBar, BorderLayout.NORTH);
 		}
 
-		/*
-		table = new JTable(){
-			public Dimension getPreferredScrollableViewportSize() {
-				return getPreferredSize();
-			}
-		};
-		*/
 		model = new ProductTableModel(table, invoice);
 		if(!editable){
 			table.setBackground(this.getBackground());
@@ -167,13 +161,9 @@ public class ProductTable
 	@Override
 	public void refresh() {
 		this.clear();
-		int quantity_tot = 0;
-		total = 0f;
 		for(Product t: invoice.getProducts()){
 			addEntity(t);
-			quantity_tot += t.getQuantity();
-			total += t.getQuantity()*t.getCost();
 		}
-		totalLabel.setText(Product.formatCurrency(total));
+		totalLabel.setText(Product.formatCurrency(invoice.getTotal()));
 	}
 }

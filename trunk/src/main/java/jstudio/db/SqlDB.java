@@ -166,7 +166,8 @@ public class SqlDB implements DatabaseInterface {
 		for(int i=0; i<fieldsn; ++i){
 			Field f = fields[i];
 			if(!Modifier.isStatic(f.getModifiers())&&
-					!Modifier.isVolatile(f.getModifiers())){
+					!Modifier.isVolatile(f.getModifiers())&&
+					!Modifier.isTransient(f.getModifiers())){
 				f.setAccessible(true);
 				rf.add(f);
 			}

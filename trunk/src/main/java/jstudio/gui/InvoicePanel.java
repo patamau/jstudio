@@ -62,8 +62,6 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			entity.setNumber(((Accounting)controller).getNextInvoiceNumber(entity.getDate()));
 		}
 		
-		//Calendar c = Calendar.getInstance();
-		//c.setTime(invoice.getDate());
 		NicePanel panel = new NicePanel(entity.getInvoiceId(),editable?Language.string("Edit details"):Language.string("View details"));
 		panel.getBody().setLayout(new BorderLayout());
 		this.setLayout(new BorderLayout());
@@ -204,6 +202,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 	}
 	
 	private boolean checkModified(){
+		if(entity.isModified()) return true;
 		if(!Long.toString(entity.getNumber()).equals(numberField.getText())) return true;
 		if(!entity.getName().equals(nameField.getText())) return true;
 		if(!entity.getLastname().equals(lastnameField.getText())) return true;
@@ -212,6 +211,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		if(!entity.getCity().equals(cityField.getText())) return true;
 		if(!entity.getCode().equals(codeField.getText())) return true;
 		if(!entity.getProvince().equals(provinceField.getText())) return true;
+		if(!Float.toString(entity.getStamp()).equals(stampField.getText())) return true;
 		if((entity.getNote().length()>0&&!noteCheck.isSelected())||
 				entity.getNote().length()==0&&noteCheck.isSelected()) return true;
 		if(!Float.toString(entity.getStamp()).equals(stampField.getText())) return true;
@@ -248,7 +248,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			rg.setHeadValue("note", entity.getNote());
 			rg.setData(entity.getProducts());
 			rg.setHeadValue("stamp", Product.formatCurrency(entity.getStamp()));
-			rg.setHeadValue("totalcost", Product.formatCurrency(productTable.getTotal()));
+			rg.setHeadValue("totalcost", Product.formatCurrency(entity.getTotal()));
 			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice_"+entity.getFilePrefix());
 			rgui.showGUI((Window)SwingUtilities.getRoot(this));
 		}else if(o==editButton){
@@ -272,7 +272,11 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 						Language.string("Apply changes to {0}?",entity.getInvoiceId()), 
 						Language.string("Changes made"), JOptionPane.YES_NO_CANCEL_OPTION);
 				if(ch==JOptionPane.CANCEL_OPTION) return;
-				if(ch==JOptionPane.YES_OPTION) applyChanges();
+				if(ch==JOptionPane.YES_OPTION){
+					if(applyChanges()){
+						manager.refresh();
+					}
+				}
 			}
 			getDialog().dispose();
 			JDialog dialog = new InvoicePanel(super.entity, super.manager, false).createDialog(super.manager.getTopLevelAncestor());
