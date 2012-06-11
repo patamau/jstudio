@@ -7,9 +7,7 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -60,8 +58,12 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 	public InvoicePanel(Invoice invoice, EntityManagerPanel<Invoice> manager, boolean editable){
 		super(invoice, manager);
 		
-		Calendar c = Calendar.getInstance();
-		c.setTime(invoice.getDate());
+		if(entity.getId()==0){
+			entity.setNumber(((Accounting)controller).getNextInvoiceNumber(entity.getDate()));
+		}
+		
+		//Calendar c = Calendar.getInstance();
+		//c.setTime(invoice.getDate());
 		NicePanel panel = new NicePanel(entity.getInvoiceId(),editable?Language.string("Edit details"):Language.string("View details"));
 		panel.getBody().setLayout(new BorderLayout());
 		this.setLayout(new BorderLayout());

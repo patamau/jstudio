@@ -14,8 +14,9 @@
 		<manifest file="MANIFEST.MF">
 			<attribute name="Built-By" value="${user.name}"/>
 			<attribute name="Main-Class" value="jstudio.Main"/>
-			<attribute name="Implementation-Version" 
-                 value="${build.number}"/>
+			<attribute name="Implementation-Title" value="JStudio"/>
+			<attribute name="Implementation-Version" value="${build.number}"/>
+			<attribute name="Implementation-Vendor" value="Matteo Pedrotti (patamau@gmail.com)"/>
 			<attribute name="Built-Date" value="${TODAY}"/>
 		</manifest>
 
