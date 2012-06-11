@@ -49,7 +49,6 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		model = new AccountingTableModel(table);
 		
 		JScrollPane scrollpane = new JScrollPane(table);
-		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
 		this.add(scrollpane, BorderLayout.CENTER);
 
 		JToolBar actionPanel = new JToolBar(Language.string("Actions"));
@@ -95,11 +94,10 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 
 	public synchronized void addEntity(Invoice i){
 		StringBuffer sb = new StringBuffer();
-		float total = 0f;
 		int c = i.getProducts().size();
 		for(Product t: i.getProducts()){
 			sb.append(t.getDescription());
-			total += t.getCost()*t.getQuantity();
+			//total += t.getCost()*t.getQuantity();
 			--c;
 			if(c>0){
 				sb.append(", ");
@@ -110,7 +108,7 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 				i.getDate(),
 				i.getName()+" "+i.getLastname(),
 				sb.toString(),
-				total
+				i.getTotal()
 		});
 	}
 	
