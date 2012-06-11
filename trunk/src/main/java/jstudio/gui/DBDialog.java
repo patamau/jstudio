@@ -19,7 +19,7 @@ import javax.swing.border.TitledBorder;
 
 import jstudio.JStudio;
 import jstudio.db.DatabaseInterface;
-import jstudio.db.HibernateDB;
+import jstudio.db.SqlDB;
 import jstudio.util.Configuration;
 import jstudio.util.Language;
 
@@ -33,7 +33,7 @@ public class DBDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	public static void main(String args[]){
-		DBDialog dialog = new DBDialog(new JFrame(), new HibernateDB("jdbc:mysql","com.mysql.jdbc.Driver"));
+		DBDialog dialog = new DBDialog(new JFrame(), new SqlDB("jdbc:mysql","com.mysql.jdbc.Driver"));
 		Configuration.setGlobalConfiguration(new Configuration());
 		dialog.showDialog(Configuration.getGlobalConfiguration());
 		System.exit(0);
