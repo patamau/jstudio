@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
@@ -48,10 +49,12 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		connectionItem,
 		exitItem;
 	private JMenuItem
+		pruneItem,
 		backupItem,
 		restoreItem,
 		loadItem,
-		clearItem;
+		clearItem,
+		aboutItem;
 		
 	private JMenu viewMenu;
 	private JLabel statusLabel;
@@ -115,6 +118,10 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		
 		//create tools menu		
 		JMenu toolsMenu = new JMenu(Language.string("Tools"));		
+		pruneItem = new JMenuItem(Language.string("Prune..."));
+		pruneItem.addActionListener(this);
+		toolsMenu.add(pruneItem);
+		toolsMenu.add(new JSeparator());
 		backupItem = new JMenuItem(Language.string("Backup..."));
 		backupItem.addActionListener(this);
 		toolsMenu.add(backupItem);
@@ -132,7 +139,9 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		
 		//create help menu		
 		JMenu helpMenu = new JMenu(Language.string("Help"));
-		helpMenu.add(new JMenuItem("Credits"));
+		aboutItem = new JMenuItem(Language.string("About..."));
+		aboutItem.addActionListener(this);
+		helpMenu.add(aboutItem);
 		menuBar.add(Box.createHorizontalGlue());
 		menuBar.add(helpMenu);
 
@@ -157,6 +166,8 @@ public class JStudioGUI extends JFrame implements ActionListener {
 			app.doClear();
 		}else if(src==loadItem){
 			app.doLoad();
+		}else if(src==pruneItem){
+			app.doPrune();
 		}else if(src==optionsItem){
 			ConfigurationDialog cdialog = new ConfigurationDialog(this);
 			Configuration c = cdialog.showDialog(Configuration.getGlobalConfiguration());
@@ -168,6 +179,8 @@ public class JStudioGUI extends JFrame implements ActionListener {
 			}
 		}else if(src==exitItem){
 			this.dispose();
+		}else if(src==aboutItem){
+			JOptionPane.showMessageDialog(this, JStudio.VERSION+" ("+JStudio.BUILD+")\n"+JStudio.AUTHOR, JStudio.class.getSimpleName(), JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 	

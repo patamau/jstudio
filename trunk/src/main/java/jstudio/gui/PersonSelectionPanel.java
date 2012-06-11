@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("serial")
 public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 
-	private static final Logger logger = LoggerFactory.getLogger(AddressBookPanel.class);
+	private static final Logger logger = LoggerFactory.getLogger(PersonSelectionPanel.class);
 
 	public static final String PIC_ADDRESSBOOK="personicon.png";
 
@@ -63,7 +63,12 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 		refreshButton.addActionListener(this);
 		refreshButton.setPreferredSize(new Dimension(60,25));
 		actionPanel.add(refreshButton);
-		filterField = new JTextField();
+		filterField = new JTextField(){
+			public void addNotify(){
+				super.addNotify();
+				this.requestFocusInWindow();
+			}
+		};
 		filterField.addKeyListener(this);
 		filterField.setPreferredSize(new Dimension(0,25));
 		actionPanel.add(filterField);
@@ -163,6 +168,8 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 		dialog.setModal(true);
 		dialog.add(this);
 		this.filterField.setText(filterText);
+		this.filterField.setSelectionEnd(filterText.length());
+		this.filterField.setSelectionStart(0);
 		this.filter(filterText);
 		//dialog.pack();
 		dialog.setSize(500, 300);
@@ -177,7 +184,8 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 		int row = table.rowAtPoint(e.getPoint());
 		if(row>=0){
 			row = table.convertRowIndexToModel(row);
-			selectedPerson = (Person)table.getValueAt(row, 0);
+			selectedPerson = (Person)model.getValueAt(row, 0);
+			logger.debug("Selected person is "+selectedPerson);
 			if(e.getClickCount()==2){
 				Window w = (Window)SwingUtilities.getRoot(this);
 				w.dispose();

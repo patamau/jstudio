@@ -41,6 +41,7 @@ public class JStudio implements UncaughtExceptionHandler{
 	public static final String 
 		VERSION = "0.1a",
 		BUILD = JStudio.class.getPackage().getImplementationVersion(),
+		AUTHOR = JStudio.class.getPackage().getImplementationVendor(),
 		SPLASH_SCREEN = "splash.png",
 		DB_HOST = "localhost",
 		DB_NAME = "jstudio",
@@ -74,7 +75,7 @@ public class JStudio implements UncaughtExceptionHandler{
 	
 	private void initializeGUI(){
 		//initialize GUI
-		gui = new JStudioGUI(this.getClass().getSimpleName()+" "+VERSION, this);
+		gui = new JStudioGUI(this.getClass().getSimpleName(), this);
 		gui.setIconImage(Resources.getImage("appicon.png").getImage());
 		gui.createGUI();
 		gui.addPanel(new AddressBookPanel(addressBook));
@@ -407,6 +408,33 @@ public class JStudio implements UncaughtExceptionHandler{
 		} catch (Exception e) {
 			gui.setStatusLabel(Language.string("Backup {0} error", sf.getName()));	
 			JOptionPane.showMessageDialog(gui, e.getLocalizedMessage(), Language.string("Dump error"), JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public void doPrune(){
+		final Date d = new Date();
+		final int c = agenda.countAllBefore(d);
+		if(c==0){
+			JOptionPane.showMessageDialog(gui, Language.string("No events to prune"), Language.string("Pruning events"), JOptionPane.INFORMATION_MESSAGE);
+			return;
+		}
+		final int ch = JOptionPane.showConfirmDialog(gui, 
+				Language.string("This will remove all events older than two days ({0} events).\nPlease double check your system date is correct before proceeding.\nYour system date is {1}", c, d),
+				Language.string("Confirm pruning"),
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE);
+		if(ch==JOptionPane.YES_OPTION){
+			if(agenda.removeAllBefore(d)){
+				gui.setStatusLabel(Language.string("{0} events pruned", c));
+			}else{
+				JOptionPane.showMessageDialog(gui, 
+						Language.string("Pruning encountered an error while removing events"), 
+						Language.string("Prune error"), 
+						JOptionPane.ERROR_MESSAGE);
+				gui.setStatusLabel(Language.string("Prune error"));
+			}
+		}else{
+			gui.setStatusLabel(Language.string("Pruning aborted by user"));
 		}
 	}
 }
