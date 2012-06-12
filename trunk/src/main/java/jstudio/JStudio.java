@@ -184,6 +184,9 @@ public class JStudio implements UncaughtExceptionHandler{
 		splash.setVisible(false);
 		splash.dispose();
 		gui.setVisible(true);
+		if(agenda.countAllToPrune(new Date())>0){
+			doPrune();
+		}
 	}
 
 	public void uncaughtException(Thread t, Throwable e) {
@@ -413,7 +416,7 @@ public class JStudio implements UncaughtExceptionHandler{
 	
 	public void doPrune(){
 		final Date d = new Date();
-		final int c = agenda.countAllBefore(d);
+		final int c = agenda.countAllToPrune(d);
 		if(c==0){
 			JOptionPane.showMessageDialog(gui, Language.string("No events to prune"), Language.string("Pruning events"), JOptionPane.INFORMATION_MESSAGE);
 			return;

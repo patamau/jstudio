@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import jstudio.JStudio;
 import jstudio.model.Event;
+import jstudio.util.Configuration;
 
 /**
  * Agenda holds events on a daily basis.
@@ -35,9 +36,9 @@ public class Agenda extends Controller<Event> {
 		return (List<Event>)getApplication().getDatabase().getBetween(getSource(), "date", from, to);
 	}
 	
-	public int countAllBefore(final Date date){
+	public int countAllToPrune(final Date date){
 		calendar.setTime(date);
-		calendar.add(Calendar.DAY_OF_YEAR, -2);
+		calendar.add(Calendar.DAY_OF_YEAR, Configuration.getGlobal("prune.days", -2));
 		final Date p = calendar.getTime();
 		try{
 			return (Integer)getApplication().getDatabase().executeQuery("SELECT COUNT(id) FROM "+source+" WHERE date<'"+dayDateFormat.format(p)+"'");

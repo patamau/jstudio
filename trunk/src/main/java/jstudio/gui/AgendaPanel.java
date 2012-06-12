@@ -201,7 +201,10 @@ public class AgendaPanel
 		if(o==refreshButton){
 			refresh();
 		}else if(o==newButton){
-			showEntity(new Event(), true);
+			Date d = this.getDate();
+			Event ev = new Event(0l);
+			ev.setDate(d);
+			showEntity(ev, true);
 			this.refresh();
 		}else if(o==editButton){
 			int row = table.convertRowIndexToModel(table.getSelectedRow());
