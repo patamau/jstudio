@@ -21,7 +21,7 @@
 		</manifest>
 
 		<jar destfile="jstudio.jar"
-           basedir="build"
+           basedir="bin"
            includes="**/*.class"
            manifest="MANIFEST.MF"
            />
