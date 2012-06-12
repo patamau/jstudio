@@ -40,8 +40,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 	
 	private JTextField 
 		numberField,
-		dateField, 
-		stampField,
+		dateField,
 		nameField,
 		lastnameField,
 		addressField,
@@ -105,8 +104,6 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 				Language.string("Code"),
 				this.entity.getCode(), editable);
 		
-		String sval = editable?Float.toString(entity.getStamp()):Product.formatCurrency(entity.getStamp());
-		stampField = GUITool.createField(head, gc, Language.string("Stamp"), sval, editable);
 		noteCheck = GUITool.createCheck(head, gc, Language.string("L675 Compliant"), this.entity.getNote(), editable);
 		
 		JPanel body = new JPanel(new BorderLayout());
@@ -180,13 +177,6 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
-		try{
-			entity.setStamp(Float.parseFloat(stampField.getText()));
-		}catch(NumberFormatException e){
-			String msg = Language.string("Wrong stamp currency format for {0}", stampField.getText());
-			JOptionPane.showMessageDialog(this, msg, Language.string("Stamp format error"),JOptionPane.ERROR_MESSAGE);
-			return false;
-		}
 		entity.setName(nameField.getText());
 		entity.setLastname(lastnameField.getText());
 		entity.setAddress(addressField.getText());
@@ -211,10 +201,8 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		if(!entity.getCity().equals(cityField.getText())) return true;
 		if(!entity.getCode().equals(codeField.getText())) return true;
 		if(!entity.getProvince().equals(provinceField.getText())) return true;
-		if(!Float.toString(entity.getStamp()).equals(stampField.getText())) return true;
 		if((entity.getNote().length()>0&&!noteCheck.isSelected())||
 				entity.getNote().length()==0&&noteCheck.isSelected()) return true;
-		if(!Float.toString(entity.getStamp()).equals(stampField.getText())) return true;
 		return false;
 	}
 

@@ -180,7 +180,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		}else if(src==exitItem){
 			this.dispose();
 		}else if(src==aboutItem){
-			JOptionPane.showMessageDialog(this, JStudio.VERSION+" ("+JStudio.BUILD+")\n"+JStudio.AUTHOR, JStudio.class.getSimpleName(), JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(this, JStudio.class.getSimpleName()+" "+JStudio.VERSION+" ("+JStudio.BUILD+")\n"+JStudio.AUTHOR, JStudio.class.getSimpleName(), JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
 	

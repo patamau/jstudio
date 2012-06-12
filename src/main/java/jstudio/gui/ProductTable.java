@@ -14,13 +14,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.table.DefaultTableCellRenderer;
 
 import jstudio.control.Accounting;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
-import jstudio.util.Configuration;
 import jstudio.util.Language;
 
 import org.apache.log4j.Logger;
@@ -31,7 +31,7 @@ public class ProductTable
 	
 	private static final Logger logger = Logger.getLogger(ProductTable.class);
 	
-	private JLabel totalLabel;
+	private JLabel totalLabel, stampLabel;
 	private Invoice invoice;
 	private EntityManagerPanel<Invoice> accounting;
 	//private JButton newButton, editButton, deleteButton;
@@ -82,11 +82,18 @@ public class ProductTable
 		gc.gridx=gc.gridy=0;
 		gc.weightx=1.0f;
 		gc.fill=GridBagConstraints.HORIZONTAL;
-		totalPanel.add(new JLabel("Total"), gc);
-		totalLabel = new JLabel("0");
+		totalPanel.add(new JLabel(Language.string("Stamp")), gc);
+		++gc.gridy;
+		totalPanel.add(new JLabel(Language.string("Total")), gc);
+		gc.gridy=0;
 		++gc.gridx;
 		gc.weightx=0.0f;
+		gc.anchor=GridBagConstraints.EAST;
 		gc.fill=GridBagConstraints.NONE;
+		stampLabel = new JLabel("0");
+		totalPanel.add(stampLabel,gc);
+		totalLabel = new JLabel("0");
+		++gc.gridy;
 		totalPanel.add(totalLabel,gc);
 		this.add(totalPanel, BorderLayout.SOUTH);
 	}
@@ -102,10 +109,11 @@ public class ProductTable
 	}
 
 	public synchronized void addEntity(Product p){
+		//logger.debug(p.getCost());
 		model.addRow(new Object[]{
 				p,
 				p.getQuantity(),
-				p.getCost()
+				Product.formatCurrency(p.getCost())
 		});
 	}
 
@@ -165,5 +173,6 @@ public class ProductTable
 			addEntity(t);
 		}
 		totalLabel.setText(Product.formatCurrency(invoice.getTotal()));
+		stampLabel.setText(Product.formatCurrency(invoice.getStamp()));
 	}
 }

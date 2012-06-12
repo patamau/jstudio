@@ -40,8 +40,11 @@ public class EventPopup extends ContextualMenu<Event> {
 			Date d = ((AgendaPanel)parent).getDate();
 			Event ev = new Event(0l);
 			ev.setDate(d);
+			parent.showEntity(ev, true);
+			/*
 			JDialog dialog = new EventPanel(ev, parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
+			*/
 		}
 	}
 

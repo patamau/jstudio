@@ -56,11 +56,11 @@ public class PersonPanel extends EntityPanel<Person> {
 		gc.gridx=0;
 		gc.gridy=0;
 		gc.insets= new Insets(4,4,4,4);
-		
-		nameField = GUITool.createField(panel.getBody(), gc, Language.string("Name"), this.entity.getName(), editable);
-		nameField.addActionListener(this);
+
 		lastnameField = GUITool.createField(panel.getBody(), gc, Language.string("Lastname"), this.entity.getLastname(), editable);
 		lastnameField.addActionListener(this);
+		nameField = GUITool.createField(panel.getBody(), gc, Language.string("Name"), this.entity.getName(), editable);
+		nameField.addActionListener(this);
 		genderBox = GUITool.createCombo(panel.getBody(), gc, Language.string("Gender"), this.entity.getGender(), Person.Gender.values(), editable);
 		genderBox.addActionListener(this);
 		birthdateField = GUITool.createDateField(panel.getBody(), gc, Language.string("Birthdate"), this.entity.getBirthdate(), editable, Person.birthdateFormat);
