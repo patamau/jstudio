@@ -1,8 +1,10 @@
 Manifest-Version: 1.0
-Ant-Version: Apache Ant 1.7.1
-Created-By: 1.5.0_15-b04 (Sun Microsystems Inc.)
+Ant-Version: Apache Ant 1.8.2
+Created-By: 1.6.0_29-ea-b08 (Sun Microsystems Inc.)
+Built-By: Matteo Pedrotti
 Main-Class: jstudio.Main
-Implementation-Version: 6
+Implementation-Title: JStudio
+Implementation-Version: 9
 Implementation-Vendor: Matteo Pedrotti (patamau@gmail.com)
-Built-Date: 2010-11-23 23:41:15
+Built-Date: 2012-06-12 12:17:26
 
