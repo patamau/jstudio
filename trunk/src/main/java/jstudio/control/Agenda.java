@@ -20,6 +20,9 @@ public class Agenda extends Controller<Event> {
 	
 	private static final Logger logger = Logger.getLogger(Agenda.class);
 	
+	public static final String PRUNE_DAYS_KEY = "prune.days";
+	public static final int PRUNE_DAYS_DEF = -1;
+	
 	public static final SimpleDateFormat dayDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	public static final Calendar calendar = Calendar.getInstance();
 
@@ -38,7 +41,7 @@ public class Agenda extends Controller<Event> {
 	
 	public int countAllToPrune(final Date date){
 		calendar.setTime(date);
-		calendar.add(Calendar.DAY_OF_YEAR, Configuration.getGlobal("prune.days", -2));
+		calendar.add(Calendar.DAY_OF_YEAR, Configuration.getGlobal(PRUNE_DAYS_KEY, PRUNE_DAYS_DEF));
 		final Date p = calendar.getTime();
 		try{
 			return (Integer)getApplication().getDatabase().executeQuery("SELECT COUNT(id) FROM "+source+" WHERE date<'"+dayDateFormat.format(p)+"'");
@@ -49,7 +52,7 @@ public class Agenda extends Controller<Event> {
 	
 	public boolean removeAllBefore(final Date date){
 		calendar.setTime(date);
-		calendar.add(Calendar.DAY_OF_YEAR, -2);
+		calendar.add(Calendar.DAY_OF_YEAR, Configuration.getGlobal(PRUNE_DAYS_KEY, PRUNE_DAYS_DEF));
 		final Date p = calendar.getTime();
 		try {
 			getApplication().getDatabase().execute("DELETE FROM "+source+" WHERE date<'"+dayDateFormat.format(p)+"'");
