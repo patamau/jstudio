@@ -20,7 +20,7 @@
 			<attribute name="Built-Date" value="${TODAY}"/>
 		</manifest>
 
-		<jar destfile="jstudio.jar"
+		<jar destfile="release/lib/jstudio.jar"
            basedir="bin"
            includes="**/*.class"
            manifest="MANIFEST.MF"

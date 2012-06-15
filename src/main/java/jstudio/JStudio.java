@@ -421,8 +421,9 @@ public class JStudio implements UncaughtExceptionHandler{
 			JOptionPane.showMessageDialog(gui, Language.string("No events to prune"), Language.string("Pruning events"), JOptionPane.INFORMATION_MESSAGE);
 			return;
 		}
+		final int n = -Configuration.getGlobal(Agenda.PRUNE_DAYS_KEY, Agenda.PRUNE_DAYS_DEF);
 		final int ch = JOptionPane.showConfirmDialog(gui, 
-				Language.string("This will remove all events older than two days ({0} events).\nPlease double check your system date is correct before proceeding.\nYour system date is {1}", c, d),
+				Language.string("This will remove all events older than {0} days ({1} events).\nPlease double check your system date is correct before proceeding.\nYour system date is {2}", n, c, d),
 				Language.string("Confirm pruning"),
 				JOptionPane.YES_NO_OPTION,
 				JOptionPane.WARNING_MESSAGE);
