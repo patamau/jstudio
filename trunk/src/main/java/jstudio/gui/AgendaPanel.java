@@ -190,8 +190,8 @@ public class AgendaPanel
 		model.addRow(new Object[]{
 				e,
 				e.getLastname()+" "+e.getName(),
+				e.getDescription(),
 				e.getPhone(),
-				e.getDescription()
 		});
 	}
 
