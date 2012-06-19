@@ -557,6 +557,7 @@ public class SqlDB implements DatabaseInterface {
 							continue;
 					}
 				}catch(IllegalArgumentException e){
+					logger.debug(e.getMessage());
 					//custom datatype
 					Long id = 0l;
 					try{
@@ -565,14 +566,17 @@ public class SqlDB implements DatabaseInterface {
 						logger.error("Unable to retrieve id for "+f.getName()+" object is "+rs.getObject(f.getName()));
 					}
 					String tab = ftype.toLowerCase();
-					if(parent!=null && parent.getId()==id &&
-							parent.getClass().getSimpleName().toLowerCase().equals(tab)){
+					if(parent!=null && parent.getId().longValue()==id.longValue() && parent.getClass().getSimpleName().equalsIgnoreCase(tab)){
+						//this will prevent endless loops
 						f.set(o, parent);
 					}else{
+						//logger.debug("Loading connected entities "+tab+" for "+o.getClass().getSimpleName()+" "+o.getId());
 						//loading the connected entity
 						List<DatabaseObject> res = execute(tab, "SELECT * FROM "+tab+" WHERE id="+id+" LIMIT 1;", o);
 						if(res.size()>0){
 							f.set(o, res.get(0));
+						}else{
+							logger.warn("No connected entities found for "+o);
 						}
 					}
 				}
