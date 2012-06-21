@@ -14,8 +14,6 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
-import org.apache.log4j.Logger;
-
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
 import jstudio.gui.generic.NicePanel;
@@ -26,7 +24,7 @@ import jstudio.util.Language;
 @SuppressWarnings("serial")
 public class PersonPanel extends EntityPanel<Person> {
 	
-	private static final Logger logger = Logger.getLogger(PersonPanel.class);
+	//private static final Logger logger = Logger.getLogger(PersonPanel.class);
 	
 	private JComboBox
 		genderBox;

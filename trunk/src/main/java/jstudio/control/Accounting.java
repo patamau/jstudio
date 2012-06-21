@@ -3,12 +3,10 @@ package jstudio.control;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Calendar;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import jstudio.JStudio;
-import jstudio.model.Event;
 import jstudio.model.Invoice;
 import jstudio.model.Product;
 
@@ -31,7 +29,6 @@ public class Accounting extends Controller<Invoice>{
 		return products;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public Integer getByNumber(final long id, final long number, final Date date){
 		calendar.setTime(date);
 		calendar.set(Calendar.DAY_OF_YEAR, 1);

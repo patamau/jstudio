@@ -33,13 +33,20 @@ import jstudio.model.Product;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JRField;
+import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperPrintManager;
+import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.JRRtfExporter;
 import net.sf.jasperreports.engine.export.JRTextExporter;
+import net.sf.jasperreports.engine.util.JRLoader;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -261,6 +268,10 @@ public class ReportGenerator {
         	throw new Exception("No such report "+reportName);
         }
 		JasperPrint print = JasperFillManager.fillReport(is, null, getDataSource()); 
+    	JasperReport report = (JasperReport) JRLoader.loadObject(getClass().getResourceAsStream(reportName));
+    	for(JRField p: report.getFields()){
+    		logger.debug(p.getName());
+    	}
 		return JasperPrintManager.printPageToImage(print, 0, 1.0f);
 	}
 	
@@ -318,7 +329,7 @@ public class ReportGenerator {
         }
         OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
         JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
-        runReportToRtfStream(is, os, null, getDataSource());
+        runReportToRtfStream(is, os, null, dataSource);
         os.close();
         is.close();
     }
@@ -329,9 +340,7 @@ public class ReportGenerator {
     		JRDataSource jrDataSource
     		) throws JRException{
     	JasperPrint jasperPrint = JasperFillManager.fillReport(inputStream, parameters, jrDataSource);
-
 		JRRtfExporter exporter = new JRRtfExporter();
-		
 		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
 		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outputStream);
 		
@@ -344,7 +353,6 @@ public class ReportGenerator {
     		JRDataSource jrDataSource
     		) throws JRException{
     	JasperPrint jasperPrint = JasperFillManager.fillReport(inputStream, parameters, jrDataSource);
-
 		JRTextExporter exporter = new JRTextExporter();
 		
 		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
