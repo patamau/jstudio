@@ -623,10 +623,13 @@ public class SqlDB implements DatabaseInterface {
 		return null;
 	}
 
+	/**
+	 * Get objects from a table where the specified field is in the given range
+	 */
 	@Override
 	public List<? extends DatabaseObject> getBetween(String table, String field, String from, String to) {
 		table = table.toLowerCase();
-		String sql = new String("SELECT * FROM "+table+" WHERE "+field+" BETWEEN '"+from+"' AND '"+to+"';");
+		String sql = new String("SELECT * FROM "+table+" WHERE "+field+" BETWEEN '"+from+"' AND '"+to+"' ORDER BY "+field+";");
 		try {
 			return execute(table, sql, null);
 		} catch (Exception e) {
