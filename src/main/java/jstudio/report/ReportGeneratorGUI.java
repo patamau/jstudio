@@ -42,7 +42,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	//private DefaultTableModel htable, dtable;
 	private JTextField fileField;
 	private JLabel preview;
-	private JButton browseButton, printButton, cancelButton;
+	private JButton browseButton, printButton, cancelButton, sendToPrinterButton;
 	private JComboBox formatBox;
 	
 	public enum PrintMode {
@@ -70,10 +70,14 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		panel.getBody().add(getPreviewPanel(), gc);
 		
 		panel.addButtonsGlue();
+		sendToPrinterButton = new JButton(Language.string("Send To Printer..."));
+		sendToPrinterButton.addActionListener(this);
 		printButton = new JButton(Language.string("Print"));
 		printButton.addActionListener(this);
 		cancelButton = new JButton(Language.string("Cancel"));
 		cancelButton.addActionListener(this);
+		
+		panel.addButton(sendToPrinterButton);
 		panel.addButton(printButton);
 		panel.addButton(cancelButton);
 	}
@@ -239,6 +243,18 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 			}
 		}else if(src==cancelButton){
 			((Window)SwingUtilities.getRoot(this)).dispose();
+		}else if(src==sendToPrinterButton){
+			String lastPath;
+			int pos = fileField.getText().lastIndexOf(File.separator);
+			if(pos<0) lastPath = ".";
+			else lastPath = fileField.getText().substring(0, pos);
+			Configuration.getGlobalConfiguration().setProperty(PRINTPATH_KEY, lastPath);
+			int idx = formatBox.getSelectedIndex();
+			try {
+				rg.sendToPrinter();
+			} catch (Exception e1) {
+				e1.printStackTrace();
+			}
 		}else if(src==printButton){
 			String lastPath;
 			int pos = fileField.getText().lastIndexOf(File.separator);
@@ -247,18 +263,18 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 			Configuration.getGlobalConfiguration().setProperty(PRINTPATH_KEY, lastPath);
 			int idx = formatBox.getSelectedIndex();
 			switch(idx){
-			case 0:
-				if(doPrint(fileField.getText(), PrintMode.PdfMode)){
-					((Window)SwingUtilities.getRoot(this)).dispose();
-				}
-				break;
-			case 1:
-				if(doPrint(fileField.getText(), PrintMode.DocMode)){
-					((Window)SwingUtilities.getRoot(this)).dispose();
-				}
-				break;
-			default:
-				logger.error("Unmapped print mode "+idx);
+				case 0:
+					if(doPrint(fileField.getText(), PrintMode.PdfMode)){
+						((Window)SwingUtilities.getRoot(this)).dispose();
+					}
+					break;
+				case 1:
+					if(doPrint(fileField.getText(), PrintMode.DocMode)){
+						((Window)SwingUtilities.getRoot(this)).dispose();
+					}
+					break;
+				default:
+					logger.error("Unmapped print mode "+idx);
 			}
 		}
 	}

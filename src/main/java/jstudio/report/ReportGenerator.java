@@ -8,6 +8,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -22,6 +24,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.print.PrintService;
+import javax.print.PrintServiceLookup;
+import javax.print.attribute.HashPrintRequestAttributeSet;
+import javax.print.attribute.PrintRequestAttributeSet;
+import javax.print.attribute.standard.Copies;
+import javax.print.attribute.standard.MediaPrintableArea;
+import javax.print.attribute.standard.MediaSize;
+import javax.print.attribute.standard.MediaSizeName;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -44,6 +54,8 @@ import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRMapCollectionDataSource;
 import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
+import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
 import net.sf.jasperreports.engine.export.JRRtfExporter;
 import net.sf.jasperreports.engine.export.JRTextExporter;
 import net.sf.jasperreports.engine.util.JRLoader;
@@ -334,6 +346,16 @@ public class ReportGenerator {
         is.close();
     }
     
+    public void sendToPrinter() throws Exception {
+        InputStream is = getClass().getResourceAsStream(reportName);
+        if(is==null){
+        	throw new Exception("No such report "+reportName);
+        }
+        JRMapCollectionDataSource dataSource = new JRMapCollectionDataSource(data); 
+        runReportToPrinter(is, null, dataSource);
+        is.close();
+    }   
+    
     public static void runReportToRtfStream(InputStream inputStream, 
     		OutputStream outputStream, 
     		Map parameters, 
@@ -359,6 +381,45 @@ public class ReportGenerator {
 		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outputStream);
 		
 		exporter.exportReport();
+    }
+    
+    public static void runReportToPrinter(InputStream inputStream, 
+    		Map parameters, 
+    		JRDataSource jrDataSource
+    		) throws JRException{
+    	JasperPrint jasperPrint = JasperFillManager.fillReport(inputStream, parameters, jrDataSource);
+    	
+    	PrinterJob job = PrinterJob.getPrinterJob();
+    	/* Create an array of PrintServices */
+    	PrintService[] services = PrintServiceLookup.lookupPrintServices(null, null);
+    	int selectedService = 0;
+    	/* Scan found services to see if anyone suits our needs */
+    	for(int i = 0; i < services.length;i++){
+	    	if(services[i].getName().toUpperCase().contains("Your printer's name")){
+		    	/*If the service is named as what we are querying we select it */
+		    	selectedService = i;
+	    	}
+    	}
+    	try {
+			job.setPrintService(services[selectedService]);
+		} catch (PrinterException e) {
+			e.printStackTrace();
+			return;
+		}
+    	PrintRequestAttributeSet printRequestAttributeSet = new HashPrintRequestAttributeSet();
+    	MediaSizeName mediaSizeName = MediaSize.findMedia(4,4,MediaPrintableArea.INCH);
+    	printRequestAttributeSet.add(mediaSizeName);
+    	printRequestAttributeSet.add(new Copies(1));
+    	JRPrintServiceExporter exporter;
+    	exporter = new JRPrintServiceExporter();
+    	exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+    	/* We set the selected service and pass it as a paramenter */
+    	exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE, services[selectedService]);
+    	exporter.setParameter(JRPrintServiceExporterParameter.PRINT_SERVICE_ATTRIBUTE_SET, services[selectedService].getAttributes());
+    	exporter.setParameter(JRPrintServiceExporterParameter.PRINT_REQUEST_ATTRIBUTE_SET, printRequestAttributeSet);
+    	exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PAGE_DIALOG, Boolean.FALSE);
+    	exporter.setParameter(JRPrintServiceExporterParameter.DISPLAY_PRINT_DIALOG, Boolean.TRUE);
+    	exporter.exportReport();
     }
 }
 
