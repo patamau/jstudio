@@ -145,6 +145,13 @@ public class Configuration {
 		this.modified=true;
 	}
 	
+	public void setProperty(String key, boolean value){
+		String svalue = Boolean.toString(value);
+		String old = String.valueOf(properties.setProperty(key, svalue));
+		firePropertyChange(key,svalue,old);
+		this.modified=true;
+	}
+	
 	/**
 	 * Subscribe to property change events
 	 * @param listener
