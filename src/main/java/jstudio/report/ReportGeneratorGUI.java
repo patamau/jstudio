@@ -10,17 +10,21 @@ import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
@@ -33,7 +37,11 @@ import jstudio.util.Language;
 @SuppressWarnings("serial")
 public class ReportGeneratorGUI extends JPanel implements ActionListener {
 
-	public static final String PRINTPATH_KEY = "print.path";
+	public static final String PRINTPATH_KEY = "print.path",
+			PRINTPDF_KEY = "print.pdf",
+			PRINTDOC_KEY = "print.doc",
+			PRINTXLS_KEY = "print.xls",
+			PRINTSYS_KEY = "print.sys";
 	private static final int PRV_SIZX=210, PRV_SIZY=297; //A4 standard
 	
 	private static final Logger logger = Logger.getLogger(ReportGeneratorGUI.class);
@@ -43,10 +51,11 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	private JTextField fileField;
 	private JLabel preview;
 	private JButton browseButton, printButton, cancelButton, sendToPrinterButton;
-	private JComboBox formatBox;
+	//private JComboBox formatBox;
+	private JCheckBox pdfCheck, docCheck, xlsCheck, sysCheck;
 	
 	public enum PrintMode {
-		PdfMode, DocMode, XlsMode
+		PdfMode, DocMode, XlsMode, SystemMode
 	}
 	
 	/**
@@ -59,15 +68,13 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		this.rg = rg;
 		
 		NicePanel panel = new NicePanel(Language.string("Printing {0}", filename), Language.string("Configure printing"));
-		panel.getBody().setLayout(new GridBagLayout());
+		panel.getBody().setLayout(new BorderLayout());
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
 		
-		GridBagConstraints gc = new GridBagConstraints();
-		gc.gridx=gc.gridy=0;
-		panel.getBody().add(getBodyPanel(filename), gc);
-		++gc.gridx;
-		panel.getBody().add(getPreviewPanel(), gc);
+		final JSplitPane bodyPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, getBodyPanel(filename), getPreviewPanel());
+		
+		panel.getBody().add(bodyPane, BorderLayout.CENTER);
 		
 		panel.addButtonsGlue();
 		sendToPrinterButton = new JButton(Language.string("Send To Printer..."));
@@ -77,14 +84,20 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		cancelButton = new JButton(Language.string("Cancel"));
 		cancelButton.addActionListener(this);
 		
-		panel.addButton(sendToPrinterButton);
+		//panel.addButton(sendToPrinterButton);
 		panel.addButton(printButton);
 		panel.addButton(cancelButton);
 	}
 	
 	private Component getBodyPanel(final String filename){
-		final JPanel body = new JPanel(new BorderLayout());
-		body.add(getFilePanel(filename),BorderLayout.CENTER);
+		final JPanel body = new JPanel(new GridBagLayout());
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx=gc.gridy=0;
+		gc.weightx=1.0f;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		body.add(getFilePanel(filename), gc);
+		gc.gridy++;
+		body.add(getPrinterPanel(), gc);
 		return body;
 	}
 	
@@ -114,24 +127,51 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		gc.anchor=GridBagConstraints.LINE_START;
 		gc.weightx=1.0f;
 		gc.fill=GridBagConstraints.HORIZONTAL;
-		String[] formats = {
-				Language.string("Pdf (Portable Document Format)"),
-				Language.string("Rtf (Rich Text Format)")
-		};
-		formatBox = new JComboBox(formats);
-		panel.add(formatBox, gc);
+		
+		pdfCheck = new JCheckBox(Language.string("Pdf (Portable Document Format)"));
+		pdfCheck.setSelected(Configuration.getGlobal(PRINTPDF_KEY, false));
+		gc.gridy++;
+		panel.add(pdfCheck, gc);
+		docCheck = new JCheckBox(Language.string("Rtf (Rich Text Format)"));
+		docCheck.setSelected(Configuration.getGlobal(PRINTDOC_KEY, false));
+		gc.gridy++;
+		panel.add(docCheck, gc);
+		xlsCheck = new JCheckBox(Language.string("Xls (eXeL Spreadsheet)"));
+		xlsCheck.setSelected(Configuration.getGlobal(PRINTXLS_KEY, false));
+		//gc.gridy++;
+		//panel.add(xlsCheck, gc);
 
-		JLabel note = new JLabel(Language.string("Extension added automatically"));
+		JLabel note = new JLabel(Language.string("Extensions added automatically"));
 		note.setFont(note.getFont().deriveFont(Font.PLAIN));
 		gc.gridy++;
 		panel.add(note, gc);
 		return panel;
 	}
 	
+	private Component getPrinterPanel(){
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Language.string("Print to system")));
+		GridBagConstraints gc = new GridBagConstraints();
+		gc.gridx=0;
+		gc.gridy=0;
+		gc.insets = new Insets(5,5,5,5);
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=1.0;
+		sysCheck = new JCheckBox(Language.string("Send to printer"));
+		sysCheck.setSelected(Configuration.getGlobal(PRINTSYS_KEY, false));
+		panel.add(sysCheck, gc);
+		gc.gridy++;
+		JLabel printerLabel = new JLabel(Language.string("Will open the system printer configuration window"));
+		printerLabel.setFont(printerLabel.getFont().deriveFont(Font.PLAIN));
+		panel.add(printerLabel,gc);
+		return panel;
+	}
+	
 	private Component getFilePanel(final String filename){
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
-		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Language.string("Destination")));
+		panel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Language.string("Print to file")));
 		GridBagConstraints gc = new GridBagConstraints();
 		String defaultPath = Configuration.getGlobal(PRINTPATH_KEY, ".");
 		fileField = new JTextField();
@@ -200,9 +240,13 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 			case XlsMode:
 				f = new File(checkExtension(destination, "xls"));
 				if(checkOverwrite(f)){
-					//rg.generateRtf(f.getParent(), f.getName());
-					JOptionPane.showMessageDialog(this,"INTERNAL: XLS NOT IMPLEMENTED");
+					rg.generateXls(f.getParent(), f.getName());
+					printed=true;
 				}
+				break;
+			case SystemMode:
+				rg.sendToPrinter();
+				printed=true;
 				break;
 			default:
 				logger.error("Unrecognized print mode "+mode);
@@ -225,6 +269,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		dialog.pack();
 		dialog.setModal(true);
 		dialog.setLocationRelativeTo(parent);
+		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
 
@@ -246,10 +291,12 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		}else if(src==sendToPrinterButton){
 			String lastPath;
 			int pos = fileField.getText().lastIndexOf(File.separator);
-			if(pos<0) lastPath = ".";
-			else lastPath = fileField.getText().substring(0, pos);
+			if(pos<0) {
+				lastPath = ".";
+			} else {
+				lastPath = fileField.getText().substring(0, pos);
+			}
 			Configuration.getGlobalConfiguration().setProperty(PRINTPATH_KEY, lastPath);
-			int idx = formatBox.getSelectedIndex();
 			try {
 				rg.sendToPrinter();
 			} catch (Exception e1) {
@@ -261,20 +308,31 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 			if(pos<0) lastPath = ".";
 			else lastPath = fileField.getText().substring(0, pos);
 			Configuration.getGlobalConfiguration().setProperty(PRINTPATH_KEY, lastPath);
-			int idx = formatBox.getSelectedIndex();
-			switch(idx){
-				case 0:
-					if(doPrint(fileField.getText(), PrintMode.PdfMode)){
-						((Window)SwingUtilities.getRoot(this)).dispose();
-					}
-					break;
-				case 1:
-					if(doPrint(fileField.getText(), PrintMode.DocMode)){
-						((Window)SwingUtilities.getRoot(this)).dispose();
-					}
-					break;
-				default:
-					logger.error("Unmapped print mode "+idx);
+			boolean pres = false, sel = false;
+			Configuration.getGlobalConfiguration().setProperty(PRINTPDF_KEY, pdfCheck.isSelected());
+			Configuration.getGlobalConfiguration().setProperty(PRINTDOC_KEY, docCheck.isSelected());
+			Configuration.getGlobalConfiguration().setProperty(PRINTXLS_KEY, xlsCheck.isSelected());
+			Configuration.getGlobalConfiguration().setProperty(PRINTSYS_KEY, sysCheck.isSelected());
+			if(pdfCheck.isSelected()){
+				pres = doPrint(fileField.getText(), PrintMode.PdfMode);
+				sel = true;
+			}
+			if(docCheck.isSelected()){
+				pres = doPrint(fileField.getText(), PrintMode.DocMode);
+				sel = true;
+			}
+			if(xlsCheck.isSelected()){
+				pres = doPrint(fileField.getText(), PrintMode.XlsMode);
+				sel = true;
+			}
+			if(sysCheck.isSelected()){
+				pres = doPrint(fileField.getText(), PrintMode.SystemMode);
+				sel = true;
+			}
+			if(pres){
+				((Window)SwingUtilities.getRoot(this)).dispose();
+			}else if(!sel){
+				JOptionPane.showMessageDialog(this, Language.string("Select at least one print option to print the report"), Language.string("Select print options"), JOptionPane.WARNING_MESSAGE);
 			}
 		}
 	}

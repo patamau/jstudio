@@ -58,6 +58,7 @@ import net.sf.jasperreports.engine.export.JRPrintServiceExporter;
 import net.sf.jasperreports.engine.export.JRPrintServiceExporterParameter;
 import net.sf.jasperreports.engine.export.JRRtfExporter;
 import net.sf.jasperreports.engine.export.JRTextExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
 import net.sf.jasperreports.engine.util.JRLoader;
 
 import org.apache.log4j.BasicConfigurator;
@@ -329,6 +330,23 @@ public class ReportGenerator {
         is.close();
     }
     
+    public void generateXls(String outputDir, String outputFile) throws Exception {
+        InputStream is = getClass().getResourceAsStream(reportName);
+        if(is==null){
+        	throw new Exception("No such report "+reportName);
+        }
+        File outDir = new File(outputDir);
+        if(!outDir.exists()){
+        	logger.warn("Creating output dir "+outputDir);
+        	outDir.mkdirs();
+        }
+        OutputStream os = new FileOutputStream(new File(outDir, outputFile)); 
+        //runReportToRtfStream(is, os, null, getDataSource());
+        runReportToXlsStream(is, os, null, getDataSource());
+        os.close();
+        is.close();
+    }
+    
     public void generateText(String outputDir, String outputFile) throws Exception {
         InputStream is = getClass().getResourceAsStream(reportName);
         if(is==null){
@@ -355,6 +373,19 @@ public class ReportGenerator {
         runReportToPrinter(is, null, dataSource);
         is.close();
     }   
+    
+    public static void runReportToXlsStream(InputStream inputStream, 
+    		OutputStream outputStream, 
+    		Map parameters, 
+    		JRDataSource jrDataSource
+    		) throws JRException{
+    	JasperPrint jasperPrint = JasperFillManager.fillReport(inputStream, parameters, jrDataSource);
+		JRXlsExporter exporter = new JRXlsExporter();
+		exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+		exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, outputStream);
+		
+		exporter.exportReport();
+    }
     
     public static void runReportToRtfStream(InputStream inputStream, 
     		OutputStream outputStream, 
