@@ -141,7 +141,7 @@ public class ProductTable
 				if(null!=p){
 					int ch = JOptionPane.showConfirmDialog(this, 
 							Language.string("Are you sure you want to remove the product {0}?",p.getDescription()),
-							Language.string("Romove product?"), 
+							Language.string("Remove product?"), 
 							JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 					if(ch==JOptionPane.YES_OPTION){
 						if(!invoice.getProducts().remove(p)){

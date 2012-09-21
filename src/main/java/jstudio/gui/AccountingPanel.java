@@ -152,7 +152,7 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 				Invoice context = (Invoice)model.getValueAt(row, 0);
 				int ch = JOptionPane.showConfirmDialog(this, 
 						Language.string("Are you sure you want to remove invoice {0} {1}?",context.getId(),Invoice.dateFormat.format(context.getDate())),
-						Language.string("Romove invoice?"), 
+						Language.string("Remove invoice?"), 
 						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 				if(ch==JOptionPane.YES_OPTION){
 					controller.delete(context);

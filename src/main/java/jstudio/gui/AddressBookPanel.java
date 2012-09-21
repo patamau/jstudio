@@ -129,7 +129,7 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 				Person context = (Person)model.getValueAt(row, 0);
 				int ch = JOptionPane.showConfirmDialog(this, 
 						Language.string("Are you sure you want to remove {0} {1}?",context.getName(),context.getLastname()),
-						Language.string("Romove person?"), 
+						Language.string("Remove person?"), 
 						JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 				if(ch==JOptionPane.YES_OPTION){
 					controller.delete(context);

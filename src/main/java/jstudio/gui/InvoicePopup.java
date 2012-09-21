@@ -56,7 +56,7 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 		}else if(o==deleteItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
 					Language.string("Are you sure you want to remove invoice {0} {1}?",context.getId(),Invoice.dateFormat.format(context.getDate())),
-					Language.string("Romove invoice?"), 
+					Language.string("Remove invoice?"), 
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if(ch==JOptionPane.YES_OPTION){
 				controller.delete(context);

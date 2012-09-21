@@ -29,7 +29,7 @@ public class PersonPopup extends ContextualMenu<Person> {
 		}else if(o==deleteItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
 					Language.string("Are you sure you want to remove {0} {1}?",context.getName(),context.getLastname()),
-					Language.string("Romove person?"), 
+					Language.string("Remove person?"), 
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if(ch==JOptionPane.YES_OPTION){
 				controller.delete(context);
