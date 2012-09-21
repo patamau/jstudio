@@ -186,7 +186,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		entity.setCode(codeField.getText());
 		if(entity.getId()==0) entity.setId(controller.getNextId());
 		if(entity.getNumber()==0) entity.setNumber(((Accounting)controller).getNextInvoiceNumber(entity.getDate()));
-		entity.setNote(noteCheck.isSelected()?Language.string("L675 compliant"):"");
+		entity.setNote(noteCheck.isSelected()?Language.string("L675 Compliant"):"");
 		controller.store(entity);
 		return true;
 	}

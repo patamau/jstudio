@@ -29,7 +29,7 @@ public class EventPopup extends ContextualMenu<Event> {
 		}else if(o==deleteItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
 					Language.string("Are you sure you want to remove the event {0} at {1}?",context.getDescription(), Event.timeFormat.format(context.getDate())),
-					Language.string("Romove event?"), 
+					Language.string("Remove event?"), 
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if(ch==JOptionPane.YES_OPTION){
 				controller.delete(context);

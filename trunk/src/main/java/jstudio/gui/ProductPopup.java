@@ -35,7 +35,7 @@ public class ProductPopup extends ContextualMenu<Product> {
 		}else if(o==deleteItem){
 			int ch = JOptionPane.showConfirmDialog(parent, 
 					Language.string("Are you sure you want to remove the product {0}?",context.getDescription()),
-					Language.string("Romove product?"), 
+					Language.string("Remove product?"), 
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 			if(ch==JOptionPane.YES_OPTION){
 				if(!invoice.getProducts().remove(context)){

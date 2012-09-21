@@ -26,8 +26,8 @@ public class AgendaTableModel extends DefaultTableModel {
 		table.setModel(this);
 		table.setAutoCreateRowSorter(true);
 		table.getRowSorter().toggleSortOrder(0);
-		table.getColumn("Time").setMaxWidth(50);
-		table.getColumn("Time").setMinWidth(50);
+		table.getColumn(cols[0]).setMaxWidth(50);
+		table.getColumn(cols[0]).setMinWidth(50);
 	}
 
 	public boolean isCellEditable(int row, int col){
