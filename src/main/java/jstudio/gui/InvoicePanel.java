@@ -35,6 +35,7 @@ import jstudio.util.Language;
 public class InvoicePanel extends EntityPanel<Invoice> {
 	
 	public static final String 
+		L675_COMPLIANT = "L675 Compliant",
 		INVOICE_REPORT = "report.invoice",
 		INVOICE_REPORT_DEF = "/reports/invoice.jasper";
 	
@@ -104,7 +105,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 				Language.string("Code"),
 				this.entity.getCode(), editable);
 		
-		noteCheck = GUITool.createCheck(head, gc, Language.string("L675 Compliant"), this.entity.getNote(), editable);
+		noteCheck = GUITool.createCheck(head, gc, Language.string("L675 Compliant Check"), L675_COMPLIANT, editable);
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
@@ -186,7 +187,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		entity.setCode(codeField.getText());
 		if(entity.getId()==0) entity.setId(controller.getNextId());
 		if(entity.getNumber()==0) entity.setNumber(((Accounting)controller).getNextInvoiceNumber(entity.getDate()));
-		entity.setNote(noteCheck.isSelected()?Language.string("L675 Compliant"):"");
+		entity.setNote(noteCheck.isSelected()?L675_COMPLIANT:"");
 		controller.store(entity);
 		return true;
 	}
@@ -233,7 +234,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			rg.setReport(Configuration.getGlobal(INVOICE_REPORT, INVOICE_REPORT_DEF));
 			rg.setHead(entity);
 			rg.setHeadValue("date", Person.birthdateFormat.format(entity.getDate()));
-			rg.setHeadValue("note", entity.getNote());
+			rg.setHeadValue("note", Language.string(entity.getNote()));
 			rg.setData(entity.getProducts());
 			rg.setHeadValue("stamp", Product.formatCurrency(entity.getStamp()));
 			rg.setHeadValue("totalcost", Product.formatCurrency(entity.getTotal()));
