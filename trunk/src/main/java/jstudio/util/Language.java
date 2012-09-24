@@ -413,6 +413,7 @@ public class Language {
 	 * @return
 	 */
 	public String getString(String key){
+		if(key==null||key.length()==0) return "";
 		String value = this.strings.getProperty(key);
 		if(value==null){
 			value = key;

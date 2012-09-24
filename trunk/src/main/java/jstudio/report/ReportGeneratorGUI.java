@@ -106,6 +106,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 			preview = new JLabel();
 			preview.setIcon(new ImageIcon(ReportGenerator.doResizeImage(img, PRV_SIZX, PRV_SIZY)));
 		} catch (Exception e) {
+			e.printStackTrace();
 			logger.error(e);
 			JOptionPane.showMessageDialog(this, e.getLocalizedMessage(), Language.string("Preview error"), JOptionPane.ERROR_MESSAGE);
 			preview = new JLabel(Language.string("N/A"));
