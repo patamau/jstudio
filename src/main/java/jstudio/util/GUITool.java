@@ -210,7 +210,7 @@ public class GUITool {
 		gc.gridx++;		
 		int ow = gc.gridwidth; //store old weight
 		gc.gridwidth=2;
-		c.add(editable?f:new JLabel(label),gc);
+		c.add(editable?f:(value.length()>0?new JLabel(label):new JLabel()),gc);
 		gc.fill=GridBagConstraints.NONE;
 		gc.weightx=0.0f;
 		gc.gridx=px;

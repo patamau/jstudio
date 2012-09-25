@@ -105,7 +105,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 				Language.string("Code"),
 				this.entity.getCode(), editable);
 		
-		noteCheck = GUITool.createCheck(head, gc, Language.string("L675 Compliant Check"), L675_COMPLIANT, editable);
+		noteCheck = GUITool.createCheck(head, gc, Language.string("L675 Compliant Check"), entity.getNote(), editable);
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
