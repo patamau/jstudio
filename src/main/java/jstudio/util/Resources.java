@@ -1,6 +1,11 @@
 package jstudio.util;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
@@ -35,5 +40,19 @@ public class Resources {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static final File[] getFiles(final String path, final String suffix){
+		File root = new File(ClassLoader.getSystemClassLoader().getResource(path).getFile());
+		if(root.exists()&&root.isDirectory()){
+			return root.listFiles(new FileFilter(){
+				@Override
+				public boolean accept(File f) {
+					return f.isFile()&&f.getName().endsWith(suffix);
+				}
+			});
+		}else{
+			throw new RuntimeException("Invalid folder "+path);
+		}
 	}
 }
