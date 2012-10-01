@@ -21,7 +21,7 @@ public class Agenda extends Controller<Event> {
 	private static final Logger logger = Logger.getLogger(Agenda.class);
 	
 	public static final String PRUNE_DAYS_KEY = "prune.days";
-	public static final int PRUNE_DAYS_DEF = -1;
+	public static final int PRUNE_DAYS_DEF = -2;
 	
 	public static final SimpleDateFormat dayDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	public static final Calendar calendar = Calendar.getInstance();
