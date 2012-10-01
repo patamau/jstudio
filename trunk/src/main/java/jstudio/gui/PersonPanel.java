@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.text.ParseException;
 
@@ -13,11 +14,15 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.EntityPanel;
 import jstudio.gui.generic.NicePanel;
 import jstudio.model.Person;
+import jstudio.report.ReportChooser;
+import jstudio.report.ReportGenerator;
+import jstudio.report.ReportGeneratorGUI;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
@@ -39,7 +44,7 @@ public class PersonPanel extends EntityPanel<Person> {
 		codeField,
 		phoneField;
 	private JButton okButton, cancelButton;
-	private JButton viewButton, editButton, deleteButton;
+	private JButton viewButton, printButton, editButton, deleteButton;
 	private JButton closeButton;
 
 	public PersonPanel(Person person, EntityManagerPanel<Person> manager, boolean editable){
@@ -99,6 +104,9 @@ public class PersonPanel extends EntityPanel<Person> {
 			editButton = new JButton(Language.string("Edit"));
 			editButton.addActionListener(this);
 			panel.addButton(editButton);
+			printButton = new JButton(Language.string("Print"));
+			printButton.addActionListener(this);
+			panel.addButton(printButton);
 			panel.addButtonsGlue();
 			closeButton = new JButton(Language.string("Close"));
 			closeButton.addActionListener(this);
@@ -162,6 +170,11 @@ public class PersonPanel extends EntityPanel<Person> {
 			getDialog().dispose();
 			JDialog dialog = new PersonPanel(super.entity, super.manager, true).createDialog(super.manager.getTopLevelAncestor());
 			dialog.setVisible(true);
+		}else if(o==printButton){
+			ReportGenerator rg = new ReportGenerator();
+			rg.setHead(super.entity);
+			ReportChooser rc = new ReportChooser(rg);
+			rc.showGUI(this.getDialog());
 		}else if(o==deleteButton){
 			int ch = JOptionPane.showConfirmDialog(super.manager, 
 					Language.string("Are you sure you want to remove {0} {1}?",
