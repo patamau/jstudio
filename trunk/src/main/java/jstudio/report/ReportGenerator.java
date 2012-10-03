@@ -217,6 +217,10 @@ public class ReportGenerator {
 		head.putAll(entry.getPrintData());
 	}
 	
+	public Map<String, String> getHead(){
+		return head;
+	}
+	
 	/**
 	 * Custom method
 	 * @param entry

@@ -2,10 +2,7 @@ package jstudio.util;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.Enumeration;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
