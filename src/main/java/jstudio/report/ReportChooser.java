@@ -1,6 +1,7 @@
 package jstudio.report;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -16,20 +17,20 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
-
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRField;
-import net.sf.jasperreports.engine.JasperCompileManager;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.util.JRLoader;
+import javax.swing.table.DefaultTableModel;
 
 import jstudio.gui.generic.NicePanel;
 import jstudio.model.Person;
 import jstudio.util.Configuration;
 import jstudio.util.Language;
 import jstudio.util.Resources;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRField;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
 
 public class ReportChooser extends JPanel implements ActionListener {
 	
@@ -59,15 +60,15 @@ public class ReportChooser extends JPanel implements ActionListener {
 		REPORTS_PATH_DEF = "reports",
 		REPORTS_SUFFIX_DEF = ".jasper";
 	
-	private final JButton printButton, cancelButton;
-	
+	private final JButton printButton, cancelButton;	
 	private JComboBox reportsBox;
+	private DefaultTableModel tmodel;
 	
 	private final ReportGenerator rg;
 
 	public ReportChooser(final ReportGenerator rg){
 		this.rg = rg;
-		NicePanel panel = new NicePanel(Language.string("Report Chooser"), Language.string("Select a report to print"));
+		NicePanel panel = new NicePanel(Language.string("Custom Report"), Language.string("Print any report with custom data"));
 		panel.getBody().setLayout(new BorderLayout());
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
@@ -109,12 +110,16 @@ public class ReportChooser extends JPanel implements ActionListener {
 		gc.gridx++;
 		panel.add(reportsBox, gc);
 		
-		updateTable();
-		
 		gc.gridy++;
 		gc.gridx=0;
 		gc.gridwidth=2;
-		panel.add(new JTable(), gc);
+		tmodel = new DefaultTableModel(new String[]{Language.string("Key"),Language.string("Value")}, 2);
+		final JTable t = new JTable(tmodel);
+		final JScrollPane scrollpane = new JScrollPane(t);
+		scrollpane.setPreferredSize(new Dimension(400,250));
+		panel.add(scrollpane, gc);		
+
+		updateTable();
 		
 		return panel;
 	}
@@ -129,8 +134,12 @@ public class ReportChooser extends JPanel implements ActionListener {
     	JasperReport jr;
 		try {
 			jr = (JasperReport)JRLoader.loadObject(is);
+			while(tmodel.getRowCount()>0){
+				tmodel.removeRow(0);
+			}
 	    	for(JRField f : jr.getFields()){
-	    		System.out.println(f.getName());
+	    		//System.out.println(f.getName());
+	    		tmodel.addRow(new String[]{f.getName(), rg.getHead().get(f.getName())});
 	    	}
 		} catch (JRException e) {
 			e.printStackTrace();
