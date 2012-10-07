@@ -155,6 +155,12 @@ public class ReportChooser extends JPanel implements ActionListener {
 		dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		dialog.setVisible(true);
 	}
+	
+	private String getReportName(final String file){
+		final int p = file.lastIndexOf('.');
+		if(p<0) return file;
+		else return file.substring(0, p);
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent ev) {
@@ -162,7 +168,12 @@ public class ReportChooser extends JPanel implements ActionListener {
 		if(src==printButton){
 			String reportsPath = Configuration.getGlobal(REPORTS_PATH_KEY, REPORTS_PATH_DEF);
 			rg.setReport("/"+reportsPath+"/"+reportsBox.getSelectedItem());
-			ReportGeneratorGUI rggui = new ReportGeneratorGUI(rg, "testMe");
+			for(int i=0; i<tmodel.getRowCount(); ++i){
+				String k = (String)tmodel.getValueAt(i, 0);
+				String v = (String)tmodel.getValueAt(i, 1);
+				rg.setHeadValue(k, v);
+			}
+			ReportGeneratorGUI rggui = new ReportGeneratorGUI(rg, getReportName(reportsBox.getSelectedItem().toString()));
 			rggui.showGUI(((Window)SwingUtilities.getRoot(this)));
 		}else if(src==cancelButton){
 			((Window)SwingUtilities.getRoot(this)).dispose();
