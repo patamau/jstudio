@@ -8,15 +8,20 @@ import java.util.Collection;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
 
 import jstudio.control.Controller;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Person;
+import jstudio.report.ReportChooser;
+import jstudio.report.ReportGenerator;
 import jstudio.util.Language;
 import jstudio.util.Resources;
 
@@ -29,6 +34,8 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 	private static final Logger logger = LoggerFactory.getLogger(AddressBookPanel.class);
 
 	public static final String PIC_ADDRESSBOOK="personicon.png";
+	
+	private JButton printButton;
 	
 	public AddressBookPanel(Controller<Person> controller){
 		super(controller);
@@ -46,6 +53,10 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 		actionPanel.add(viewButton);
 		actionPanel.add(editButton);
 		actionPanel.add(deleteButton);
+		printButton = new JButton(Language.string("Print"));
+		printButton.setEnabled(false);
+		printButton.addActionListener(this);
+		actionPanel.add(printButton);
 		actionPanel.add(Box.createHorizontalGlue());
 		actionPanel.add(filterField);
 		actionPanel.setPreferredSize(new Dimension(0,25));
@@ -111,21 +122,27 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 		} else if(o==viewButton){
 			int row = table.convertRowIndexToModel(table.getSelectedRow());
 			if(row>=0){
-				logger.debug("ROW Selected "+row);
 				showEntity((Person)model.getValueAt(row, 0), false);
 				this.refresh();
 			}
 		} else if(o==editButton){
 			int row = table.convertRowIndexToModel(table.getSelectedRow());
 			if(row>=0){
-				logger.debug("ROW Selected "+row);
 				showEntity((Person)model.getValueAt(row, 0), true);
 				this.refresh();
 			}
+		} else if(o==printButton){
+			int row = table.convertRowIndexToModel(table.getSelectedRow());
+			if(row>=0){
+				ReportGenerator rg = new ReportGenerator();
+				rg.setHead((Person)model.getValueAt(row, 0));
+				ReportChooser rc = new ReportChooser(rg);
+				rc.showGUI(this.getController().getApplication().getGUI());
+			}
+			
 		} else if(o==deleteButton){
 			int row = table.convertRowIndexToModel(table.getSelectedRow());
 			if(row>=0){
-				logger.debug("ROW Selected "+row);
 				Person context = (Person)model.getValueAt(row, 0);
 				int ch = JOptionPane.showConfirmDialog(this, 
 						Language.string("Are you sure you want to remove {0} {1}?",context.getName(),context.getLastname()),
@@ -140,4 +157,17 @@ public class AddressBookPanel extends EntityManagerPanel<Person> {
 			logger.warn("Event source not mapped: "+o);
 		}
 	}
+	
+	public void valueChanged(ListSelectionEvent e) {
+        //Ignore extra messages.
+        if (e.getValueIsAdjusting()) return;		
+		super.valueChanged(e);
+
+        ListSelectionModel lsm = (ListSelectionModel)e.getSource();
+        if (lsm.isSelectionEmpty()) {
+            printButton.setEnabled(false);
+        } else {
+        	printButton.setEnabled(true);
+        }
+    }
 }
