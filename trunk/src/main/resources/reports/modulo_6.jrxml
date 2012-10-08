@@ -2,14 +2,10 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Modulo 11" pageWidth="595" pageHeight="842" columnWidth="341" leftMargin="127" rightMargin="127" topMargin="170" bottomMargin="170">
 	<property name="ireport.zoom" value="2.1961500000000007"/>
 	<property name="ireport.x" value="136"/>
-	<property name="ireport.y" value="510"/>
+	<property name="ireport.y" value="366"/>
 	<field name="date" class="java.lang.String"/>
 	<field name="name" class="java.lang.String"/>
 	<field name="lastname" class="java.lang.String"/>
-	<field name="birthplace" class="java.lang.String"/>
-	<field name="birthdate" class="java.lang.String"/>
-	<field name="city" class="java.lang.String"/>
-	<field name="address" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -51,7 +47,7 @@
 				<textElement verticalAlignment="Top">
 					<font size="12"/>
 				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA["                    Si certifica che il/la Sig./Sig.ra "+$F{lastname}+" "+$F{name}+", nato a "+$F{birthplace}+" il "+$F{birthdate}+" e residente a "+$F{city}+", "+$F{address}+" ha iniziato il trattamento ortodonziatico."]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA["                    Si certifica che il/la Sig./Sig.ra "+$F{lastname}+" "+$F{name}+", è stato/a sottoposto/a, in data odierna, ad intervento e necessita di 2 giorni di riposo."]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="233" y="89" width="108" height="25"/>
