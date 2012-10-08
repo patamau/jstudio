@@ -161,6 +161,14 @@ public class ReportChooser extends JPanel implements ActionListener {
 		if(p<0) return file;
 		else return file.substring(0, p);
 	}
+	
+	private void updateReportValues(){
+		for(int i=0; i<tmodel.getRowCount(); ++i){
+			String k = (String)tmodel.getValueAt(i, 0);
+			String v = (String)tmodel.getValueAt(i, 1);
+			rg.setHeadValue(k, v);
+		}
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent ev) {
@@ -168,16 +176,13 @@ public class ReportChooser extends JPanel implements ActionListener {
 		if(src==printButton){
 			String reportsPath = Configuration.getGlobal(REPORTS_PATH_KEY, REPORTS_PATH_DEF);
 			rg.setReport("/"+reportsPath+"/"+reportsBox.getSelectedItem());
-			for(int i=0; i<tmodel.getRowCount(); ++i){
-				String k = (String)tmodel.getValueAt(i, 0);
-				String v = (String)tmodel.getValueAt(i, 1);
-				rg.setHeadValue(k, v);
-			}
+			updateReportValues();
 			ReportGeneratorGUI rggui = new ReportGeneratorGUI(rg, getReportName(reportsBox.getSelectedItem().toString()));
 			rggui.showGUI(((Window)SwingUtilities.getRoot(this)));
 		}else if(src==cancelButton){
 			((Window)SwingUtilities.getRoot(this)).dispose();
 		}else if(src==reportsBox){
+			updateReportValues();
 			updateTable();
 		}
 	}
