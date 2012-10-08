@@ -4,7 +4,7 @@ Created-By: 1.6.0_31-b05 (Sun Microsystems Inc.)
 Built-By: Rogue
 Main-Class: jstudio.Main
 Implementation-Title: JStudio
-Implementation-Version: 28
+Implementation-Version: 29
 Implementation-Vendor: Matteo Pedrotti (patamau@gmail.com)
-Built-Date: 2012-10-08 11:33:19
+Built-Date: 2012-10-08 23:28:10
 
