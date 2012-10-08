@@ -287,9 +287,6 @@ public class ReportGenerator {
         }
 		JasperPrint print = JasperFillManager.fillReport(is, null, getDataSource()); 
     	JasperReport report = (JasperReport) JRLoader.loadObject(getClass().getResourceAsStream(reportName));
-    	for(JRField p: report.getFields()){
-    		logger.debug(p.getName());
-    	}
 		return JasperPrintManager.printPageToImage(print, 0, 1.0f);
 	}
 	

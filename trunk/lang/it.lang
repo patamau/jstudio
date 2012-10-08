@@ -1,11 +1,12 @@
 #italiano it - v.0.3
-#Wed Oct 03 21:57:19 CEST 2012
+#Mon Oct 08 22:45:46 CEST 2012
 Driver\:=Driver\:
 Extensions\ added\ automatically=Estensioni aggiunte automaticamente
 Invoice\ id\ error=Id fattura errato
 Configuration=Configurazione
 Backup...=Backup...
 Value=Value
+Select\ at\ least\ one\ print\ option\ to\ print\ the\ report=Select at least one print option to print the report
 A\ file\ with\ the\ same\ name\ already\ exists\:\ are\ you\ sure\ you\ want\ to\ overwrite?=Un file con lo stesso nome gi\u00E0 esiste\: sei sicuro di sovrascrivere?
 Write\ error=Errore di scrittura
 Next\ month=Prossimo mese
@@ -52,8 +53,8 @@ Phone=Telefono
 Province=Provincia
 Connection\ details=Dettagli connessione
 N/A=N/A
-Key=Key
 Gender=Sesso
+Key=Key
 Ok=Ok
 Number=Numero
 Custom\ Report=Custom Report
@@ -131,6 +132,7 @@ Tools=Strumenti
 Report\ Chooser=Report Chooser
 Advanced\ options...=Opzioni avanzate...
 >>=>>
+Select\ print\ options=Select print options
 Send\ to\ printer=Invio alla stampante
 Events\ pruned=Eventi eliminati
 Product\ dialog=Interfaccia Prodotto
