@@ -101,7 +101,7 @@ public class ReportGenerator {
 		set.add(p2);
 		i.setProducts(set);
 		rg.setHead(i);
-		rg.setHeadValue("note", "Questa fattura è conforme agli standard 675/10");
+		rg.setHeadValue("note", "Questa fattura e' conforme agli standard 675/10");
 		//rg.setData(i.getProducts());
 		for(Product pe: i.getProducts()){
 			rg.addData(pe.getPrintData());

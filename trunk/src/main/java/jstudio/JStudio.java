@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class JStudio implements UncaughtExceptionHandler{
 
 	public static final String 
-		VERSION = "0.1a",
+		VERSION = "0.2a",
 		BUILD = JStudio.class.getPackage().getImplementationVersion(),
 		AUTHOR = JStudio.class.getPackage().getImplementationVendor(),
 		SPLASH_SCREEN = "splash.png",
