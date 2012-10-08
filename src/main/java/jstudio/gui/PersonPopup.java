@@ -1,21 +1,45 @@
 package jstudio.gui;
 
+import java.awt.Font;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JDialog;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JSeparator;
 
 import jstudio.control.Controller;
 import jstudio.gui.generic.ContextualMenu;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.model.Person;
+import jstudio.report.ReportChooser;
+import jstudio.report.ReportGenerator;
 import jstudio.util.Language;
+
+import org.apache.log4j.Logger;
 
 @SuppressWarnings("serial")
 public class PersonPopup extends ContextualMenu<Person> {
 	
+	private static final Logger logger = Logger.getLogger(PersonPopup.class);
+	
+	private JMenuItem printItem;
+	
 	public PersonPopup(EntityManagerPanel<Person> parent, Controller<Person> controller){
 		super(parent);
+		this.remove(newItem);
+		printItem = new JMenuItem(Language.string("Print..."));
+	    printItem.setFont(deleteItem.getFont().deriveFont(Font.PLAIN));
+	    printItem.addActionListener(this);
+	    this.add(printItem);
+		this.add(new JSeparator());
+		this.add(newItem);
+	}
+	
+	public void setContext(Person p){
+		super.setContext(p);
+		printItem.setEnabled(p!=null);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -38,6 +62,12 @@ public class PersonPopup extends ContextualMenu<Person> {
 		}else if(o==newItem){
 			JDialog dialog = new PersonPanel(new Person(0l), parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
+		}else if(o==printItem){
+			if(context==null) logger.error("No such context");
+			ReportGenerator rg = new ReportGenerator();
+			rg.setHead(context);
+			ReportChooser rc = new ReportChooser(rg);
+			rc.showGUI((Window)parent.getTopLevelAncestor());
 		}
 	}
 
