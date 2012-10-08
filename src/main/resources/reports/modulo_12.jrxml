@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Modulo 12" pageWidth="595" pageHeight="842" columnWidth="341" leftMargin="127" rightMargin="127" topMargin="170" bottomMargin="170">
+	<property name="ireport.zoom" value="2.1961500000000007"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="414"/>
+	<field name="date" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="lastname" class="java.lang.String"/>
+	<field name="birthplace" class="java.lang.String"/>
+	<field name="birthdate" class="java.lang.String"/>
+	<field name="city" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="78" splitType="Stretch">
+			<staticText>
+				<reportElement x="186" y="22" width="47" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Trento,]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="233" y="22" width="108" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{date}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="170" splitType="Stretch">
+			<staticText>
+				<reportElement x="233" y="145" width="108" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Dott. Danilo Motta]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="0" width="341" height="62"/>
+				<textElement verticalAlignment="Top">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["                    Si dichiara che il/la Sig./Sig.ra "+$F{lastname}+" "+$F{name}+", nato/a a "+$F{birthplace}+" il "+$F{birthdate}+" e residente a "+$F{city}+", "+$F{address}+", ha terminato la prima fase del trattamento ortodontico."]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="233" y="120" width="108" height="25"/>
+				<textElement verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[In fede]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="62" width="341" height="47"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[                     Al momento dell'eruzione dei canini permanenti si renderà necessaria l'applicazione di un ulteriore apparecchio della durata di un anno e mezzo circa.]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

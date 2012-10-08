@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.InputStream;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -60,7 +61,7 @@ public class ReportChooser extends JPanel implements ActionListener {
 		REPORTS_PATH_DEF = "reports",
 		REPORTS_SUFFIX_DEF = ".jasper";
 	
-	private final JButton printButton, cancelButton;	
+	private final JButton printButton, cancelButton, rrefreshButton;	
 	private JComboBox reportsBox;
 	private DefaultTableModel tmodel;
 	
@@ -72,6 +73,9 @@ public class ReportChooser extends JPanel implements ActionListener {
 		panel.getBody().setLayout(new BorderLayout());
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
+		
+		rrefreshButton = new JButton(Language.string("Refresh"));
+		rrefreshButton.addActionListener(this);
 		
 		panel.getBody().add(getBody(), BorderLayout.CENTER);
 		
@@ -85,12 +89,26 @@ public class ReportChooser extends JPanel implements ActionListener {
 		panel.addButton(cancelButton);
 	}
 	
+	private void updateReports(){
+		DefaultComboBoxModel model = (DefaultComboBoxModel)reportsBox.getModel();
+		model.removeAllElements();
+		
+		String reportsPath = Configuration.getGlobal(REPORTS_PATH_KEY, REPORTS_PATH_DEF);
+		String reportsSuffix = Configuration.getGlobal(REPORTS_SUFFIX_KEY, REPORTS_SUFFIX_DEF);
+		File[] files = Resources.getFiles(reportsPath, reportsSuffix);
+		int i=0;
+		for(File f:files){
+			model.addElement(f.getName());
+		}
+	}
+	
 	private JPanel getBody(){
 		JPanel panel = new JPanel(new GridBagLayout());
 		GridBagConstraints gc = new GridBagConstraints();
 		gc.gridx=gc.gridy=0;
 		gc.gridheight=gc.gridwidth=1;
 		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.weightx=0f;
 		gc.insets=new Insets(4,4,4,4);
 		
 		panel.add(new JLabel(Language.string("Report")), gc);
@@ -108,11 +126,18 @@ public class ReportChooser extends JPanel implements ActionListener {
 		reportsBox.addActionListener(this);
 		
 		gc.gridx++;
+		gc.weightx=1f;
 		panel.add(reportsBox, gc);
+		gc.gridx++;
+		gc.weightx=0f;
+		gc.fill=GridBagConstraints.NONE;
+		panel.add(rrefreshButton, gc);
 		
 		gc.gridy++;
 		gc.gridx=0;
-		gc.gridwidth=2;
+		gc.weightx=1f;
+		gc.fill=GridBagConstraints.HORIZONTAL;
+		gc.gridwidth=3;
 		tmodel = new DefaultTableModel(new String[]{Language.string("Key"),Language.string("Value")}, 2);
 		final JTable t = new JTable(tmodel);
 		final JScrollPane scrollpane = new JScrollPane(t);
@@ -124,23 +149,31 @@ public class ReportChooser extends JPanel implements ActionListener {
 		return panel;
 	}
 	
-	private void updateTable(){
+	private JasperReport getReport(final String filename) throws JRException {
+		if(filename==null) return null;
 		String reportsPath = Configuration.getGlobal(REPORTS_PATH_KEY, REPORTS_PATH_DEF);
-		String reportsName = "/"+reportsPath+"/"+reportsBox.getSelectedItem();
+		String reportsName = "/"+reportsPath+"/"+filename;
 		InputStream is = getClass().getResourceAsStream(reportsName);
         if(is==null){
         	throw new RuntimeException("No such report "+reportsName);
         }
-    	JasperReport jr;
+    	return (JasperReport)JRLoader.loadObject(is);
+	}
+	
+	private void updateTable(){
 		try {
-			jr = (JasperReport)JRLoader.loadObject(is);
+			JasperReport jr = getReport((String)reportsBox.getSelectedItem());
+			if(jr==null) return;
 			while(tmodel.getRowCount()>0){
 				tmodel.removeRow(0);
 			}
-	    	for(JRField f : jr.getFields()){
-	    		//System.out.println(f.getName());
-	    		tmodel.addRow(new String[]{f.getName(), rg.getHead().get(f.getName())});
-	    	}
+			System.err.println(jr.getName());
+			if(jr.getFields()!=null){
+		    	for(JRField f : jr.getFields()){
+		    		//System.out.println(f.getName());
+		    		tmodel.addRow(new String[]{f.getName(), rg.getHead().get(f.getName())});
+		    	}
+			}
 		} catch (JRException e) {
 			e.printStackTrace();
 		}
@@ -156,10 +189,18 @@ public class ReportChooser extends JPanel implements ActionListener {
 		dialog.setVisible(true);
 	}
 	
-	private String getReportName(final String file){
-		final int p = file.lastIndexOf('.');
-		if(p<0) return file;
-		else return file.substring(0, p);
+	private String getReportName(final String report){
+		try{
+			return getReport(report).getName();
+		}catch(JRException e){
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private String getPrintName(final String report){
+		final int p = report.lastIndexOf('.');
+		if(p<0) return report;
+		else return report.substring(0, p);
 	}
 	
 	private void updateReportValues(){
@@ -177,13 +218,15 @@ public class ReportChooser extends JPanel implements ActionListener {
 			String reportsPath = Configuration.getGlobal(REPORTS_PATH_KEY, REPORTS_PATH_DEF);
 			rg.setReport("/"+reportsPath+"/"+reportsBox.getSelectedItem());
 			updateReportValues();
-			ReportGeneratorGUI rggui = new ReportGeneratorGUI(rg, getReportName(reportsBox.getSelectedItem().toString()));
+			ReportGeneratorGUI rggui = new ReportGeneratorGUI(rg, getPrintName((String)reportsBox.getSelectedItem()));
 			rggui.showGUI(((Window)SwingUtilities.getRoot(this)));
 		}else if(src==cancelButton){
 			((Window)SwingUtilities.getRoot(this)).dispose();
 		}else if(src==reportsBox){
 			updateReportValues();
 			updateTable();
+		}else if(src==rrefreshButton){
+			updateReports();
 		}
 	}
 }
