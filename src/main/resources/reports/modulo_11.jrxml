@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Modulo 11" pageWidth="595" pageHeight="842" columnWidth="341" leftMargin="127" rightMargin="127" topMargin="170" bottomMargin="170">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Certificato inizio trattamento" pageWidth="595" pageHeight="842" columnWidth="341" leftMargin="127" rightMargin="127" topMargin="170" bottomMargin="170">
 	<property name="ireport.zoom" value="2.1961500000000007"/>
 	<property name="ireport.x" value="136"/>
-	<property name="ireport.y" value="510"/>
+	<property name="ireport.y" value="366"/>
 	<field name="date" class="java.lang.String"/>
 	<field name="name" class="java.lang.String"/>
 	<field name="lastname" class="java.lang.String"/>

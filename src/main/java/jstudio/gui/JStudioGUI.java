@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Date;
 
 import javax.swing.Box;
 import javax.swing.JFrame;
@@ -21,6 +22,9 @@ import org.apache.log4j.Logger;
 import jstudio.JStudio;
 import jstudio.db.DatabaseObject;
 import jstudio.gui.generic.EntityManagerPanel;
+import jstudio.model.Invoice;
+import jstudio.report.ReportChooser;
+import jstudio.report.ReportGenerator;
 import jstudio.util.Configuration;
 import jstudio.util.ConfigurationDialog;
 import jstudio.util.Language;
@@ -49,6 +53,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		connectionItem,
 		exitItem;
 	private JMenuItem
+		customPrintItem,
 		pruneItem,
 		backupItem,
 		restoreItem,
@@ -118,6 +123,10 @@ public class JStudioGUI extends JFrame implements ActionListener {
 		
 		//create tools menu		
 		JMenu toolsMenu = new JMenu(Language.string("Tools"));		
+		customPrintItem = new JMenuItem(Language.string("Custom print..."));
+		customPrintItem.addActionListener(this);
+		toolsMenu.add(customPrintItem);
+		toolsMenu.add(new JSeparator());
 		pruneItem = new JMenuItem(Language.string("Prune..."));
 		pruneItem.addActionListener(this);
 		toolsMenu.add(pruneItem);
@@ -181,6 +190,11 @@ public class JStudioGUI extends JFrame implements ActionListener {
 			this.dispose();
 		}else if(src==aboutItem){
 			JOptionPane.showMessageDialog(this, JStudio.class.getSimpleName()+" "+JStudio.VERSION+" ("+JStudio.BUILD+")\n"+JStudio.AUTHOR, JStudio.class.getSimpleName(), JOptionPane.INFORMATION_MESSAGE);
+		}else if(src==customPrintItem){
+			ReportGenerator rg = new ReportGenerator();
+			rg.setHeadValue("date", Invoice.dateFormat.format(new Date()));
+			ReportChooser rc = new ReportChooser(rg);
+			rc.showGUI(this);
 		}
 	}
 	
