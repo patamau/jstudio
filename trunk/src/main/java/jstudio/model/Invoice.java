@@ -11,6 +11,7 @@ import java.util.TreeSet;
 
 import jstudio.db.DatabaseObject;
 import jstudio.util.Configuration;
+import jstudio.util.Language;
 
 public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	
@@ -233,7 +234,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		map.put("city",city);
 		map.put("province",province);
 		map.put("stamp", Product.formatCurrency(stamp));
-		map.put("note", note);
+		map.put("note", Language.string(note));
 		return map;
 	}
 }

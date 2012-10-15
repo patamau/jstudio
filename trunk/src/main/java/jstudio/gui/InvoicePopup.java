@@ -71,7 +71,7 @@ public class InvoicePopup extends ContextualMenu<Invoice> {
 			rg.setReport(Configuration.getGlobal(InvoicePanel.INVOICE_REPORT, InvoicePanel.INVOICE_REPORT_DEF));
 			rg.setHead(context);
 			rg.setHeadValue("date", Person.birthdateFormat.format(context.getDate()));
-			rg.setHeadValue("note", context.getNote());
+			rg.setHeadValue("note", Language.string(context.getNote()));
 			rg.setData(context.getProducts());
 			rg.setHeadValue("stamp", Product.formatCurrency(context.getStamp()));
 			float tot = 0f;

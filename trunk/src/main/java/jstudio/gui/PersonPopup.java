@@ -3,6 +3,7 @@ package jstudio.gui;
 import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.util.Date;
 
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
@@ -12,6 +13,7 @@ import javax.swing.JSeparator;
 import jstudio.control.Controller;
 import jstudio.gui.generic.ContextualMenu;
 import jstudio.gui.generic.EntityManagerPanel;
+import jstudio.model.Invoice;
 import jstudio.model.Person;
 import jstudio.report.ReportChooser;
 import jstudio.report.ReportGenerator;
@@ -37,10 +39,12 @@ public class PersonPopup extends ContextualMenu<Person> {
 		this.add(newItem);
 	}
 	
+	/*
 	public void setContext(Person p){
 		super.setContext(p);
 		printItem.setEnabled(p!=null);
 	}
+	*/
 
 	public void actionPerformed(ActionEvent e) {
 		Object o = e.getSource();
@@ -63,9 +67,9 @@ public class PersonPopup extends ContextualMenu<Person> {
 			JDialog dialog = new PersonPanel(new Person(0l), parent, true).createDialog(parent.getTopLevelAncestor());
 			dialog.setVisible(true);
 		}else if(o==printItem){
-			if(context==null) logger.error("No such context");
 			ReportGenerator rg = new ReportGenerator();
-			rg.setHead(context);
+			if(context!=null) rg.setHead(context);
+			rg.setHeadValue("date", Invoice.dateFormat.format(new Date()));
 			ReportChooser rc = new ReportChooser(rg);
 			rc.showGUI((Window)parent.getTopLevelAncestor());
 		}
