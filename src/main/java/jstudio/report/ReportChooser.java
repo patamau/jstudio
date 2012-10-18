@@ -23,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -72,6 +73,7 @@ public class ReportChooser extends JPanel implements ActionListener {
 	
 	private final JButton printButton, cancelButton, rrefreshButton;	
 	private JComboBox reportsBox;
+	private JTable table;
 	private DefaultTableModel tmodel;
 	private final ArrayList<String> filenames;
 	
@@ -143,8 +145,8 @@ public class ReportChooser extends JPanel implements ActionListener {
 		gc.fill=GridBagConstraints.HORIZONTAL;
 		gc.gridwidth=3;
 		tmodel = new ReportDataModel(new String[]{Language.string("Key"),Language.string("Value")}, 2);
-		final JTable t = new JTable(tmodel);
-		final JScrollPane scrollpane = new JScrollPane(t);
+		table = new JTable(tmodel);
+		final JScrollPane scrollpane = new JScrollPane(table);
 		scrollpane.setPreferredSize(new Dimension(400,250));
 		panel.add(scrollpane, gc);		
 
@@ -178,7 +180,9 @@ public class ReportChooser extends JPanel implements ActionListener {
 			if(jr.getFields()!=null){
 		    	for(JRField f : jr.getFields()){
 		    		//System.out.println(f.getName());
-		    		tmodel.addRow(new String[]{f.getName(), rg.getHead().get(f.getName())});
+		    		String val = rg.getHead().get(f.getName());
+		    		if(val==null) val = "";
+		    		tmodel.addRow(new String[]{f.getName(), val});
 		    	}
 			}
 		} catch (JRException e) {
@@ -211,6 +215,11 @@ public class ReportChooser extends JPanel implements ActionListener {
 	}
 	
 	private void updateReportValues(){
+		TableCellEditor editor = table.getCellEditor();
+		if (editor != null) {
+		  editor.stopCellEditing();
+		}
+		
 		for(int i=0; i<tmodel.getRowCount(); ++i){
 			String k = (String)tmodel.getValueAt(i, 0);
 			String v = (String)tmodel.getValueAt(i, 1);
@@ -233,6 +242,7 @@ public class ReportChooser extends JPanel implements ActionListener {
 			updateReportValues();
 			updateTable();
 		}else if(src==rrefreshButton){
+			updateReportValues();
 			updateReports();
 		}
 	}

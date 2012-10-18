@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Azitro + Dentosan" pageWidth="595" pageHeight="842" columnWidth="341" leftMargin="127" rightMargin="127" topMargin="170" bottomMargin="170">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Naproxene" pageWidth="595" pageHeight="842" columnWidth="341" leftMargin="127" rightMargin="127" topMargin="170" bottomMargin="170">
 	<property name="ireport.zoom" value="2.1961500000000007"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="250"/>
 	<property name="ireport.y" value="366"/>
 	<field name="date" class="java.lang.String"/>
 	<field name="name" class="java.lang.String"/>
@@ -40,14 +40,14 @@
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[pr. azitromicina 500 mg]]></text>
+				<text><![CDATA[pr. naproxene 550mg bustine]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="36" y="40" width="305" height="20"/>
 				<textElement>
 					<font size="12"/>
 				</textElement>
-				<text><![CDATA[s. 1 al giorno per 3 giorni]]></text>
+				<text><![CDATA[s. 1 bustina al bisogno]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="233" y="159" width="108" height="25"/>
@@ -63,20 +63,6 @@
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA["Sig./Sig.ra "+$F{lastname}+" "+$F{name}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="0" y="80" width="341" height="20"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[pr. Dentosan colluttorio con clorexidina al 0,2%]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="36" y="100" width="305" height="20"/>
-				<textElement>
-					<font size="12"/>
-				</textElement>
-				<text><![CDATA[via orale]]></text>
-			</staticText>
 		</band>
 	</detail>
 </jasperReport>
