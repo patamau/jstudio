@@ -39,11 +39,14 @@ import jstudio.model.Event;
 public class GUITool {
 	
 	public static void main(String args[]){
+		SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm");
+		
 		JFrame frame = new JFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		GridBagConstraints gc = new GridBagConstraints();
 		frame.getContentPane().setLayout(new GridBagLayout());		
 		frame.getContentPane().add(GUITool.createTimeSpinner(frame.getContentPane(), gc, "Time", new Date(), true));
+		frame.getContentPane().add(GUITool.createTimeField(frame.getContentPane(), gc, "Time", new Date(), true, timeFormat));
 		
 		//Add the third label-spinner pair.
 		Calendar calendar = Calendar.getInstance();
@@ -308,6 +311,46 @@ public class GUITool {
 		public void keyReleased(KeyEvent e) {}
 	}
 	
+	private static class TimeKeyListener implements KeyListener {
+		final JTextField field;
+		public TimeKeyListener(final JTextField f){
+			this.field = f;
+		}
+		@Override
+		public void keyTyped(KeyEvent e){
+			e.consume();
+			char ch = e.getKeyChar();
+			int pos = field.getCaretPosition();
+			if(KeyEvent.VK_BACK_SPACE==ch){
+				field.setText(field.getText().substring(0,pos));
+				return;
+			}
+			if(pos==2){
+				if(Character.isDigit(ch)){
+					field.setText(field.getText().substring(0, pos)+':'+ch);
+					pos+=2;
+				}else{
+					field.setText(field.getText().substring(0, pos)+':');
+					pos++;
+				}
+				field.setCaretPosition(pos);
+			}else if(pos<5){
+				if(Character.isDigit(ch)){
+					field.setText(field.getText().substring(0,pos)+ch);
+				}else if(pos==1){
+					field.setText('0'+field.getText().substring(0,pos)+':');
+					field.setCaretPosition(3);
+				}
+			}
+		}
+		@Override
+		public void keyPressed(KeyEvent e) {
+		}
+		@Override
+		public void keyReleased(KeyEvent e) {
+		}
+	}
+	
 	private static class DateKeyListener implements KeyListener {
 		final JTextField field;
 		public DateKeyListener(final JTextField f){
@@ -476,6 +519,50 @@ public class GUITool {
 		gc.fill=GridBagConstraints.NONE;
 		gc.weightx=0.0f;
 		gc.gridx=px;
+		gc.gridwidth=ow;
+		return f;
+	}
+	
+	public static JTextField createTimeField(final Container c, GridBagConstraints gc, String label, Date value, boolean editable, final SimpleDateFormat timeFormat){
+		final JTextField f = new JTextField(timeFormat.format(value));
+		if(editable){
+			f.addKeyListener(new TimeKeyListener(f));
+			f.addFocusListener(new FocusListener(){
+				@Override
+				public void focusGained(FocusEvent e){
+					f.setCaretPosition(0);
+					f.setBackground(Color.white);
+				}
+				@Override
+				public void focusLost(FocusEvent e){
+					try {
+						Date d = timeFormat.parse(f.getText());
+						Calendar c = Calendar.getInstance();
+						c.setTime(d);
+						f.setText(timeFormat.format(c.getTime()));
+					} catch (ParseException e1) {
+						f.setBackground(Color.orange);
+					}
+				}
+			});
+		}
+		f.setEditable(editable);
+		f.setColumns(10);
+		gc.gridy++;
+		gc.anchor = GridBagConstraints.EAST;
+		JLabel l = new JLabel(label, JLabel.RIGHT);
+		c.add(l, gc);
+		gc.anchor = GridBagConstraints.WEST;
+		gc.fill = GridBagConstraints.HORIZONTAL;
+		gc.weightx = 1.0f;
+		int ow = gc.gridwidth;
+		gc.gridwidth=2;
+		int px = gc.gridx;
+		gc.gridx++;
+		c.add(f, gc);
+		gc.fill = GridBagConstraints.NONE;
+		gc.weightx = 0.0f;
+		gc.gridx = px;
 		gc.gridwidth=ow;
 		return f;
 	}

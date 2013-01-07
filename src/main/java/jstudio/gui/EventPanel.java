@@ -36,7 +36,8 @@ public class EventPanel extends EntityPanel<Event> {
 		nameField,
 		lastnameField,
 		phoneField;
-	private JSpinner timeSpinner;
+	//private JSpinner timeSpinner;
+	private JTextField timeField;
 	private JTextArea descriptionArea;
 	private JButton okButton, cancelButton, closeButton, deleteButton, editButton, viewButton;;
 	private JButton pickPersonButton;
@@ -58,9 +59,12 @@ public class EventPanel extends EntityPanel<Event> {
 				Language.string("Date"), 
 				this.entity.getDate(), editable,
 				Person.birthdateFormat);
+		/*
 		timeSpinner = GUITool.createTimeSpinner(panel.getBody(), gc, 
 				Language.string("Time"), 
 				this.entity.getDate(), editable);
+		*/
+		timeField = GUITool.createTimeField(panel.getBody(), gc, Language.string("Time"), this.entity.getDate(), editable, Event.timeFormat);
 		if(editable){
 			pickPersonButton = GUITool.createButton(panel.getBody(), gc, 
 				Language.string("Pick"), this);
@@ -121,11 +125,11 @@ public class EventPanel extends EntityPanel<Event> {
 			return false;
 		}
 		try {
-			Date t = Event.timeFormat.parse((String)timeSpinner.getValue());
+			Date t = Event.timeFormat.parse(timeField.getText());
 			ct.setTime(t);
 			logger.debug("Time is "+Event.timeFormat.format(ct.getTime()));
 		} catch (ParseException e1) {
-			String msg = Language.string("Wrong date format for {0}, expected {1}",timeSpinner.getValue(),Event.timeFormat.toPattern());
+			String msg = Language.string("Wrong date format for {0}, expected {1}",timeField.getText(),Event.timeFormat.toPattern());
 			JOptionPane.showMessageDialog(this, msg, Language.string("Date format error"),JOptionPane.ERROR_MESSAGE);
 			return false;
 		}
@@ -148,7 +152,7 @@ public class EventPanel extends EntityPanel<Event> {
 		if(!entity.getLastname().equals(lastnameField.getText())) return true;
 		if(!entity.getDescription().equals(descriptionArea.getText())) return true;
 		if(!Person.birthdateFormat.format(entity.getDate()).equals(dateField.getText())) return true;
-		if(!Event.timeFormat.format(entity.getDate()).equals(timeSpinner.getValue())) return true;
+		if(!Event.timeFormat.format(entity.getDate()).equals(timeField.getText())) return true;
 		if(!entity.getPhone().equals(phoneField.getText())) return true;
 		return false;
 	}
