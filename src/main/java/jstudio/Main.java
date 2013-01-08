@@ -43,6 +43,11 @@ public class Main {
 		if(opts.isSet(DEBUG_OPT)){
 			//force debug and enable console
 			root.addAppender(new ConsoleAppender(new PatternLayout(LOG_PATTERN)));
+			try{
+				root.addAppender(new FileAppender(new PatternLayout(LOG_PATTERN), LOG_FILE, false));
+			}catch(IOException e){
+				JOptionPane.showMessageDialog(null, "File log error "+e.getMessage()+". Using console...", "Log Error", JOptionPane.ERROR_MESSAGE);
+			}
 			root.setLevel(Level.DEBUG);
 			Logger.getLogger("org.hibernate").setLevel(Level.INFO);
 			//this will help find errors
