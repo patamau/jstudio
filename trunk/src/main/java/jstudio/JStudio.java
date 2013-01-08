@@ -8,9 +8,11 @@ import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.Date;
 
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JWindow;
+import javax.swing.ProgressMonitor;
 
 import jstudio.control.Accounting;
 import jstudio.control.AddressBook;
@@ -307,7 +309,7 @@ public class JStudio implements UncaughtExceptionHandler{
 			gui.setStatusLabel(Language.string("Restore canceled by user"));
 			return;
 		}
-		File f = fc.getSelectedFile();
+		final File f = fc.getSelectedFile();
 		if(!f.exists()||!f.canRead()){
 			gui.setStatusLabel(Language.string("Unable to access {0}",f.getName()));
 			JOptionPane.showMessageDialog(gui, 
@@ -316,13 +318,28 @@ public class JStudio implements UncaughtExceptionHandler{
 					JOptionPane.ERROR_MESSAGE);
 		}else{
 			if(doClear()){
-				try {
-					database.restore(f);
-					gui.setStatusLabel(Language.string("Database restored from {0}",f.getName()));
-				} catch (Exception e) {
-					gui.setStatusLabel(Language.string("Restore error"));
-					JOptionPane.showMessageDialog(gui, e.getLocalizedMessage(), Language.string("Restore error"), JOptionPane.ERROR_MESSAGE);
-				}
+				final JDialog progressMonitor = new JDialog(gui);
+				progressMonitor.setTitle(Language.string("Restore in progress..."));
+				progressMonitor.setModal(true);
+				final Thread t = new Thread(new Runnable(){
+					public void run(){
+						progressMonitor.setVisible(true);
+					}
+				});
+				t.start();
+				final Thread r = new Thread(new Runnable(){
+					public void run(){
+						try {
+							database.restore(f);
+							t.interrupt();
+							gui.setStatusLabel(Language.string("Database restored from {0}",f.getName()));
+						} catch (Exception e) {
+							gui.setStatusLabel(Language.string("Restore error"));
+							JOptionPane.showMessageDialog(gui, e.getLocalizedMessage(), Language.string("Restore error"), JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				});
+				r.start();
 			}
 		}
 	}
