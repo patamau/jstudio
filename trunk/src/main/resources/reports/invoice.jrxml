@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Fattura" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="303"/>
+	<property name="ireport.y" value="0"/>
 	<style name="table" isDefault="false">
 		<box>
 			<pen lineWidth="1.0" lineColor="#999999"/>
@@ -52,75 +52,77 @@
 			<staticText>
 				<reportElement x="0" y="0" width="281" height="24"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="18" isBold="true"/>
+					<font size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Dott. Danilo Motta]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="24" width="281" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10"/>
+					<font size="8"/>
 				</textElement>
 				<text><![CDATA[MEDICO CHIRURGO]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="37" width="281" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10"/>
+					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Specialista in odontoiatria e protesi dentaria]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="50" width="281" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10"/>
+					<font size="8"/>
 				</textElement>
 				<text><![CDATA[specialista in chirurgia maxillo - facciale]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="63" width="281" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10"/>
+					<font size="8"/>
 				</textElement>
 				<text><![CDATA[specialista in ortognatodonzia]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="76" width="281" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10"/>
+					<font size="8"/>
 				</textElement>
 				<text><![CDATA[Via Piave, 28 - Tel. 0461/92.32.36]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="89" width="281" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10" isBold="false"/>
+					<font size="8" isBold="true"/>
 				</textElement>
 				<text><![CDATA[38122 TRENTO]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="102" width="281" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10" isBold="false"/>
+					<font size="8" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Codice fiscale MTTDNL52C13H612L]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="115" width="281" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10" isBold="false"/>
+					<font size="8" isBold="false"/>
 				</textElement>
 				<text><![CDATA[Partita I.V.A. 00848280228]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="155" y="155" width="126" height="20"/>
-				<textElement verticalAlignment="Bottom"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="14"/>
+				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{number}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="0" y="155" width="112" height="24"/>
-				<textElement verticalAlignment="Middle">
-					<font size="18" isBold="true"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
 				</textElement>
 				<text><![CDATA[FATTURA]]></text>
 			</staticText>
@@ -140,7 +142,9 @@
 			</staticText>
 			<textField>
 				<reportElement x="155" y="175" width="126" height="20"/>
-				<textElement verticalAlignment="Bottom"/>
+				<textElement verticalAlignment="Bottom">
+					<font size="14"/>
+				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{date}]]></textFieldExpression>
 			</textField>
 			<staticText>
@@ -226,13 +230,13 @@
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{cost}]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement x="1" y="20" width="554" height="1" forecolor="#999999"/>
+				<reportElement x="1" y="20" width="554" height="1" forecolor="#CCCCCC"/>
 			</line>
 			<line>
-				<reportElement x="450" y="15" width="1" height="5" forecolor="#999999"/>
+				<reportElement x="450" y="15" width="1" height="5" forecolor="#CCCCCC"/>
 			</line>
 			<line>
-				<reportElement x="402" y="15" width="1" height="5" forecolor="#999999"/>
+				<reportElement x="402" y="15" width="1" height="5" forecolor="#CCCCCC"/>
 			</line>
 		</band>
 	</detail>
