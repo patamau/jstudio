@@ -1,5 +1,12 @@
 package jstudio;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -8,11 +15,13 @@ import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
 import java.util.Date;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JProgressBar;
 import javax.swing.JWindow;
-import javax.swing.ProgressMonitor;
 
 import jstudio.control.Accounting;
 import jstudio.control.AddressBook;
@@ -322,16 +331,62 @@ public class JStudio implements UncaughtExceptionHandler{
 				progressMonitor.setTitle(Language.string("Restore in progress..."));
 				progressMonitor.setModal(true);
 				final Thread t = new Thread(new Runnable(){
-					public void run(){
+					public void run(){						
 						progressMonitor.setVisible(true);
+						logger.debug("Progress monitor window was closed");
 					}
 				});
+				final Thread w = new Thread(new Runnable(){
+					public void run(){
+						JLabel status = new JLabel(Language.string("Loading {0}...",f.getName()));
+						progressMonitor.setLayout(new GridBagLayout());
+						GridBagConstraints gc = new GridBagConstraints();
+						gc.insets = new Insets(5,5,5,5);
+						gc.gridx=gc.gridy=0;
+						gc.weightx=1.0f;
+						gc.fill=GridBagConstraints.HORIZONTAL;
+						status.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+						status.setHorizontalAlignment(JLabel.CENTER);
+						progressMonitor.add(status, gc);
+						gc.gridy++;
+						JProgressBar progressBar = new JProgressBar(JProgressBar.HORIZONTAL, 100);
+						progressBar.setIndeterminate(true);
+						progressBar.setStringPainted(true);
+						progressMonitor.add(progressBar, gc);
+						JButton closeButton = new JButton(Language.string("Close"));
+						closeButton.addActionListener(new ActionListener(){
+							public void actionPerformed(ActionEvent e) {
+								progressMonitor.dispose();
+							}
+						});
+						closeButton.setEnabled(false);
+						gc.gridy++;
+						progressMonitor.add(closeButton, gc);
+						progressMonitor.setResizable(false);
+						progressMonitor.setSize(400, 250);
+						progressMonitor.setLocationRelativeTo(gui);
+						for(int i=0; ; ++i){
+							//progressBar.setValue(i%100);
+							try{
+								Thread.sleep(500);
+							}catch(InterruptedException e){
+								break;
+							}
+						}
+						logger.debug("Progress monitor thread interrupted");
+						progressBar.setIndeterminate(false);
+						progressBar.setValue(100);
+						status.setText(Language.string("Finished loading {0}",f.getName()));
+						closeButton.setEnabled(true);
+					}
+				});
+				w.start();
 				t.start();
 				final Thread r = new Thread(new Runnable(){
 					public void run(){
 						try {
 							database.restore(f);
-							t.interrupt();
+							w.interrupt();
 							gui.setStatusLabel(Language.string("Database restored from {0}",f.getName()));
 						} catch (Exception e) {
 							gui.setStatusLabel(Language.string("Restore error"));
@@ -340,6 +395,7 @@ public class JStudio implements UncaughtExceptionHandler{
 					}
 				});
 				r.start();
+				gui.setStatusLabel(Language.string("Started restore from {0}",f.getName()));
 			}
 		}
 	}
