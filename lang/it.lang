@@ -1,5 +1,5 @@
 #italiano it - v.0.3
-#Mon Oct 15 22:13:27 CEST 2012
+#Mon Jul 01 00:39:06 CEST 2013
 Driver\:=Driver\:
 Extensions\ added\ automatically=Estensioni aggiunte automaticamente
 Invoice\ id\ error=Id fattura errato
@@ -36,6 +36,7 @@ Test=Test
 Database\ cleared=Database svuotato
 Total=Totale
 Quit=Esci
+Loading\ {0}...=Loading {0}...
 Xls\ (eXeL\ Spreadsheet)=Xls (eXeL Spreadsheet)
 Preview\ error=Preview error
 Stamp\ format\ error=Errore formato bollo
@@ -69,6 +70,7 @@ Print\ error=Errore di stampa
 Will\ open\ the\ system\ printer\ configuration\ window=Aprir\u00E0 la finestra per la configurazione della stampante di sistema
 Database\ name\:=Nome del database\:
 Unable\ to\ access\ backup\ file=Impossibile accedere al file di backup
+Restore\ in\ progress...=Restore in progress...
 Print...=Stampa...
 Generating\ graphic\ interface...=Generazione interfaccia grafica...
 CAP=CAP
@@ -94,6 +96,7 @@ This\ will\ remove\ all\ events\ older\ than\ {0}\ days\ ({1}\ events).\nPlease\
 Database\ restored\ from\ {0}=Database ripristinato da {0}
 Mon=Lun
 Username\:=Nome utente\:
+Finished\ loading\ {0}=Finished loading {0}
 Accept=Accetta
 Connection\ established=Connessione stabilita
 Invoice\ dialog=Interfaccia Fattura
@@ -115,6 +118,7 @@ JDBC\:=JDBC\:
 Date=Data
 Birthdate=Data di nascita
 File=File
+Remove\ product?=Remove product?
 Preview=Preview
 Are\ you\ sure\ you\ want\ to\ remove\ the\ product\ {0}?=Sicuro di voler rimuovere il prodotto {0}?
 Unable\ to\ create\ the\ target\ file=Impossibile creare il file
@@ -129,6 +133,7 @@ Save=Salva
 Pruning\ aborted\ by\ user=Eliminazione annullata dall'utente
 New=Nuovo
 Database\ clear\ canceled=Canellazione del database annullata
+Started\ restore\ from\ {0}=Started restore from {0}
 Tools=Strumenti
 Report\ Chooser=Selezione Modulo
 Advanced\ options...=Opzioni avanzate...
@@ -138,8 +143,8 @@ Send\ to\ printer=Invio alla stampante
 Events\ pruned=Eventi eliminati
 Product\ dialog=Interfaccia Prodotto
 About...=About...
-Ready\!=Pronto\!
 Report=Modulo
+Ready\!=Pronto\!
 Fri=Ven
 Description=Descrizione
 Uncaught\ exception=Eccezione

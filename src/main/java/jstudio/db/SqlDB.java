@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.ProgressMonitor;
-
 import jstudio.model.Event;
 import jstudio.model.Invoice;
 import jstudio.model.Person;
@@ -245,7 +243,7 @@ public class SqlDB implements DatabaseInterface {
 		}
 		
 		sql +=");";
-		logger.debug(sql);
+		//logger.debug(sql);
 		Statement s;
 		try {
 			s = connection.createStatement();
@@ -512,7 +510,7 @@ public class SqlDB implements DatabaseInterface {
 		} finally {
 			if(rs!=null) rs.close();
 		}
-		logger.debug("execute >"+sql+"< returns "+l.size()+" elements");
+		//logger.debug("execute >"+sql+"< returns "+l.size()+" elements");
 		return l;
 	}
 	
@@ -559,7 +557,7 @@ public class SqlDB implements DatabaseInterface {
 							continue;
 					}
 				}catch(IllegalArgumentException e){
-					logger.debug(e.getMessage());
+					//logger.debug(e.getMessage());
 					//custom datatype
 					Long id = 0l;
 					try{
