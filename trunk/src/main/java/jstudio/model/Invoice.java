@@ -98,20 +98,24 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		this.number = number;
 	}
 	
+	public void updateStamp(){
+		final float threshold = Configuration.getGlobal(Invoice.INVOICE_STAMP_THRESHOLD, Invoice.INVOICE_STAMP_THRESHOLD_DEF);
+		final float total = getTotal();
+		if(total>threshold){
+			final float stamp = Configuration.getGlobal(Invoice.INVOICE_STAMP_VALUE, Invoice.INVOICE_STAMP_VALUE_DEF);
+			setStamp(stamp);
+		}else{
+			setStamp(0f);
+		}
+	}
+	
 	/** Compute and return the sum of product cost **/
 	public float getTotal(){
-		final float threshold = Configuration.getGlobal(Invoice.INVOICE_STAMP_THRESHOLD, Invoice.INVOICE_STAMP_THRESHOLD_DEF);
 		float total = 0f;
 		for(Product t: products){
 			total += t.getQuantity()*t.getCost();
 		}
-		if(total>threshold){
-			final float stamp = Configuration.getGlobal(Invoice.INVOICE_STAMP_VALUE, Invoice.INVOICE_STAMP_VALUE_DEF);
-			setStamp(stamp);
-			total += stamp;
-		}else{
-			setStamp(0f);
-		}
+		total += stamp;
 		return total;
 	}
 	

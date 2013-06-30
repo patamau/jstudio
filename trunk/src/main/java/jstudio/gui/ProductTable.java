@@ -33,12 +33,14 @@ public class ProductTable
 	private JLabel totalLabel, stampLabel;
 	private Invoice invoice;
 	private EntityManagerPanel<Invoice> accounting;
+	private boolean editable;
 	//private JButton newButton, editButton, deleteButton;
 	
 	private float total;
 	
 	public ProductTable(Invoice invoice, EntityManagerPanel<Invoice> accounting, boolean editable){
 		super(((Accounting)accounting.getController()).getProducts(), false);
+		this.editable = editable;
 		this.invoice = invoice;
 		this.accounting = accounting;
 		
@@ -170,6 +172,9 @@ public class ProductTable
 		this.clear();
 		for(Product t: invoice.getProducts()){
 			addEntity(t);
+		}
+		if(editable){
+			invoice.updateStamp();
 		}
 		totalLabel.setText(Product.formatCurrency(invoice.getTotal()));
 		stampLabel.setText(Product.formatCurrency(invoice.getStamp()));
