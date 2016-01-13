@@ -35,6 +35,7 @@ import jstudio.util.Language;
 public class InvoicePanel extends EntityPanel<Invoice> {
 	
 	public static final String 
+		PRIVACY_NOTE = "Privacy note",
 		L675_COMPLIANT = "L675 Compliant",
 		INVOICE_REPORT = "report.invoice",
 		INVOICE_REPORT_DEF = "/reports/invoice.jasper";
@@ -50,6 +51,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		capField,
 		codeField;
 	private JCheckBox
+		privacyCheck,
 		noteCheck;
 	private ProductTable productTable;
 	private JButton okButton, cancelButton, printButton, closeButton, deleteButton, editButton, viewButton;
@@ -106,6 +108,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 				this.entity.getCode(), editable);
 		
 		noteCheck = GUITool.createCheck(head, gc, Language.string("L675 Compliant Check"), entity.getNote(), editable);
+		privacyCheck = GUITool.createCheck(head, gc, Language.string("Privacy Check"), entity.getPrivacy(), editable);
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
@@ -188,6 +191,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		if(entity.getId()==0) entity.setId(controller.getNextId());
 		if(entity.getNumber()==0) entity.setNumber(((Accounting)controller).getNextInvoiceNumber(entity.getDate()));
 		entity.setNote(noteCheck.isSelected()?L675_COMPLIANT:"");
+		entity.setPrivacy(privacyCheck.isSelected()?PRIVACY_NOTE:"");
 		controller.store(entity);
 		return true;
 	}
@@ -204,6 +208,8 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		if(!entity.getProvince().equals(provinceField.getText())) return true;
 		if((entity.getNote().length()>0&&!noteCheck.isSelected())||
 				entity.getNote().length()==0&&noteCheck.isSelected()) return true;
+		if((entity.getPrivacy().length()>0&&!privacyCheck.isSelected())||
+				entity.getPrivacy().length()==0&&privacyCheck.isSelected()) return true;
 		return false;
 	}
 
@@ -235,6 +241,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			rg.setHead(entity);
 			rg.setHeadValue("date", Person.birthdateFormat.format(entity.getDate()));
 			rg.setHeadValue("note", Language.string(entity.getNote()));
+			rg.setHeadValue("privacy", Language.string(entity.getPrivacy()));
 			rg.setData(entity.getProducts());
 			rg.setHeadValue("stamp", Product.formatCurrency(entity.getStamp()));
 			rg.setHeadValue("totalcost", Product.formatCurrency(entity.getTotal()));

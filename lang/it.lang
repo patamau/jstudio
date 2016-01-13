@@ -1,5 +1,5 @@
 #italiano it - v.0.3
-#Mon Jul 01 00:39:06 CEST 2013
+#Wed Jan 13 11:37:05 CET 2016
 Driver\:=Driver\:
 Extensions\ added\ automatically=Estensioni aggiunte automaticamente
 Invoice\ id\ error=Id fattura errato
@@ -143,9 +143,10 @@ Send\ to\ printer=Invio alla stampante
 Events\ pruned=Eventi eliminati
 Product\ dialog=Interfaccia Prodotto
 About...=About...
-Report=Modulo
 Ready\!=Pronto\!
+Report=Modulo
 Fri=Ven
+Are\ you\ sure\ you\ want\ to\ remove\ {0}?=Are you sure you want to remove {0}?
 Description=Descrizione
 Uncaught\ exception=Eccezione
 Date\ Picker=Selezione Data

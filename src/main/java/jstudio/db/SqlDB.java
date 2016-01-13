@@ -404,7 +404,9 @@ public class SqlDB implements DatabaseInterface {
 			}
 			++fsize;
 		}
-		return connection.prepareStatement("REPLACE INTO "+getClassTable(c)+" VALUES ("+args+")");
+		String sql = "REPLACE INTO "+getClassTable(c)+" VALUES ("+args+")";
+		//logger.debug("db update statement: "+sql);
+		return connection.prepareStatement(sql);
 	}
 	
 	private void fillPreparedStatement(final DatabaseObject o, final PreparedStatement ps) 
@@ -413,7 +415,7 @@ public class SqlDB implements DatabaseInterface {
 		String ftype;
 		for(Field f: getFields(o.getClass())){
 			ftype = f.getType().getSimpleName();
-			//logger.debug("factual is "+factual+"/"+fsize);
+			//logger.debug("filling statement with "+ftype+" "+f.getName());
 			try{
 				switch(EntryType.valueOf(ftype)){
 					case Set:
@@ -477,7 +479,7 @@ public class SqlDB implements DatabaseInterface {
 			ps.executeUpdate();
 			ps.close();
 		} catch (Exception e) {
-			logger.error("store("+o+")",e);
+			logger.error("storing ("+o+") into "+table,e);
 		} 
 		return o;
 	}
@@ -530,7 +532,8 @@ public class SqlDB implements DatabaseInterface {
 							break;
 						case Integer:
 						case String:
-							f.set(o, rs.getObject(f.getName()));
+							Object val = rs.getObject(f.getName());
+							f.set(o, val==null?"":val);
 							break;
 						case Long:
 							Object rso = rs.getObject(f.getName());
@@ -556,6 +559,10 @@ public class SqlDB implements DatabaseInterface {
 							logger.warn("EntryType "+ftype+" not implemented");
 							continue;
 					}
+				}catch(ClassCastException e){
+					logger.error("bad data type for "+f.getName()+" ("+ftype+"): "+rs.getObject(f.getName())+ " ["+o.getClass().getSimpleName()+":"+o+"]");
+				}catch(SQLException e){
+					logger.error("database error for field "+f.getName()+": "+e);
 				}catch(IllegalArgumentException e){
 					//logger.debug(e.getMessage());
 					//custom datatype

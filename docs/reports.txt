@@ -1,0 +1,22 @@
+Il programma si chiama iReport 3.7.2 ed è molto intuitivo da usare.
+Scaricalo da qui:
+http://sourceforge.net/projects/ireport/files/iReport/iReport-3.7.2/iReport-3.7.2-windows-installer.exe/download
+
+Attenzione: la versione che devi usare è la 3.7.2, non l'ultima (4.7)
+altrimenti il programma non va (lo aggiorno all'ultima versione appena
+ho un pò di tempo).
+
+Una volta installato il programma lancialo (Programmi -> Jaspersoft ->
+iReport): adesso puoi aprire i file jrxml che si trovano nella
+cartella reports del programma per modificarli.
+Quando hai finito di modificare il file, salvalo: questo aggiorna il
+jrxml ma non modifica il report vero e proprio che è il file jasper.
+Per compilare il report e poterlo usare nel programma devi cliccare
+sull'iconcina con il martello in alto: Compile report (vedi immagine
+allegata).
+Una volta salvato il jasper (senza errori) puoi usarlo subito.
+
+Se vuoi fare nuovi moduli puoi salvare il jrxml con un altro nome e
+poi compilarlo.
+Apparirà nella lista "Stampa personalizzata" e potrai usarlo al volo
+(clicca su Aggiorna per aggiornare la lista).

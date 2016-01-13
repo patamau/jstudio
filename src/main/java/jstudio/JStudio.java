@@ -288,14 +288,21 @@ public class JStudio implements UncaughtExceptionHandler{
 			String str;
 			try {
 				BufferedReader reader = new BufferedReader(new FileReader(f));
+				int c = 0;
 				while((str = reader.readLine())!=null){
 					str = str.trim();
 					//logger.debug("Read: "+str);
 					if(str.length()==0) continue;
 					if(str.startsWith("-")) continue;
 					database.execute(str);
+					++c;
 					//break; //FIXME: remove this break to continue loading stuff
 				}
+				logger.info("loaded "+c+" lines");
+				JOptionPane.showMessageDialog(gui, 
+						Language.string("${0} SQL statements executed on the database",c),
+						Language.string("Load finished"),
+						JOptionPane.INFORMATION_MESSAGE);
 			} catch (Exception e) {
 				logger.error("Loading "+f,e);
 				JOptionPane.showMessageDialog(gui, 

@@ -28,7 +28,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 
 	private Long id, number;
 	private Date date;
-	private String name, lastname, address, city, province, cap, code, note;
+	private String name, lastname, address, city, province, cap, code, note, privacy;
 	private Float stamp;
 	private Set<Product> products;
 	private transient boolean modified;
@@ -57,6 +57,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		this.province="";
 		this.code="";
 		this.note="";
+		this.privacy="";
 		this.stamp=0f;
 		this.products = new HashSet<Product>();
 	}
@@ -67,6 +68,14 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	
 	public boolean isModified(){
 		return modified;
+	}
+	
+	public String getPrivacy(){
+		return privacy;
+	}
+	
+	public void setPrivacy(final String privacy){
+		this.privacy = privacy;
 	}
 	
 	public String getNote() {
@@ -239,6 +248,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		map.put("province",province);
 		map.put("stamp", Product.formatCurrency(stamp));
 		map.put("note", Language.string(note));
+		map.put("privacy", Language.string(note));
 		return map;
 	}
 }
