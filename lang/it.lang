@@ -1,5 +1,5 @@
 #italiano it - v.0.3
-#Wed Jan 13 11:37:05 CET 2016
+#Thu Jan 14 15:34:37 CET 2016
 Driver\:=Driver\:
 Extensions\ added\ automatically=Estensioni aggiunte automaticamente
 Invoice\ id\ error=Id fattura errato
@@ -39,6 +39,7 @@ Quit=Esci
 Loading\ {0}...=Loading {0}...
 Xls\ (eXeL\ Spreadsheet)=Xls (eXeL Spreadsheet)
 Preview\ error=Preview error
+Privacy\ note=Fattura non trasmessa al sistema tessera sanitaria ai fini della predisposizione del 730 precompilato, per opposizione dell\'assistito ai sensi dell\'art.3 d.m. 31/07/2015 e dell'art.7 (diritti dell\'interessato D.gls. 196/2003 e ss.mm.ii.)
 Stamp\ format\ error=Errore formato bollo
 Stamp=Bollo
 Connection...=Connessione...
@@ -46,6 +47,7 @@ Edit=Modifica
 Print\ any\ report\ with\ custom\ data=Stampa i moduli con dati personalizzati
 Prune...=Pulizia...
 View\ details=Vedi dettagli
+Privacy\ Check=Privacy Check
 Wed=Mer
 Are\ you\ really-really\ sure\ you\ want\ to\ remove\ all\ the\ data\ from\ the\ database?\n\ Everything\ lost\ forever?\n\ Are\ you\ Sure?=Are you really-really sure you want to remove all the data from the database?\n Everything lost forever?\n Are you Sure?
 Changes\ made=Effettuati cambiamenti
@@ -143,8 +145,8 @@ Send\ to\ printer=Invio alla stampante
 Events\ pruned=Eventi eliminati
 Product\ dialog=Interfaccia Prodotto
 About...=About...
-Ready\!=Pronto\!
 Report=Modulo
+Ready\!=Pronto\!
 Fri=Ven
 Are\ you\ sure\ you\ want\ to\ remove\ {0}?=Are you sure you want to remove {0}?
 Description=Descrizione
@@ -162,4 +164,3 @@ L675\ compliant=L675 compliant
 Lastname=Cognome
 Sun=Sole
 <<=<<
-Privacy\ note=Privacy note
