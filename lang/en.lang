@@ -1,5 +1,5 @@
 #English en - v.0.3
-#Wed Jan 13 16:35:06 CET 2016
+#Thu Jan 14 08:05:17 CET 2016
 Prune...=Prune...
 Edit=Edit
 Configure\ printing=Configure printing
@@ -35,6 +35,7 @@ Load\ finished=Load finished
 Preview=Preview
 Clear\ database?=Clear database?
 Birthdate=Birthdate
+Apply\ changes\ to\ {0}?=Apply changes to {0}?
 Overwrite?=Overwrite?
 View\ details=View details
 Ready\!=Ready\!
@@ -51,6 +52,7 @@ Save=Save
 Tools=Tools
 Refresh=Refresh
 File=File
+Privacy\ note=Privacy note
 Address\ Book=Address Book
 Description=Description
 Database\ restored\ from\ {0}=Database restored from {0}
@@ -101,6 +103,7 @@ Send\ To\ Printer...=Send To Printer...
 Contact=Contact
 Advanced\ options...=Advanced options...
 CAP=CAP
+Changes\ made=Changes made
 L675\ Compliant=L675 Compliant
 View=View
 Delete=Delete

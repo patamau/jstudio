@@ -237,14 +237,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 			getDialog().dispose();
 		}else if(o==printButton){
 			ReportGenerator rg = new ReportGenerator();
-			rg.setReport(Configuration.getGlobal(INVOICE_REPORT, INVOICE_REPORT_DEF));
-			rg.setHead(entity);
-			rg.setHeadValue("date", Person.birthdateFormat.format(entity.getDate()));
-			rg.setHeadValue("note", Language.string(entity.getNote()));
-			rg.setHeadValue("privacy", Language.string(entity.getPrivacy()));
-			rg.setData(entity.getProducts());
-			rg.setHeadValue("stamp", Product.formatCurrency(entity.getStamp()));
-			rg.setHeadValue("totalcost", Product.formatCurrency(entity.getTotal()));
+			entity.setReport(rg);
 			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice_"+entity.getFilePrefix());
 			rgui.showGUI((Window)SwingUtilities.getRoot(this));
 		}else if(o==editButton){

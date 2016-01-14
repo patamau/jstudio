@@ -164,13 +164,7 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 			if(row<0) return;
 			Invoice context = (Invoice)model.getValueAt(row, 0);
 			ReportGenerator rg = new ReportGenerator();
-			rg.setReport(Configuration.getGlobal(InvoicePanel.INVOICE_REPORT, InvoicePanel.INVOICE_REPORT_DEF));
-			rg.setHead(context);
-			rg.setHeadValue("date", Person.birthdateFormat.format(context.getDate()));
-			rg.setHeadValue("note", Language.string(context.getNote()));
-			rg.setData(context.getProducts());
-			rg.setHeadValue("stamp", Product.formatCurrency(context.getStamp()));
-			rg.setHeadValue("totalcost", Product.formatCurrency(context.getTotal()));
+			context.setReport(rg);
 			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice_"+context.getFilePrefix());
 			rgui.showGUI((Window)SwingUtilities.getRoot(this));		
 		}else{

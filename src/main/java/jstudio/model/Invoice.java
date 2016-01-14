@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import jstudio.db.DatabaseObject;
+import jstudio.gui.InvoicePanel;
+import jstudio.report.ReportGenerator;
 import jstudio.util.Configuration;
 import jstudio.util.Language;
 
@@ -76,6 +78,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	
 	public void setPrivacy(final String privacy){
 		this.privacy = privacy;
+		System.out.println("privacy set to "+privacy);
 	}
 	
 	public String getNote() {
@@ -248,7 +251,22 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		map.put("province",province);
 		map.put("stamp", Product.formatCurrency(stamp));
 		map.put("note", Language.string(note));
-		map.put("privacy", Language.string(note));
+		map.put("privacy", Language.string(privacy));
 		return map;
+	}
+	
+	/**
+	 * Configures the report data
+	 * @param rg
+	 */
+	public void setReport(ReportGenerator rg){
+		rg.setReport(Configuration.getGlobal(InvoicePanel.INVOICE_REPORT, InvoicePanel.INVOICE_REPORT_DEF));
+		rg.setHead(this);
+		rg.setHeadValue("date", Person.birthdateFormat.format(this.getDate()));
+		rg.setData(this.getProducts());
+		//have to set those fields again for the footer!
+		rg.setHeadValue("stamp", Product.formatCurrency(this.getStamp()));
+		rg.setHeadValue("totalcost", Product.formatCurrency(this.getTotal()));
+		rg.setHeadValue("privacy", Language.string(this.getPrivacy()));
 	}
 }
