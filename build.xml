@@ -48,6 +48,7 @@
 		<mkdir dir="build" />
 		<copy todir="build">
 			<fileset dir="src/main/resources" includes="*.exe" />
+			<fileset dir="src/main/resources" includes="*.dll" />
 		</copy>
 		<copy todir="build/lib">
 			<fileset dir="lib" includes="**/*.jar" />
