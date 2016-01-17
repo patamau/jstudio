@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.lang.reflect.Constructor;
 import java.text.MessageFormat;
@@ -284,8 +285,9 @@ public class JStudio implements UncaughtExceptionHandler{
 			Configuration.getGlobalConfiguration().setProperty(LOADFILE_KEY, f.getAbsolutePath());
 			askClear();
 			String str;
+			BufferedReader reader = null;
 			try {
-				BufferedReader reader = new BufferedReader(new FileReader(f));
+				reader = new BufferedReader(new FileReader(f));
 				int c = 0;
 				while((str = reader.readLine())!=null){
 					str = str.trim();
@@ -307,6 +309,14 @@ public class JStudio implements UncaughtExceptionHandler{
 						e.getLocalizedMessage(),
 						Language.string("Loading error"),
 						JOptionPane.ERROR_MESSAGE);
+			} finally {
+				if(null != reader){
+					try{
+						reader.close();
+					}catch(IOException e){
+						logger.error("closing buffered reader on "+f+": "+e);
+					}
+				}
 			}
 		}
 	}
@@ -332,6 +342,7 @@ public class JStudio implements UncaughtExceptionHandler{
 					JOptionPane.ERROR_MESSAGE);
 		}else{
 			if(doClear()){
+				//TODO: try to improve this somehow
 				final JDialog progressMonitor = new JDialog(gui);
 				progressMonitor.setTitle(Language.string("Restore in progress..."));
 				progressMonitor.setModal(true);
