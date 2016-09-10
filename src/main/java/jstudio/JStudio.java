@@ -1,5 +1,6 @@
 package jstudio;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -21,6 +22,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JWindow;
+import javax.swing.UIManager;
+import javax.swing.plaf.ColorUIResource;
 
 import jstudio.control.Accounting;
 import jstudio.control.AddressBook;
@@ -62,7 +65,9 @@ public class JStudio implements UncaughtExceptionHandler{
 		LOADFILE_KEY = "load.file",
 		LOADFILE_DEF = ".",
 		BACKUPFILE_KEY = "backup.file",
-		BACKUPFILE_DEF = ".";
+		BACKUPFILE_DEF = ".",
+		CUSTOMNAME_KEY = "name.custom",
+		CUSTOMNAME_DEF = "";
 	
 	public static final MessageFormat backupNameFormat = new MessageFormat("jstudio_{0}.bak"); 
 	
@@ -79,13 +84,16 @@ public class JStudio implements UncaughtExceptionHandler{
 	private Agenda agenda;
 	private AddressBook addressBook;
 	private Accounting accounting;
-	
+
 	public JStudio(){
 	}
 	
 	private void initializeGUI(){
 		//initialize GUI
-		gui = new JStudioGUI(this.getClass().getSimpleName(), this);
+		String customName = Configuration.getGlobal(CUSTOMNAME_KEY, CUSTOMNAME_DEF);
+		String clsName = this.getClass().getSimpleName() + " " + VERSION;
+		String appName = 0 < customName.length() ? appName = clsName + " - " + customName : clsName;
+		gui = new JStudioGUI(appName, this);
 		gui.setIconImage(Resources.getImage("appicon.png").getImage());
 		gui.createGUI();
 		gui.addPanel(new AddressBookPanel(addressBook));
