@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -32,7 +34,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	private Date date;
 	private String name, lastname, address, city, province, cap, code, note, privacy;
 	private Float stamp;
-	private Set<Product> products;
+	private List<Product> products;
 	private transient boolean modified;
 	
 	public String getProvince() {
@@ -61,7 +63,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		this.note="";
 		this.privacy="";
 		this.stamp=0f;
-		this.products = new HashSet<Product>();
+		this.products = new LinkedList<Product>();
 	}
 	
 	public void setModified(final boolean modified){
@@ -211,12 +213,12 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		this.date = date;
 	}
 
-	public Set<Product> getProducts() {
+	public List<Product> getProducts() {
 		return products;
 	}
 
-	public void setProducts(final Set<Product> products) {
-		this.products = new TreeSet<Product>(products);
+	public void setProducts(final List<Product> products) {
+		this.products = new LinkedList<Product>(products);
 	}
 
 	public void setId(Long id) {

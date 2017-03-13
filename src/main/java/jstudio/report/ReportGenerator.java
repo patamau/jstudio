@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,7 +81,7 @@ public class ReportGenerator {
 		i.setCity("Trento");
 		i.setCap("38123");
 		i.setProvince("TN");
-		Set<Product> set = new HashSet<Product>();
+		List<Product> set = new LinkedList<Product>();
 		Product p = new Product(1l);
 		p.setId(0l);
 		p.setDescription("Estrazione dente del giudizio");

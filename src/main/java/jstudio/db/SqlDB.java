@@ -63,7 +63,7 @@ public class SqlDB implements DatabaseInterface {
 	}
 
 	public enum EntryType {
-		Integer, Long, Float, Date, String, Set,
+		Integer, Long, Float, Date, String, Set, List
 	}
 
 	public static final String SQLITE_PROTOCOL_PREFIX = "jdbc:sqlite:",
@@ -148,7 +148,7 @@ public class SqlDB implements DatabaseInterface {
 		initialize(c);
 	}
 
-	private String getSetTable(Field f) {
+	private String getCollectionsTable(Field f) {
 		String t = f.getName().toLowerCase();
 		if (t.endsWith("s")) {
 			return t.substring(0, t.length() - 1);
@@ -469,7 +469,7 @@ public class SqlDB implements DatabaseInterface {
 					// the set requires another table referring to this entities
 					@SuppressWarnings("unchecked")
 					Set<DatabaseObject> _s = (Set<DatabaseObject>) f.get(o);
-					String _t = getSetTable(f);
+					String _t = getCollectionsTable(f);
 					for (DatabaseObject dob : _s) {
 						store(_t, dob);
 					}
@@ -592,7 +592,7 @@ public class SqlDB implements DatabaseInterface {
 			for (Field f : fs) {
 				ftype = f.getType().getSimpleName();
 				try {
-					// logger.debug("Trying to get field "+f.getName()+" as "+ftype);
+					//logger.debug("Trying to get field "+f.getName()+" as "+ftype);
 					switch (EntryType.valueOf(ftype)) {
 					case Float:
 						f.set(o, ((Double) rs.getObject(f.getName()))
@@ -615,12 +615,21 @@ public class SqlDB implements DatabaseInterface {
 						String thedate = (String) rs.getObject(f.getName());
 						f.set(o, SQLDateFormat.parse(thedate));
 						break;
+					case List:
+						// the list or set requires referring table access, list is also ordered by id
+						String listTable = getCollectionsTable(f);
+						List<DatabaseObject> _l = execute(listTable,
+								"SELECT * FROM " + listTable + " WHERE "
+										+ c.getSimpleName().toLowerCase() + "="
+										+ o.getId() + " ORDER BY id", o);
+						f.set(o, _l);
+						// logger.debug("Set list of "+f.getName()+" "+ftype+" for "+o.getId()+" where parent is "+parent);
+						break;
 					case Set:
-						// the set requires another table referring to this
-						// entities
-						String table = getSetTable(f);
-						List<DatabaseObject> _li = execute(table,
-								"SELECT * FROM " + table + " WHERE "
+						// the list or set requires referring table access, list is also ordered by id
+						String setTable = getCollectionsTable(f);
+						List<DatabaseObject> _li = execute(setTable,
+								"SELECT * FROM " + setTable + " WHERE "
 										+ c.getSimpleName().toLowerCase() + "="
 										+ o.getId(), o);
 						Set<DatabaseObject> s = new HashSet<DatabaseObject>(_li);
@@ -639,7 +648,7 @@ public class SqlDB implements DatabaseInterface {
 					logger.error("database error for field " + f.getName()
 							+ ": " + e);
 				} catch (IllegalArgumentException e) {
-					// logger.debug(e.getMessage());
+					//logger.debug(e.getMessage());
 					// custom datatype
 					Long id = 0l;
 					try {

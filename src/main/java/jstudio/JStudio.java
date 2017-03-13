@@ -1,6 +1,5 @@
 package jstudio;
 
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -22,8 +21,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.JWindow;
-import javax.swing.UIManager;
-import javax.swing.plaf.ColorUIResource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jstudio.control.Accounting;
 import jstudio.control.AddressBook;
@@ -39,9 +39,6 @@ import jstudio.util.DatePicker;
 import jstudio.util.IconPanel;
 import jstudio.util.Language;
 import jstudio.util.Resources;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This is the main class for the control flow of the JStudio application
