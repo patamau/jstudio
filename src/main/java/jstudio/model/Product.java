@@ -90,6 +90,7 @@ public class Product implements DatabaseObject, Comparable<Product> {
 		Map<String,String> data = new HashMap<String,String>();
 		data.put("description", description);
 		//data.put("cost", NumberFormat.getCurrencyInstance().format(cost));
+		data.put("itemcost", formatCurrency(cost/quantity));
 		data.put("cost", formatCurrency(cost));
 		data.put("quantity", Integer.toString(quantity));
 		return data;

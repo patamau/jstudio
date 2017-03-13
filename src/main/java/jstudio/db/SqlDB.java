@@ -220,6 +220,7 @@ public class SqlDB implements DatabaseInterface {
 				case Date:
 					fdef += " DATETIME";
 					break;
+				case List:
 				case Set:
 					// the set requires another table referring to this entities
 					continue;
@@ -438,7 +439,8 @@ public class SqlDB implements DatabaseInterface {
 		for (Field f : getFields(c)) {
 			ftype = f.getType().getSimpleName();
 			try {
-				if (EntryType.valueOf(ftype) == EntryType.Set)
+				if (EntryType.valueOf(ftype) == EntryType.Set ||
+						EntryType.valueOf(ftype) == EntryType.List)
 					continue;
 			} catch (IllegalArgumentException ex) {
 				// when no object is mapped in the entrytype enum
@@ -465,13 +467,22 @@ public class SqlDB implements DatabaseInterface {
 			// logger.debug("filling statement with "+ftype+" "+f.getName());
 			try {
 				switch (EntryType.valueOf(ftype)) {
+				case List:
+					// the list requires another table referring to this entities
+					@SuppressWarnings("unchecked")
+					List<DatabaseObject> _l = (List<DatabaseObject>) f.get(o);
+					String _lt = getCollectionsTable(f);
+					for (DatabaseObject dob : _l) {
+						store(_lt, dob);
+					}
+					break;
 				case Set:
 					// the set requires another table referring to this entities
 					@SuppressWarnings("unchecked")
 					Set<DatabaseObject> _s = (Set<DatabaseObject>) f.get(o);
-					String _t = getCollectionsTable(f);
+					String _st = getCollectionsTable(f);
 					for (DatabaseObject dob : _s) {
-						store(_t, dob);
+						store(_st, dob);
 					}
 					break;
 				case Integer:
