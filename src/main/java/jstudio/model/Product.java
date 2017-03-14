@@ -89,9 +89,8 @@ public class Product implements DatabaseObject, Comparable<Product> {
 	public Map<String,String> getPrintData(){
 		Map<String,String> data = new HashMap<String,String>();
 		data.put("description", description);
-		//data.put("cost", NumberFormat.getCurrencyInstance().format(cost));
-		data.put("itemcost", formatCurrency(cost/quantity));
-		data.put("cost", formatCurrency(cost));
+		data.put("itemcost", formatCurrency(cost));
+		data.put("cost", formatCurrency(cost*quantity));
 		data.put("quantity", Integer.toString(quantity));
 		return data;
 	}
