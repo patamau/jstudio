@@ -2,6 +2,7 @@ package jstudio.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,7 +35,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	private Date date;
 	private String name, lastname, address, city, province, cap, code, note, privacy;
 	private Float stamp;
-	private List<Product> products;
+	private Collection<Product> products;
 	private transient boolean modified;
 	
 	public String getProvince() {
@@ -213,11 +214,11 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		this.date = date;
 	}
 
-	public List<Product> getProducts() {
+	public Collection<Product> getProducts() {
 		return products;
 	}
 
-	public void setProducts(final List<Product> products) {
+	public void setProducts(final Collection<Product> products) {
 		this.products = new LinkedList<Product>(products);
 	}
 
