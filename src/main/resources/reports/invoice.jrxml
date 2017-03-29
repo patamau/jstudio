@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Fattura" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-	<property name="ireport.zoom" value="2.727272727272727"/>
-	<property name="ireport.x" value="653"/>
-	<property name="ireport.y" value="829"/>
+	<property name="ireport.zoom" value="8.559350118330025"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="2999"/>
 	<style name="table" isDefault="false">
 		<box>
 			<pen lineWidth="1.0" lineColor="#999999"/>
@@ -56,35 +56,21 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Dott. Danilo Motta]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="24" width="281" height="13"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<text><![CDATA[MEDICO CHIRURGO]]></text>
+				<text><![CDATA[Dott. Alessandro Motta]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="37" width="281" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<text><![CDATA[Specialista in odontoiatria e protesi dentaria]]></text>
+				<text><![CDATA[Dottore in odontoiatria e protesi dentaria]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="50" width="281" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
-				<text><![CDATA[specialista in chirurgia maxillo - facciale]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="0" y="63" width="281" height="13"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="8"/>
-				</textElement>
-				<text><![CDATA[specialista in ortognatodonzia]]></text>
+				<text><![CDATA[Specialista in chirurgia odontostomatologica]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="76" width="281" height="13"/>
@@ -105,14 +91,14 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Codice fiscale MTTDNL52C13H612L]]></text>
+				<text><![CDATA[Codice fiscale MTTLSN80B29L378R]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="0" y="115" width="281" height="13"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" isBold="false"/>
 				</textElement>
-				<text><![CDATA[Partita I.V.A. 00848280228]]></text>
+				<text><![CDATA[Partita I.V.A. 02196370221]]></text>
 			</staticText>
 			<textField>
 				<reportElement x="155" y="155" width="126" height="20"/>
@@ -208,6 +194,9 @@
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{province}]]></textFieldExpression>
 			</textField>
+			<line>
+				<reportElement x="1" y="30" width="280" height="1" forecolor="#999999"/>
+			</line>
 		</band>
 	</title>
 	<columnHeader>
@@ -216,46 +205,46 @@
 	<detail>
 		<band height="28" splitType="Stretch">
 			<textField>
-				<reportElement x="1" y="0" width="361" height="20"/>
+				<reportElement x="1" y="4" width="361" height="20"/>
 				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
 				<textElement verticalAlignment="Bottom"/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="false">
-				<reportElement x="369" y="0" width="32" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom">
-					<font size="9"/>
-				</textElement>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{quantity}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="486" y="0" width="69" height="20"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{cost}]]></textFieldExpression>
-			</textField>
 			<line>
-				<reportElement x="1" y="20" width="554" height="1" forecolor="#CCCCCC"/>
-			</line>
-			<line>
-				<reportElement x="482" y="15" width="1" height="5" forecolor="#CCCCCC"/>
-			</line>
-			<line>
-				<reportElement x="365" y="15" width="1" height="5" forecolor="#CCCCCC"/>
+				<reportElement x="482" y="19" width="1" height="5" forecolor="#CCCCCC"/>
 			</line>
 			<textField isBlankWhenNull="false">
-				<reportElement x="411" y="0" width="69" height="20"/>
+				<reportElement x="411" y="4" width="69" height="20"/>
 				<textElement textAlignment="Right" verticalAlignment="Bottom">
 					<font size="9"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{itemcost}]]></textFieldExpression>
 			</textField>
+			<line>
+				<reportElement x="365" y="19" width="1" height="5" forecolor="#CCCCCC"/>
+			</line>
+			<textField isBlankWhenNull="false">
+				<reportElement x="369" y="4" width="32" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{quantity}]]></textFieldExpression>
+			</textField>
 			<staticText>
-				<reportElement x="402" y="1" width="9" height="19"/>
+				<reportElement x="402" y="5" width="9" height="19"/>
 				<textElement textAlignment="Center" verticalAlignment="Bottom">
 					<font size="8" isBold="false"/>
 				</textElement>
 				<text><![CDATA[x]]></text>
 			</staticText>
+			<textField>
+				<reportElement x="486" y="4" width="69" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cost}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="1" y="24" width="554" height="1" forecolor="#CCCCCC"/>
+			</line>
 		</band>
 	</detail>
 	<lastPageFooter>
