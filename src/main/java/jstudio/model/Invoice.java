@@ -33,7 +33,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 
 	private Long id, number;
 	private Date date;
-	private String name, lastname, address, city, province, cap, code, note, privacy;
+	private String name, lastname, address, city, province, cap, code, note, privacy, casagit;
 	private Float stamp;
 	private Collection<Product> products;
 	private transient boolean modified;
@@ -63,6 +63,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		this.code="";
 		this.note="";
 		this.privacy="";
+		this.casagit="";
 		this.stamp=0f;
 		this.products = new LinkedList<Product>();
 	}
@@ -75,13 +76,20 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		return modified;
 	}
 	
+	public String getCasagit(){
+		return casagit;
+	}
+	
+	public void setCasagit(final String casagit){
+		this.casagit = casagit;
+	}
+	
 	public String getPrivacy(){
 		return privacy;
 	}
 	
 	public void setPrivacy(final String privacy){
 		this.privacy = privacy;
-		System.out.println("privacy set to "+privacy);
 	}
 	
 	public String getNote() {
@@ -255,6 +263,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		map.put("stamp", Product.formatCurrency(stamp));
 		map.put("note", Language.string(note));
 		map.put("privacy", Language.string(privacy));
+		map.put("casagit", Language.string(casagit));
 		return map;
 	}
 	
@@ -271,5 +280,6 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		rg.setHeadValue("stamp", Product.formatCurrency(this.getStamp()));
 		rg.setHeadValue("totalcost", Product.formatCurrency(this.getTotal()));
 		rg.setHeadValue("privacy", Language.string(this.getPrivacy()));
+		rg.setHeadValue("casagit", Language.string(this.getCasagit()));
 	}
 }

@@ -1,5 +1,5 @@
 #italiano it - v.0.3
-#Thu Jan 14 15:34:37 CET 2016
+#Thu Mar 30 15:06:47 CEST 2017
 Driver\:=Driver\:
 Extensions\ added\ automatically=Estensioni aggiunte automaticamente
 Invoice\ id\ error=Id fattura errato
@@ -39,7 +39,7 @@ Quit=Esci
 Loading\ {0}...=Loading {0}...
 Xls\ (eXeL\ Spreadsheet)=Xls (eXeL Spreadsheet)
 Preview\ error=Preview error
-Privacy\ note=Fattura non trasmessa al sistema tessera sanitaria ai fini della predisposizione del 730 precompilato, per opposizione dell\'assistito ai sensi dell\'art.3 d.m. 31/07/2015 e dell'art.7 (diritti dell\'interessato D.gls. 196/2003 e ss.mm.ii.)
+Privacy\ note=Fattura non trasmessa al sistema tessera sanitaria ai fini della predisposizione del 730 precompilato, per opposizione dell'assistito ai sensi dell'art.3 d.m. 31/07/2015 e dell'art.7 (diritti dell'interessato D.gls. 196/2003 e ss.mm.ii.)
 Stamp\ format\ error=Errore formato bollo
 Stamp=Bollo
 Connection...=Connessione...
@@ -74,6 +74,7 @@ Database\ name\:=Nome del database\:
 Unable\ to\ access\ backup\ file=Impossibile accedere al file di backup
 Restore\ in\ progress...=Restore in progress...
 Print...=Stampa...
+CASAGIT\ Check=CASAGIT Check
 Generating\ graphic\ interface...=Generazione interfaccia grafica...
 CAP=CAP
 Extension\ added\ automatically=Estensione aggiunta automaticamente
@@ -112,6 +113,7 @@ Code=Codice
 Time=Tempo
 Rtf\ (Rich\ Text\ Format)=Rtf (Rich Text Format)
 Backup\ {0}\ completed=Backup {0} completato
+CASAGIT=CASAGIT
 Print\ to\ file=Stampa su file
 Quantity=Quantit\u00E0
 Configure\ printing=Configura stampante

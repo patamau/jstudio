@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Fattura" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
-	<property name="ireport.zoom" value="8.559350118330025"/>
+	<property name="ireport.zoom" value="1.399522140629204"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="2999"/>
+	<property name="ireport.y" value="48"/>
 	<style name="table" isDefault="false">
 		<box>
 			<pen lineWidth="1.0" lineColor="#999999"/>
@@ -46,6 +46,7 @@
 	<field name="province" class="java.lang.String"/>
 	<field name="privacy" class="java.lang.String"/>
 	<field name="itemcost" class="java.lang.String"/>
+	<field name="casagit" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -313,6 +314,14 @@
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{privacy}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="169" width="554" height="31" isRemoveLineWhenBlank="true"/>
+				<box topPadding="1" leftPadding="5" bottomPadding="1" rightPadding="1"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{casagit}]]></textFieldExpression>
 			</textField>
 		</band>
 	</lastPageFooter>

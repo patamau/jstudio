@@ -27,7 +27,6 @@ import jstudio.model.Person;
 import jstudio.model.Product;
 import jstudio.report.ReportGenerator;
 import jstudio.report.ReportGeneratorGUI;
-import jstudio.util.Configuration;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 
@@ -37,6 +36,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 	public static final String 
 		PRIVACY_NOTE = "Privacy note",
 		L675_COMPLIANT = "L675 Compliant",
+		CASAGIT = "CASAGIT",
 		INVOICE_REPORT = "report.invoice",
 		INVOICE_REPORT_DEF = "/reports/invoice.jasper";
 	
@@ -51,6 +51,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		capField,
 		codeField;
 	private JCheckBox
+		casagitCheck,
 		privacyCheck,
 		noteCheck;
 	private ProductTable productTable;
@@ -109,6 +110,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		
 		noteCheck = GUITool.createCheck(head, gc, Language.string("L675 Compliant Check"), entity.getNote(), editable);
 		privacyCheck = GUITool.createCheck(head, gc, Language.string("Privacy Check"), entity.getPrivacy(), editable);
+		casagitCheck = GUITool.createCheck(head, gc, Language.string("CASAGIT Check"), entity.getCasagit(), editable);
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
@@ -192,6 +194,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		if(entity.getNumber()==0) entity.setNumber(((Accounting)controller).getNextInvoiceNumber(entity.getDate()));
 		entity.setNote(noteCheck.isSelected()?L675_COMPLIANT:"");
 		entity.setPrivacy(privacyCheck.isSelected()?PRIVACY_NOTE:"");
+		entity.setCasagit(casagitCheck.isSelected()?CASAGIT:"");
 		controller.store(entity);
 		return true;
 	}
@@ -210,6 +213,8 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 				entity.getNote().length()==0&&noteCheck.isSelected()) return true;
 		if((entity.getPrivacy().length()>0&&!privacyCheck.isSelected())||
 				entity.getPrivacy().length()==0&&privacyCheck.isSelected()) return true;
+		if((entity.getCasagit().length()>0&&!casagitCheck.isSelected())||
+				entity.getCasagit().length()==0&&casagitCheck.isSelected()) return true;
 		return false;
 	}
 
