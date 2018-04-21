@@ -4,7 +4,7 @@ Created-By: 1.7.0_79-b15 (Oracle Corporation)
 Built-By: patam
 Main-Class: jstudio.Main
 Implementation-Title: JStudio
-Implementation-Version: 41
+Implementation-Version: 42
 Implementation-Vendor: Matteo Pedrotti (patamau@gmail.com)
-Built-Date: 2017-03-14 18:31:54
+Built-Date: 2017-04-03 18:29:33
 
