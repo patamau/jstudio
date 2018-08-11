@@ -1,9 +1,15 @@
 package jstudio.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.Box;
 import javax.swing.ImageIcon;
@@ -13,18 +19,21 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterListener;
 
 import jstudio.control.Controller;
 import jstudio.gui.generic.EntityManagerPanel;
 import jstudio.gui.generic.PopupListener;
 import jstudio.model.Invoice;
-import jstudio.model.Person;
 import jstudio.model.Product;
 import jstudio.report.ReportGenerator;
 import jstudio.report.ReportGeneratorGUI;
-import jstudio.util.Configuration;
+import jstudio.util.CustomRowSorter;
 import jstudio.util.Language;
 import jstudio.util.Resources;
 
@@ -32,7 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
-public class AccountingPanel extends EntityManagerPanel<Invoice> {
+public class AccountingPanel extends EntityManagerPanel<Invoice> implements RowSorterListener {
 	
 	private static final Logger logger = LoggerFactory.getLogger(AccountingPanel.class);
 	
@@ -47,6 +56,12 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		this.setLayout(new BorderLayout());
 		
 		model = new AccountingTableModel(table);
+		CustomRowSorter rowsorter = new CustomRowSorter(model);
+		table.setRowSorter(rowsorter);
+		table.getRowSorter().addRowSorterListener(this);
+		table.getRowSorter().toggleSortOrder(0);
+		rowsorter.setSortable(3, false);
+		rowsorter.setSortable(4, false);
 		
 		JScrollPane scrollpane = new JScrollPane(table);
 		this.add(scrollpane, BorderLayout.CENTER);
@@ -91,6 +106,23 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 	public synchronized void clear(){
 		while(model.getRowCount()>0) model.removeRow(0);
 	}
+	
+	private String getColumnDatavalue(int col) {
+		switch(col) {
+			case 0:
+				return "id";
+			case 1:
+				return "date";
+			case 2:
+				return "lastname";
+			case 3:
+				return null;
+			case 4:
+				return null;
+			default:
+				return null;
+		}
+	}
 
 	public synchronized void addEntity(Invoice i){
 		StringBuffer sb = new StringBuffer();
@@ -106,7 +138,7 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
 		model.addRow(new Object[]{
 				i,
 				i.getDate(),
-				i.getName()+" "+i.getLastname(),
+				i.getLastname()+" "+i.getName(),
 				sb.toString(),
 				i.getTotal()
 		});
@@ -184,4 +216,69 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> {
         	printButton.setEnabled(true);
         }
     }
+	
+	private void updateData() {
+		List<? extends SortKey> keys = table.getRowSorter().getSortKeys();
+		List<SortKey> newKeys = new ArrayList<SortKey>();
+		Map<String, String> order = new HashMap<String, String>();
+		for(SortKey s : keys) {
+			String col = getColumnDatavalue(s.getColumn());
+			if(null != col) {
+				SortOrder so = s.getSortOrder();
+				if(so == SortOrder.UNSORTED) continue;
+				order.put(col, so==SortOrder.ASCENDING?"ASC":"DESC");
+				newKeys.add(s);
+				break;
+			}
+		}
+		table.getRowSorter().setSortKeys(newKeys);
+		Collection<Invoice> ts;
+		String text = filterField.getText().trim();
+		//filter by filter field status (gray is disabled)
+		if (text.length() > 0 && filterField.getForeground()!=Color.GRAY) {
+			String[] vals = text.split(" ");
+			String[] cols = new String[] { "name", "lastname", "date" };
+			ts = controller.findAll(vals, cols, null, order);
+		} else {
+			ts = controller.getAll(null, order);
+		}
+		clear();
+		if(ts!=null){
+			for(Invoice t: ts){
+				this.addEntity(t);
+			}
+		}else{
+			JOptionPane.showMessageDialog(this, Language.string("Unable to load data"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+
+	/**
+	 * This method is triggered when the sorting order of the table is changed
+	 * and is used to correctly fetch the data based on the filter
+	 * @param e
+	 */
+	@Override
+	public synchronized void sorterChanged(RowSorterEvent e) {
+		if(e.getType() != RowSorterEvent.Type.SORT_ORDER_CHANGED) return;
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				updateData();
+			}
+		});
+	}
+	
+	@Override
+	public void refresh() {
+		updateData();
+	}
+	
+	@Override
+	public synchronized void filter(String text){
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				updateData();
+			}
+		});
+	}
 }

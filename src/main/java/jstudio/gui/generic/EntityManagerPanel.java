@@ -23,6 +23,7 @@ import javax.swing.table.DefaultTableModel;
 
 import jstudio.control.Controller;
 import jstudio.db.DatabaseObject;
+import jstudio.util.CustomRowSorter;
 import jstudio.util.Language;
 
 import org.slf4j.Logger;
@@ -150,7 +151,7 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 	public synchronized void filter(String text){
 		text = text.trim();
 		if(text.length()==0){
-			this.refresh();
+			refresh();
 			return;
 		}
 		this.clear();

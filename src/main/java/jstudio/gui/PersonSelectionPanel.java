@@ -7,7 +7,11 @@ import java.awt.Frame;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,7 +21,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.RowSorter.SortKey;
+import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterListener;
 
 import jstudio.control.Controller;
 import jstudio.gui.generic.EntityManagerPanel;
@@ -30,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("serial")
-public class PersonSelectionPanel extends EntityManagerPanel<Person> {
+public class PersonSelectionPanel extends EntityManagerPanel<Person> implements RowSorterListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(PersonSelectionPanel.class);
 
@@ -52,6 +60,7 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 			}
 		};
 		model = new PersonSelectionTableModel(table);
+		table.getRowSorter().addRowSorterListener(this);
 
 		JScrollPane scrollpane = new JScrollPane(table);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
@@ -108,6 +117,21 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 		JDialog dialog = new PersonPanel(p,this, edit).createDialog((Frame)this.getTopLevelAncestor());
 		dialog.setVisible(true);
 	}
+	
+	private String getColumnDatavalue(int col) {
+		switch(col) {
+			case 0:
+				return "lastname";
+			case 1:
+				return "name";
+			case 2:
+				return "birthdate";
+			case 3:
+				return "city";
+			default:
+				return null;
+		}
+	}
 
 	public synchronized void addEntity(Person p){
 		model.addRow(new Object[]{
@@ -117,27 +141,12 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 				p.getCity()});
 	}
 	
-	public void filter(String text){
-		text = text.trim();
-		this.clear();
-		Collection<Person> ts;
-		if(text.length()>0){
-			String[] vals = text.split(" ");
-			String[] cols = new String[]{
-					"name",
-					"lastname" };
-			ts = controller.findAll(vals, cols);
-		}else{
-			ts = controller.getAll();
-		}
-		
-		if(ts!=null){
-			for(Person t: ts){
-				this.addEntity(t);
+	public synchronized void filter(String text) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				updateData();
 			}
-		}else{
-			JOptionPane.showMessageDialog(this, Language.string("Unable to load data"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
-		}
+		});
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -185,7 +194,6 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 		if(row>=0){
 			row = table.convertRowIndexToModel(row);
 			selectedPerson = (Person)model.getValueAt(row, 0);
-			logger.debug("Selected person is "+selectedPerson);
 			if(e.getClickCount()==2){
 				Window w = (Window)SwingUtilities.getRoot(this);
 				w.dispose();
@@ -197,4 +205,59 @@ public class PersonSelectionPanel extends EntityManagerPanel<Person> {
 	 * Intentionally empty to avoid popup to show
 	 */
 	public void mouseReleased(final MouseEvent e){ }
+	
+	private void updateData() {
+		List<? extends SortKey> keys = table.getRowSorter().getSortKeys();
+		List<SortKey> newKeys = new ArrayList<SortKey>();
+		Map<String, String> order = new HashMap<String, String>();
+		for(SortKey s : keys) {
+			String col = getColumnDatavalue(s.getColumn());
+			if(null != col) {
+				SortOrder so = s.getSortOrder();
+				if(so == SortOrder.UNSORTED) continue;
+				order.put(col, so==SortOrder.ASCENDING?"ASC":"DESC");
+				newKeys.add(s);
+				break;
+			}
+		}
+		table.getRowSorter().setSortKeys(newKeys);
+		Collection<Person> ts;
+		String text = filterField.getText().trim();
+		if (text.length() > 0) {
+			String[] vals = text.split(" ");
+			String[] cols = new String[] { "name", "lastname" };
+			ts = controller.findAll(vals, cols, null, order);
+		} else {
+			ts = controller.getAll(null, order);
+		}
+		clear();
+		if(ts!=null){
+			for(Person t: ts){
+				logger.debug("person "+t.getLastname()+" "+t.getName());
+				this.addEntity(t);
+			}
+		}else{
+			JOptionPane.showMessageDialog(this, Language.string("Unable to load data"),Language.string("Database error"),JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	/**
+	 * This method is triggered when the sorting order of the table is changed
+	 * and is used to correctly fetch the data based on the filter
+	 * @param e
+	 */
+	@Override
+	public synchronized void sorterChanged(RowSorterEvent e) {
+		if(e.getType() != RowSorterEvent.Type.SORT_ORDER_CHANGED) return;
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				updateData();
+			}
+		});
+	}
+	
+	@Override
+	public void refresh() {
+		updateData();
+	}
 }

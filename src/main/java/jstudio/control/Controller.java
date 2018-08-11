@@ -63,22 +63,27 @@ public class Controller<E extends DatabaseObject> {
 	
 	@SuppressWarnings("unchecked")
 	public Collection<E> getAll(){
-		return (Collection<E>)app.getDatabase().getAll(source);
+		return (Collection<E>)app.getDatabase().getAll(source, null, null);
 	}
 	
 	@SuppressWarnings("unchecked")
 	public Collection<E> getAll(Map<String,String> map){
-		return (Collection<E>)app.getDatabase().getAll(source, map);
+		return (Collection<E>)app.getDatabase().getAll(source, map, null);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Collection<E> getAll(Map<String,String> map, Map<String, String> order){
+		return (Collection<E>)app.getDatabase().getAll(source, map, order);
 	}
 	
 	@SuppressWarnings("unchecked")
 	public Collection<E> findAll(String[] values, String[] columns){
-		return (Collection<E>)app.getDatabase().findAll(source, values, columns);
+		return (Collection<E>)app.getDatabase().findAll(source, values, columns, null, null);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Collection<E> findAll(String[] values, String[] columns, Map<String,String> constraints){
-		return (Collection<E>)app.getDatabase().findAll(source, values, columns, constraints);
+	public Collection<E> findAll(String[] values, String[] columns, Map<String,String> constraints, Map<String,String> order){
+		return (Collection<E>)app.getDatabase().findAll(source, values, columns, constraints, order);
 	}
 	
 	public void store(E o){

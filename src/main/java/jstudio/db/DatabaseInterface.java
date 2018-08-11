@@ -13,7 +13,8 @@ public interface DatabaseInterface {
 		KEY_HOST = "db.host",
 		KEY_NAME = "db.name",
 		KEY_USER = "db.user",
-		KEY_PASS = "db.password";
+		KEY_PASS = "db.password",
+		KEY_QUERYLIMIT = "db.query.limit";
 	
 	public static final String
 		/* sqlite default configuration */
@@ -29,6 +30,9 @@ public interface DatabaseInterface {
 		DEF_NAME = "none",
 		DEF_USER = "",
 		DEF_PASS = "";
+	
+	public static final int
+		DEF_QUERYLIMIT = 3;
 
 	public void connect(String host, String table, String user, String pass) throws Exception;
 	public void close();
@@ -41,11 +45,10 @@ public interface DatabaseInterface {
 	public void initialize(String table, Class<?> c);
 	public DatabaseObject store(String table, DatabaseObject o);
 	public void delete(String table, DatabaseObject o);
-	public List<? extends DatabaseObject> getAll(String table);
 	public List<? extends DatabaseObject> getAll(String table, String column);
 	public DatabaseObject get(String table, int id);
 	public List<? extends DatabaseObject> getBetween(String table, String field, String from, String to);
-	public List<? extends DatabaseObject> getAll(String table, Map<String, String> values);
+	public List<? extends DatabaseObject> getAll(String table, Map<String, String> values, Map<String, String> order);
 	public List<? extends DatabaseObject> findAll(String table, String[] values, String[] columns);
-	public List<? extends DatabaseObject> findAll(String source, String[] values, String[] columns, Map<String, String> constraints);
+	public List<? extends DatabaseObject> findAll(String source, String[] values, String[] columns, Map<String, String> constraints, Map<String, String> order);
 }

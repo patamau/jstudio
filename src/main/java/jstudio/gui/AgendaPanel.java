@@ -306,7 +306,7 @@ public class AgendaPanel
 				"lastname"};
 		Map<String,String> constraints = new HashMap<String,String>();
 		constraints.put("date", Agenda.dayDateFormat.format(getDate()));
-		Collection<Event> ts = ((Agenda)controller).findAll(vals, cols, constraints);
+		Collection<Event> ts = ((Agenda)controller).findAll(vals, cols, constraints, null);
 		logger.debug("Filtering by "+text+" returned "+ts);
 		if(ts!=null){
 			for(Event t: ts){

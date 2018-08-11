@@ -28,6 +28,7 @@ import jstudio.model.Event;
 import jstudio.model.Invoice;
 import jstudio.model.Person;
 import jstudio.model.Product;
+import jstudio.util.Configuration;
 import jstudio.util.Language;
 
 import org.apache.log4j.BasicConfigurator;
@@ -54,7 +55,7 @@ public class SqlDB implements DatabaseInterface {
 		db.store(null, new Invoice(2l));
 		db.store(null, new Invoice(3l));
 		db.executeQuery("SELECT MAX(id) FROM invoice");
-		List<? extends DatabaseObject> list = db.getAll("invoice");
+		List<? extends DatabaseObject> list = db.getAll("invoice", null, null);
 		for (DatabaseObject o : list) {
 			logger.debug(o.toString());
 		}
@@ -342,7 +343,7 @@ public class SqlDB implements DatabaseInterface {
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		for (String source : getTables()) {
 			logger.info("Starting to dump " + source);
-			List<DatabaseObject> data = getAll(source);
+			List<DatabaseObject> data = (List<DatabaseObject>) getAll(source, null, null);
 			for (DatabaseObject d : data) {
 				oos.writeObject(d);
 			}
@@ -675,9 +676,10 @@ public class SqlDB implements DatabaseInterface {
 					} else {
 						// logger.debug("Loading connected entities "+tab+" for "+o.getClass().getSimpleName()+" "+o.getId());
 						// loading the connected entity
+						int limit = Configuration.getGlobal(KEY_QUERYLIMIT, DEF_QUERYLIMIT);
 						List<DatabaseObject> res = execute(tab,
 								"SELECT * FROM " + tab + " WHERE id=" + id
-										+ " LIMIT 1;", o);
+										+ " LIMIT " + limit + ";", o);
 						if (res.size() > 0) {
 							f.set(o, res.get(0));
 						} else {
@@ -690,24 +692,13 @@ public class SqlDB implements DatabaseInterface {
 		}
 		return l;
 	}
-
-	@Override
-	public List<DatabaseObject> getAll(String table) {
-		table = table.toLowerCase();
-		String sql = new String("SELECT * FROM " + table + ";");
-		try {
-			return execute(table, sql, null);
-		} catch (Exception e) {
-			logger.error(sql, e);
-		}
-		return null;
-	}
-
+	
 	@Override
 	public List<? extends DatabaseObject> getAll(String table, String column) {
 		table = table.toLowerCase();
+		int limit = Configuration.getGlobal(KEY_QUERYLIMIT, DEF_QUERYLIMIT);
 		String sql = new String("SELECT * FROM " + table + " GROUP BY "
-				+ column + ";");
+				+ column + " LIMIT " + limit + ";");
 		try {
 			return execute(table, sql, null);
 		} catch (Exception e) {
@@ -719,8 +710,7 @@ public class SqlDB implements DatabaseInterface {
 	@Override
 	public DatabaseObject get(String table, int id) {
 		table = table.toLowerCase();
-		String sql = new String("SELECT * FROM " + table + " WHERE id=" + id
-				+ ";");
+		String sql = new String("SELECT * FROM " + table + " WHERE id=" + id + ";");
 		try {
 			List<DatabaseObject> l = execute(table, sql, null);
 			if (l.size() > 0)
@@ -738,9 +728,21 @@ public class SqlDB implements DatabaseInterface {
 	public List<? extends DatabaseObject> getBetween(String table,
 			String field, String from, String to) {
 		table = table.toLowerCase();
-		String sql = new String("SELECT * FROM " + table + " WHERE " + field
-				+ " BETWEEN '" + from + "' AND '" + to + "' ORDER BY " + field
-				+ ";");
+		int limit = Configuration.getGlobal(KEY_QUERYLIMIT, DEF_QUERYLIMIT);
+		StringBuffer sb = new StringBuffer("SELECT * FROM ");
+		sb.append(table);
+		sb.append(" WHERE ");
+		sb.append(field);
+		sb.append(" BETWEEN '");
+		sb.append(from);
+		sb.append("' AND '");
+		sb.append(to);
+		sb.append("' ORDER BY ");
+		sb.append(field);
+		sb.append(" LIMIT ");
+		sb.append(limit);
+		sb.append(';');
+		String sql = sb.toString();
 		try {
 			return execute(table, sql, null);
 		} catch (Exception e) {
@@ -750,30 +752,51 @@ public class SqlDB implements DatabaseInterface {
 	}
 
 	@Override
-	public List<? extends DatabaseObject> getAll(String table,
-			Map<String, String> values) {
-		// if no values specified, bounce to default getAll
-		if (null == values || 0 == values.keySet().size())
-			return getAll(table);
+	public List<? extends DatabaseObject> getAll(String table, Map<String, String> values, Map<String, String> order) {
 		if (!isConnected())
 			return null;
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT * FROM ");
 		sb.append(table.toLowerCase());
-		sb.append(" WHERE ");
-		int siz = values.size();
-		for (String k : values.keySet()) {
-			sb.append(k);
-			sb.append("='");
-			sb.append(values.get(k));
-			sb.append("'");
-			siz--;
-			if (siz > 0) {
-				sb.append(" AND ");
+		if(null != values) {
+			int siz = values.size();
+			if(siz>0) {
+				sb.append(" WHERE ");
+			}
+			for (String k : values.keySet()) {
+				sb.append(k);
+				sb.append("='");
+				sb.append(values.get(k));
+				sb.append("'");
+				siz--;
+				if (siz > 0) {
+					sb.append(" AND ");
+				}
 			}
 		}
+		if(null != order) {
+			int ksiz = order.keySet().size();
+			if(ksiz>0) {
+				sb.append(" ORDER BY ");
+			}
+			for (String k: order.keySet()) {
+				sb.append(k);
+				sb.append(" ");
+				sb.append(order.get(k));
+				ksiz--;
+				if(ksiz>0) {
+					sb.append(", ");
+				}
+			}
+		}
+		int limit = Configuration.getGlobal(KEY_QUERYLIMIT, DEF_QUERYLIMIT);
+		sb.append(" LIMIT ");
+		sb.append(limit);
+		sb.append(';');
+		String sql = sb.toString();
+		logger.debug(sql);
 		try {
-			return execute(table.toLowerCase(), sb.toString(), null);
+			return execute(table.toLowerCase(), sql, null);
 		} catch (Exception e) {
 			logger.error(sb.toString(), e);
 		}
@@ -781,14 +804,13 @@ public class SqlDB implements DatabaseInterface {
 	}
 
 	@Override
-	public List<? extends DatabaseObject> findAll(String table,
-			String[] values, String[] columns) {
-		return findAll(table, values, columns, new HashMap<String, String>());
+	public List<? extends DatabaseObject> findAll(String table, String[] values, String[] columns) {
+		return findAll(table, values, columns, null, null);
 	}
 
 	@Override
 	public List<? extends DatabaseObject> findAll(String source,
-			String[] values, String[] columns, Map<String, String> constraints) {
+			String[] values, String[] columns, Map<String, String> constraints, Map<String, String> order) {
 
 		// building query
 		StringBuffer sb = new StringBuffer();
@@ -815,19 +837,41 @@ public class SqlDB implements DatabaseInterface {
 				sb.append(" AND ");
 			}
 		}
-		int ksiz = constraints.keySet().size();
-		for (String k : constraints.keySet()) {
-			if (ksiz > 0)
-				sb.append(" AND ");
-			sb.append(k);
-			sb.append(" LIKE '%");
-			sb.append(constraints.get(k));
-			sb.append("%'");
-			ksiz--;
+		if(null != constraints) {
+			int ksiz = constraints.keySet().size();
+			for (String k : constraints.keySet()) {
+				if (ksiz > 0)
+					sb.append(" AND ");
+				sb.append(k);
+				sb.append(" LIKE '%");
+				sb.append(constraints.get(k));
+				sb.append("%'");
+				ksiz--;
+			}
 		}
-
+		if(null != order) {
+			int ksiz = order.keySet().size();
+			if(ksiz>0) {
+				sb.append(" ORDER BY ");
+			}
+			for (String k: order.keySet()) {
+				sb.append(k);
+				sb.append(" ");
+				sb.append(order.get(k));
+				ksiz--;
+				if(ksiz>0) {
+					sb.append(", ");
+				}
+			}
+		}
+		int limit = Configuration.getGlobal(KEY_QUERYLIMIT, DEF_QUERYLIMIT);
+		sb.append(" LIMIT ");
+		sb.append(limit);
+		sb.append(';');
+		String sql = sb.toString();
+		logger.debug(sql);
 		try {
-			return execute(source.toLowerCase(), sb.toString(), null);
+			return execute(source.toLowerCase(), sql, null);
 		} catch (Exception e) {
 			logger.error(sb.toString(), e);
 		}

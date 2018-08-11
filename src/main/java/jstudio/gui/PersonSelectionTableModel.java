@@ -6,6 +6,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import jstudio.model.Person;
+import jstudio.util.CustomRowSorter;
 import jstudio.util.Language;
 
 @SuppressWarnings("serial")
@@ -21,8 +22,7 @@ public class PersonSelectionTableModel extends DefaultTableModel {
 	public PersonSelectionTableModel(JTable table) {
 		super(cols, 0);
 		table.setModel(this);
-		table.setAutoCreateRowSorter(true);
-		table.getRowSorter().toggleSortOrder(0);
+		table.setRowSorter(new CustomRowSorter(this));
 		table.getRowSorter().toggleSortOrder(0);
 	}
 
