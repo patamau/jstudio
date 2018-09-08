@@ -224,7 +224,9 @@ public abstract class EntityManagerPanel<T extends DatabaseObject>
 		if(e.getClickCount()==2){
 			int row = table.rowAtPoint(e.getPoint());
 			if(row>=0){
-				showEntity((T)table.getValueAt(row, 0), false);
+				final T stub = (T)table.getValueAt(row, 0);
+				final T actual = controller.get(stub.getId().intValue());
+				showEntity(actual, false);
 			}
 		}
 	}

@@ -186,7 +186,7 @@ public class SqlDB implements DatabaseInterface {
 	private void initialize(Class<?> c) {
 		String classname = getClassTable(c);
 		if (initCache.get(classname) != null) {
-			// logger.warn("Table "+classname+" already initialized");
+			logger.warn("Table "+classname+" already initialized");
 			return;
 		} else {
 			initCache.put(classname, c);
@@ -195,9 +195,9 @@ public class SqlDB implements DatabaseInterface {
 		int factual = 0;
 		for (Field f : getFields(c)) {
 			String fname = f.getName();
-			// logger.debug(fname+" "+f.getType().getName()+" "+getGenericType(f));
 			String ftype = f.getType().getSimpleName();
 			String fdef = (factual > 0 ? ", " : "") + fname;
+			logger.debug(fname+" "+fname+" "+ftype+" "+fdef);
 			try {
 				switch (EntryType.valueOf(ftype)) {
 				case Integer:
@@ -246,7 +246,6 @@ public class SqlDB implements DatabaseInterface {
 			++factual;
 			sql += fdef;
 		}
-
 		sql += ");";
 		// logger.debug(sql);
 		Statement s = null;
@@ -560,9 +559,12 @@ public class SqlDB implements DatabaseInterface {
 			}
 		}
 	}
+	
+	private List<DatabaseObject> execute(String table, String sql, DatabaseObject parent) throws Exception {
+		return execute(table, sql, parent, false);
+	}
 
-	private List<DatabaseObject> execute(String table, String sql,
-			DatabaseObject parent) throws Exception {
+	private List<DatabaseObject> execute(String table, String sql, DatabaseObject parent, boolean recurse) throws Exception {
 		Class<?> c = this.initCache.get(table);
 		if (c == null) {
 			throw new RuntimeException("Class " + table
@@ -574,7 +576,7 @@ public class SqlDB implements DatabaseInterface {
 		try {
 			s = connection.createStatement();
 			rs = s.executeQuery(sql);
-			l = getMapped(rs, c, parent);
+			l = getMapped(rs, c, parent, recurse);
 		} catch (Exception e) {
 			logger.debug("executing " + sql, e);
 		} finally {
@@ -589,8 +591,7 @@ public class SqlDB implements DatabaseInterface {
 		return l;
 	}
 
-	private List<DatabaseObject> getMapped(ResultSet rs, Class<?> c,
-			DatabaseObject parent) throws Exception {
+	private List<DatabaseObject> getMapped(ResultSet rs, Class<?> c, DatabaseObject parent, boolean recurse) throws Exception {
 		Field[] fs = this.getFields(c);
 		List<DatabaseObject> l = new ArrayList<DatabaseObject>();
 		while (rs.next()) {
@@ -624,25 +625,29 @@ public class SqlDB implements DatabaseInterface {
 						break;
 					case Collection:
 					case List:
-						// the list or set requires referring table access, list is also ordered by id
-						String listTable = getCollectionsTable(f);
-						List<DatabaseObject> _l = execute(listTable,
-								"SELECT * FROM " + listTable + " WHERE "
-										+ c.getSimpleName().toLowerCase() + "="
-										+ o.getId() // + " ORDER BY id"
-										, o);
-						f.set(o, _l);
+						if(recurse) {
+							// the list or set requires referring table access, list is also ordered by id
+							String listTable = getCollectionsTable(f);
+							List<DatabaseObject> _l = execute(listTable,
+									"SELECT * FROM " + listTable + " WHERE "
+											+ c.getSimpleName().toLowerCase() + "="
+											+ o.getId() // + " ORDER BY id"
+											, o);
+							f.set(o, _l);
+						}
 						// logger.debug("Set list of "+f.getName()+" "+ftype+" for "+o.getId()+" where parent is "+parent);
 						break;
 					case Set:
-						// the list or set requires referring table access, list is also ordered by id
-						String setTable = getCollectionsTable(f);
-						List<DatabaseObject> _li = execute(setTable,
-								"SELECT * FROM " + setTable + " WHERE "
-										+ c.getSimpleName().toLowerCase() + "="
-										+ o.getId(), o);
-						Set<DatabaseObject> s = new HashSet<DatabaseObject>(_li);
-						f.set(o, s);
+						if(recurse) {
+							// the list or set requires referring table access, list is also ordered by id
+							String setTable = getCollectionsTable(f);
+							List<DatabaseObject> _li = execute(setTable,
+									"SELECT * FROM " + setTable + " WHERE "
+											+ c.getSimpleName().toLowerCase() + "="
+											+ o.getId(), o);
+							Set<DatabaseObject> s = new HashSet<DatabaseObject>(_li);
+							f.set(o, s);
+						}
 						// logger.debug("Set list of "+f.getName()+" "+ftype+" for "+o.getId()+" where parent is "+parent);
 						break;
 					default:
@@ -657,7 +662,6 @@ public class SqlDB implements DatabaseInterface {
 					logger.error("database error for field " + f.getName()
 							+ ": " + e);
 				} catch (IllegalArgumentException e) {
-					//logger.debug(e.getMessage());
 					// custom datatype
 					Long id = 0l;
 					try {
@@ -697,8 +701,17 @@ public class SqlDB implements DatabaseInterface {
 	public List<? extends DatabaseObject> getAll(String table, String column) {
 		table = table.toLowerCase();
 		int limit = Configuration.getGlobal(KEY_QUERYLIMIT, DEF_QUERYLIMIT);
-		String sql = new String("SELECT * FROM " + table + " GROUP BY "
-				+ column + " LIMIT " + limit + ";");
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT * FROM " );
+		sb.append(table);
+		sb.append(" GROUP BY ");
+		sb.append(column);
+		if(limit>0) {
+			sb.append(" LIMIT ");
+			sb.append(limit);
+		}
+		sb.append(";");
+		String sql = sb.toString();
 		try {
 			return execute(table, sql, null);
 		} catch (Exception e) {
@@ -712,7 +725,7 @@ public class SqlDB implements DatabaseInterface {
 		table = table.toLowerCase();
 		String sql = new String("SELECT * FROM " + table + " WHERE id=" + id + ";");
 		try {
-			List<DatabaseObject> l = execute(table, sql, null);
+			List<DatabaseObject> l = execute(table, sql, null, true);
 			if (l.size() > 0)
 				return l.get(0);
 		} catch (Exception e) {
@@ -739,8 +752,10 @@ public class SqlDB implements DatabaseInterface {
 		sb.append(to);
 		sb.append("' ORDER BY ");
 		sb.append(field);
-		sb.append(" LIMIT ");
-		sb.append(limit);
+		if(limit>0) {
+			sb.append(" LIMIT ");
+			sb.append(limit);
+		}
 		sb.append(';');
 		String sql = sb.toString();
 		try {
@@ -789,12 +804,14 @@ public class SqlDB implements DatabaseInterface {
 				}
 			}
 		}
-		int limit = Configuration.getGlobal(KEY_QUERYLIMIT, DEF_QUERYLIMIT);
-		sb.append(" LIMIT ");
-		sb.append(limit);
+		final int limit = Configuration.getGlobal(KEY_QUERYLIMIT, DEF_QUERYLIMIT);
+		if(limit>0) {
+			sb.append(" LIMIT ");
+			sb.append(limit);
+		}
 		sb.append(';');
 		String sql = sb.toString();
-		logger.debug(sql);
+		logger.debug("Getting all: " + sql);
 		try {
 			return execute(table.toLowerCase(), sql, null);
 		} catch (Exception e) {
@@ -809,8 +826,7 @@ public class SqlDB implements DatabaseInterface {
 	}
 
 	@Override
-	public List<? extends DatabaseObject> findAll(String source,
-			String[] values, String[] columns, Map<String, String> constraints, Map<String, String> order) {
+	public List<? extends DatabaseObject> findAll(String source, String[] values, String[] columns, Map<String, String> constraints, Map<String, String> order) {
 
 		// building query
 		StringBuffer sb = new StringBuffer();

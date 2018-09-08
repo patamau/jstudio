@@ -32,7 +32,7 @@ public interface DatabaseInterface {
 		DEF_PASS = "";
 	
 	public static final int
-		DEF_QUERYLIMIT = 3;
+		DEF_QUERYLIMIT = -1; //disabled by default
 
 	public void connect(String host, String table, String user, String pass) throws Exception;
 	public void close();

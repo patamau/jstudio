@@ -2,6 +2,7 @@ package jstudio.report;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,6 +12,7 @@ import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -24,6 +26,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.apache.log4j.Logger;
 
@@ -47,7 +50,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 	//private DefaultTableModel htable, dtable;
 	private JTextField fileField;
 	private JLabel preview;
-	private JButton browseButton, printButton, cancelButton, sendToPrinterButton;
+	private JButton browseButton, printButton, cancelButton, sendToPrinterButton, openFolderButton;
 	//private JComboBox formatBox;
 	private JCheckBox pdfCheck, docCheck, xlsCheck, sysCheck;
 	
@@ -135,7 +138,7 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		gc.gridy++;
 		panel.add(docCheck, gc);
 		xlsCheck = new JCheckBox(Language.string("Xls (eXeL Spreadsheet)"));
-		xlsCheck.setSelected(Configuration.getGlobal(PRINTXLS_KEY, false));
+		//xlsCheck.setSelected(Configuration.getGlobal(PRINTXLS_KEY, false));
 		//gc.gridy++;
 		//panel.add(xlsCheck, gc);
 
@@ -184,8 +187,15 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 		gc.gridx++;
 		gc.weightx=0.0;
 		browseButton = new JButton("...");
+		browseButton.setToolTipText(Language.string("Browse destination"));
 		browseButton.addActionListener(this);
 		panel.add(browseButton,gc);
+		gc.gridx++;
+		gc.weightx=0.0;
+		openFolderButton = new JButton(UIManager.getIcon("FileView.directoryIcon"));
+		openFolderButton.setToolTipText(Language.string("Open destination folder"));
+		openFolderButton.addActionListener(this);
+		panel.add(openFolderButton, gc);
 		gc.gridx=0;
 		gc.gridy++;
 		gc.gridwidth=2;
@@ -331,6 +341,17 @@ public class ReportGeneratorGUI extends JPanel implements ActionListener {
 				((Window)SwingUtilities.getRoot(this)).dispose();
 			}else if(!sel){
 				JOptionPane.showMessageDialog(this, Language.string("Select at least one print option to print the report"), Language.string("Select print options"), JOptionPane.WARNING_MESSAGE);
+			}
+		}else if(src==openFolderButton) {
+			File file = new File (fileField.getText());
+			if(!file.exists()) {
+				file = file.getParentFile();
+			}
+			Desktop desktop = Desktop.getDesktop();
+			try {
+				desktop.open(file);
+			} catch (IOException e1) {
+				logger.error(e1);
 			}
 		}
 	}

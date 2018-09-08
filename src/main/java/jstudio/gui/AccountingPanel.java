@@ -60,8 +60,6 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> implements RowS
 		table.setRowSorter(rowsorter);
 		table.getRowSorter().addRowSorterListener(this);
 		table.getRowSorter().toggleSortOrder(0);
-		rowsorter.setSortable(3, false);
-		rowsorter.setSortable(4, false);
 		
 		JScrollPane scrollpane = new JScrollPane(table);
 		this.add(scrollpane, BorderLayout.CENTER);
@@ -87,7 +85,7 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> implements RowS
 		this.popup = new InvoicePopup(this);
 		scrollpane.addMouseListener(this);
 		table.addMouseListener(this);
-		table.addMouseListener(new PopupListener<Invoice>(table, popup));
+		table.addMouseListener(new PopupListener<Invoice>(this, popup));
 	}
 	
 	public String getLabel(){
@@ -165,17 +163,21 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> implements RowS
 			refresh();
 		}else if(o==newButton){
 			showEntity(new Invoice(), true);
-			this.refresh();
+			//this.refresh();
 		}else if(o==editButton){
 			int row = table.convertRowIndexToModel(table.getSelectedRow());
 			if(row>=0){
-				showEntity((Invoice)model.getValueAt(row, 0), false);
+				Invoice stubInvoice = (Invoice)model.getValueAt(row, 0);
+				Invoice actualInvoice = controller.get(stubInvoice.getId().intValue());
+				showEntity(actualInvoice, false);
 				this.refresh();
 			}
 		}else if(o==viewButton){
 			int row = table.convertRowIndexToModel(table.getSelectedRow());
 			if(row>=0){
-				showEntity((Invoice)model.getValueAt(row, 0), false);
+				Invoice stubInvoice = (Invoice)model.getValueAt(row, 0);
+				Invoice actualInvoice = controller.get(stubInvoice.getId().intValue());
+				showEntity(actualInvoice, false);
 				this.refresh();
 			}
 		}else if(o==deleteButton){
@@ -194,7 +196,8 @@ public class AccountingPanel extends EntityManagerPanel<Invoice> implements RowS
 		}else if(o==printButton){
 			int row = table.convertRowIndexToModel(table.getSelectedRow());
 			if(row<0) return;
-			Invoice context = (Invoice)model.getValueAt(row, 0);
+			Invoice stubInvoice = (Invoice)model.getValueAt(row, 0);
+			Invoice context = controller.get(stubInvoice.getId().intValue());
 			ReportGenerator rg = new ReportGenerator();
 			context.setReport(rg);
 			ReportGeneratorGUI rgui = new ReportGeneratorGUI(rg,"invoice_"+context.getFilePrefix());

@@ -55,6 +55,7 @@ public class AddressBookPanel extends EntityManagerPanel<Person> implements RowS
 		table.setRowSorter(new CustomRowSorter(model));
 		table.getRowSorter().addRowSorterListener(this);
 		table.getRowSorter().toggleSortOrder(0);
+		table.getRowSorter().toggleSortOrder(0);
 
 		JScrollPane scrollpane = new JScrollPane(table);
 		//scrollpane.setPreferredSize(new Dimension(this.getWidth(),this.getHeight()));
@@ -80,7 +81,7 @@ public class AddressBookPanel extends EntityManagerPanel<Person> implements RowS
 		scrollpane.addMouseListener(this);
 		table.addMouseListener(this);
 		this.popup = new PersonPopup(this, controller);
-	    table.addMouseListener(new PopupListener<Person>(table, super.popup));
+	    table.addMouseListener(new PopupListener<Person>(this, super.popup));
 	}
 	
 	public String getLabel(){
@@ -218,7 +219,6 @@ public class AddressBookPanel extends EntityManagerPanel<Person> implements RowS
 		clear();
 		if(ts!=null){
 			for(Person t: ts){
-				logger.debug("person "+t.getLastname()+" "+t.getName());
 				this.addEntity(t);
 			}
 		}else{

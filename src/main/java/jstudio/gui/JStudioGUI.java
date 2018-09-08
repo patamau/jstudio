@@ -90,7 +90,7 @@ public class JStudioGUI extends JFrame implements ActionListener {
 			}			
 		});
 		viewMenu.add(item);
-		panel.refresh();
+		//panel.refresh();
 	}
 	
 	public void createGUI(){

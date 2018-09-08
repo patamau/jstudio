@@ -14,9 +14,7 @@ public class AccountingTableModel extends DefaultTableModel {
 	private static final Object[] cols = new Object[]{
 			Language.string("Number"),
 			Language.string("Date"), 
-			Language.string("Contact"), 
-			Language.string("Description"),
-			Language.string("Total"),
+			Language.string("Contact")
 			};
 	
 	public AccountingTableModel(JTable table) {

@@ -75,7 +75,7 @@ public class ProductTable
 			this.popup = new ProductPopup(this, invoice, accounting);
 			scrollpane.addMouseListener(this);
 			table.addMouseListener(this);
-			table.addMouseListener(new PopupListener<Product>(table, popup));
+			table.addMouseListener(new PopupListener<Product>(this, popup));
 		}
 		
 		JPanel totalPanel = new JPanel(new GridBagLayout());

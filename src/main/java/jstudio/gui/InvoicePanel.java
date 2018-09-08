@@ -27,7 +27,6 @@ import jstudio.model.Person;
 import jstudio.model.Product;
 import jstudio.report.ReportGenerator;
 import jstudio.report.ReportGeneratorGUI;
-import jstudio.util.Configuration;
 import jstudio.util.GUITool;
 import jstudio.util.Language;
 

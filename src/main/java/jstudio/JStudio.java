@@ -49,7 +49,7 @@ import jstudio.util.Resources;
 public class JStudio implements UncaughtExceptionHandler{
 
 	public static final String 
-		VERSION = "0.4a",
+		VERSION = "0.4.1a",
 		BUILD = JStudio.class.getPackage().getImplementationVersion(),
 		AUTHOR = JStudio.class.getPackage().getImplementationVendor(),
 		SPLASH_SCREEN = "splash.png",

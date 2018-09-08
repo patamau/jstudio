@@ -116,7 +116,7 @@ public class AgendaPanel
 		
 		this.popup = new EventPopup(this);
 		table.addMouseListener(this);
-		table.addMouseListener(new PopupListener<Event>(table, popup));
+		table.addMouseListener(new PopupListener<Event>(this, popup));
 	}
 	
 	public String getLabel(){

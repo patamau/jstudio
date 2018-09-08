@@ -5,14 +5,17 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JTable;
 
+import jstudio.control.Controller;
 import jstudio.db.DatabaseObject;
 
 public class PopupListener<Context extends DatabaseObject> extends MouseAdapter {
+	private Controller<Context> controller;
 	private JTable table;
 	private ContextualMenu<Context> popup;
 	
-	public PopupListener(JTable table, ContextualMenu<Context> popup){
-		this.table=table;
+	public PopupListener(EntityManagerPanel<Context> manager, ContextualMenu<Context> popup){
+		this.table=manager.table;
+		this.controller=manager.controller;
 		this.popup=popup;
 	}
 	
@@ -32,7 +35,8 @@ public class PopupListener<Context extends DatabaseObject> extends MouseAdapter 
 	        	int mrow = table.convertRowIndexToModel(row);
 	        	@SuppressWarnings("unchecked")
 				Context c = (Context)table.getModel().getValueAt(mrow, 0);
-	        	popup.setContext(c);
+	        	Context actualContext = controller.get(c.getId().intValue());
+	        	popup.setContext(actualContext);
 	            popup.show(e.getComponent(), e.getX(), e.getY());
         	}
         }
