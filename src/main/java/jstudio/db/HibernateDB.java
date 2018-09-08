@@ -283,7 +283,7 @@ public class HibernateDB implements DatabaseInterface{
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<DatabaseObject> getAll(String source, Map<String, String> values) {
+	public List<DatabaseObject> getAll(String source, Map<String, String> values, Map<String, String> order) {
 		//if no values specified, bounce to default getAll
 		if(null==values||0==values.keySet().size()) return getAll(source);
 		if(!isConnected()) return null;
@@ -337,11 +337,11 @@ public class HibernateDB implements DatabaseInterface{
 	
 	@Override
 	public List<DatabaseObject> findAll(String source, String[] values, String[] columns){
-		return findAll(source, values, columns, new HashMap<String,String>());
+		return findAll(source, values, columns, new HashMap<String,String>(), null);
 	}
 
 	@Override
-	public List<DatabaseObject> findAll(String source, String[] values, String[] columns, Map<String,String> constraints) {
+	public List<DatabaseObject> findAll(String source, String[] values, String[] columns, Map<String,String> constraints, Map<String, String> order) {
 		//if no values specified, bounce to default getAll
 		if(null==values||0==values.length||
 				null==columns||0==columns.length) return getAll(source);
