@@ -36,6 +36,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 	public static final String 
 		PRIVACY_NOTE = "Privacy note",
 		L675_COMPLIANT = "L675 Compliant",
+		TRACEABILITY = "Payment executed by traceable means",
 		INVOICE_REPORT = "report.invoice",
 		INVOICE_REPORT_DEF = "/reports/invoice.jasper";
 	
@@ -51,6 +52,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		codeField;
 	private JCheckBox
 		privacyCheck,
+		traceabilityCheck,
 		noteCheck;
 	private ProductTable productTable;
 	private JButton okButton, cancelButton, printButton, closeButton, deleteButton, editButton, viewButton;
@@ -108,6 +110,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		
 		noteCheck = GUITool.createCheck(head, gc, Language.string("L675 Compliant Check"), entity.getNote(), editable);
 		privacyCheck = GUITool.createCheck(head, gc, Language.string("Privacy Check"), entity.getPrivacy(), editable);
+		traceabilityCheck = GUITool.createCheck(head, gc, Language.string("Traceability"), entity.getTraceability(), editable);
 		
 		JPanel body = new JPanel(new BorderLayout());
 		
@@ -191,6 +194,7 @@ public class InvoicePanel extends EntityPanel<Invoice> {
 		if(entity.getNumber()==0) entity.setNumber(((Accounting)controller).getNextInvoiceNumber(entity.getDate()));
 		entity.setNote(noteCheck.isSelected()?L675_COMPLIANT:"");
 		entity.setPrivacy(privacyCheck.isSelected()?PRIVACY_NOTE:"");
+		entity.setTraceability(traceabilityCheck.isSelected()?TRACEABILITY:"");
 		controller.store(entity);
 		return true;
 	}

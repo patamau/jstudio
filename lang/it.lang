@@ -1,5 +1,5 @@
 #italiano it - v.0.3
-#Thu Jan 14 15:34:37 CET 2016
+#Mon Apr 03 21:04:48 CEST 2023
 Driver\:=Driver\:
 Extensions\ added\ automatically=Estensioni aggiunte automaticamente
 Invoice\ id\ error=Id fattura errato
@@ -30,6 +30,7 @@ Help=Aiuto
 Person\ dialog=Interfaccia Persona
 Select\ Person=Seleziona Persona
 Initializing\ data...=Inizializzazione dati...
+Traceability=Pagemento tracciato
 Ready...=Pronto...
 Products=Prodotti
 Test=Test
@@ -39,7 +40,7 @@ Quit=Esci
 Loading\ {0}...=Loading {0}...
 Xls\ (eXeL\ Spreadsheet)=Xls (eXeL Spreadsheet)
 Preview\ error=Preview error
-Privacy\ note=Fattura non trasmessa al sistema tessera sanitaria ai fini della predisposizione del 730 precompilato, per opposizione dell\'assistito ai sensi dell\'art.3 d.m. 31/07/2015 e dell'art.7 (diritti dell\'interessato D.gls. 196/2003 e ss.mm.ii.)
+Privacy\ note=Fattura non trasmessa al sistema tessera sanitaria ai fini della predisposizione del 730 precompilato, per opposizione dell'assistito ai sensi dell'art.3 d.m. 31/07/2015 e dell'art.7 (diritti dell'interessato D.gls. 196/2003 e ss.mm.ii.)
 Stamp\ format\ error=Errore formato bollo
 Stamp=Bollo
 Connection...=Connessione...
@@ -149,6 +150,7 @@ Report=Modulo
 Ready\!=Pronto\!
 Fri=Ven
 Are\ you\ sure\ you\ want\ to\ remove\ {0}?=Are you sure you want to remove {0}?
+Unable\ to\ access\ {0}=Unable to access {0}
 Description=Descrizione
 Uncaught\ exception=Eccezione
 Date\ Picker=Selezione Data
@@ -162,5 +164,6 @@ Cancel=Annulla
 An\ invoice\ with\ the\ same\ number\ already\ exists=Una fattura con lo stesso numero gi\u00E0 esiste
 L675\ compliant=L675 compliant
 Lastname=Cognome
+Payment\ executed\ by\ traceable\ means=Pagamento effettuato per mezzo tracciato
 Sun=Sole
 <<=<<

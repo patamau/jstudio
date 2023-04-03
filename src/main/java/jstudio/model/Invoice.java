@@ -5,12 +5,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import jstudio.db.DatabaseObject;
 import jstudio.gui.InvoicePanel;
@@ -33,7 +29,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 
 	private Long id, number;
 	private Date date;
-	private String name, lastname, address, city, province, cap, code, note, privacy;
+	private String name, lastname, address, city, province, cap, code, note, privacy, traceability;
 	private Float stamp;
 	private Collection<Product> products;
 	private transient boolean modified;
@@ -81,7 +77,14 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 	
 	public void setPrivacy(final String privacy){
 		this.privacy = privacy;
-		System.out.println("privacy set to "+privacy);
+	}
+	
+	public String getTraceability() {
+		return traceability==null?"":traceability;
+	}
+	
+	public void setTraceability(final String traceability){
+		this.traceability = traceability;
 	}
 	
 	public String getNote() {
@@ -255,6 +258,7 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		map.put("stamp", Product.formatCurrency(stamp));
 		map.put("note", Language.string(note));
 		map.put("privacy", Language.string(privacy));
+		map.put("traceability", Language.string(traceability));
 		return map;
 	}
 	
@@ -271,5 +275,6 @@ public class Invoice implements DatabaseObject, Comparable<Invoice> {
 		rg.setHeadValue("stamp", Product.formatCurrency(this.getStamp()));
 		rg.setHeadValue("totalcost", Product.formatCurrency(this.getTotal()));
 		rg.setHeadValue("privacy", Language.string(this.getPrivacy()));
+		rg.setHeadValue("traceability", Language.string(this.getTraceability()));
 	}
 }
